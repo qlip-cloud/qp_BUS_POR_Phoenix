@@ -1,0 +1,289 @@
+{% extends "qp_phonix_front/templates/main.html" %}
+
+{% block alphas_js %}
+<script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js" integrity="sha256-hlKLmzaRlE8SCJC1Kw8zoUbU8BxA+8kR3gseuKfMjxA=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
+<script src="/assets/qp_phonix_front/js/item_formulary.js"></script>
+<script src="/assets/qp_phonix_front/js/item_formulary_filter.js"></script>
+<script src="/assets/qp_phonix_front/js/img_detail.js"></script>
+
+
+</script>
+{% endblock %}
+{% block alphas_ccs %}
+
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.css" />
+
+<link rel="stylesheet" href="/assets/qp_phonix_front/css/img_detail.css">
+<link rel="stylesheet" href="/assets/qp_phonix_front/css/loader.css">
+<link rel="stylesheet" href="/assets/qp_phonix_front/css/general.css">
+
+{% endblock %}
+
+{% block section_title %}                 
+
+{%for item_group in item_groups%}
+
+    <input type="hidden" id="item_group_{{item_group.title}}" value="{{item_group.activated_filter}}">
+    
+    {%if item_group.title.lower() == item_group_select.lower() %}
+        <a  data-item-group = "{{item_group.title}}" class="item_group">{{item_group.title}}</a>
+    {%else%}
+        <a  data-item-group = "{{item_group.title}}" data-shipping-type = "{{shipping_method_select}}" data-shipping-date = "{{shipping_date_select}}" class="inactive item_group">{{item_group.title}}</a>
+    {%endif%}
+{%endfor%}
+<input type="hidden" id="item_group_active" value = "{{item_group_select}}">
+
+{% endblock %}
+{% block button_title %}
+
+<style>
+    table{
+        width: 100%;
+        border: 0 !important;
+    }
+    table.item_list  thead th {
+        background-color: #4D6444;
+        color: #FFFFFF;
+        font: normal normal bold 14px/38px Montserrat;
+        border: 1px solid #C8C8C8;
+    }
+
+    table tbody td{
+        font: normal normal medium 14px/41px Montserrat;
+        letter-spacing: 0px;
+        color: #4D6444;
+        opacity: 1;
+        border: 1px solid #C8C8C8;
+    }
+    .lateralleft{
+        border-left: 0 !important;
+    }
+    .lateralright{
+        border-right: 0 !important;
+    }
+
+    .button-new .btn{
+        background-color: #BCC6B8;
+        color: #FFFFFF;
+        font: normal normal medium 14px/24px Montserrat;
+        width: 100%;
+    }
+    .margin-left{
+        margin-left: 10px;
+    }
+
+    .filter_label{
+        color: #858585 !important;
+    }
+
+    .item_img{
+        width: 70px; 
+        height: 70px;
+    }
+
+    .padding_list{
+        padding: 10px;
+    }
+
+    .filter-option{
+        color: #FFFFFF;
+    }
+
+    .item_select{
+        color: #858585 !important;
+    }
+    .bootstrap-select{
+        width: 100% !important;
+    }
+    .dropdown-menu{
+        min-width: 100% !important;
+    }
+
+
+    /*.btn.filter_style{
+        background-color: rgba(70, 88, 63, 0.07) !important;
+        color: #4d6444 !important;
+    }*/
+
+    .link_abc{
+        margin-right: 0.5em;
+        text-decoration: underline !important;
+        color: #4D6444 !important;
+        cursor: pointer;
+        }
+    
+    .link_abc.selected{
+        text-decoration: none !important;
+         
+    }
+
+    .row-abc{
+        padding-bottom: 30px;
+        padding-top: 20px;
+    }
+
+    .filter-abc{
+
+        display: none;
+
+    }
+
+    #select_shipping_method {
+    margin: 0 auto;
+    display: block;
+}
+  
+.tooltip {
+    z-index: 2000;
+}
+
+button {
+    background: aqua;
+    padding:10px;
+  } 
+  
+  .tool-tip[title-new]:hover:after {
+      content: attr(title-new);
+      position: absolute;
+      border: #c0c0c0 1px dotted;
+      padding: 10px;
+      left: 300px;
+      display: block;
+      z-index: 1000000;
+      background-color: #000000;
+      color: #ffffff;
+      max-width: 600px;
+      width: 200px;
+      text-decoration: none;
+      text-align:left;
+      font-size: 10px;
+    }
+    #tool-tip-div{
+        position: fixed;
+        z-index: 100; /*Crea una capa nueva por encima, si tenemos una con valor 2 estará a una altura o por encima de una con 
+                        valor 1*/
+        /*margin-left:65%; /*Con este margen posicionamos el div donde queramos*/
+        border: #c0c0c0 1px dotted;
+        border-radius: 5px;
+        padding: 10px;
+        /*left: 300px;*/
+        z-index: 1000000;
+        background-color: rgba(0, 0, 0, 0.8);
+        color: rgba(255, 255, 255, 1);
+        max-width: 400px;
+        text-decoration: none;
+        text-align:left;
+        font-size: 12px;
+
+    }
+    #tool-tip-div div{
+        color: #FFFFFF;
+
+    }
+    #tool-tip-div ul{
+        list-style: none;
+        margin-left: -2em;
+        color: #FFFFFF;
+    }
+    .button-master disabled,
+    .button-master[disabled]{
+        opacity: 0.65;
+    }
+</style>
+    <input type="hidden" id="order_id" value="{{order.so_name if order else ''}}">
+    <div class="row " style="padding-top: 20px;">
+       
+        
+
+    </div>
+    <div class="row">
+        <div class="col-md-3">
+            <div class="form-group">
+                <select class="selectpicker filter_style" data-selected-text-format="count" id= "select-Categoria" data-array = "{{Categoria_list_array}}" multiple data-live-search="true">
+
+                    {%for Categoria in Categoria_list %}
+                        <option class="option select-Categoria {{Categoria.class}} {{Categoria.id}}" value="{{Categoria.code}}">{{Categoria.title}}</option>
+
+                    {%endfor%}
+
+                </select>
+            </div>
+
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <select class="selectpicker filter_style"   data-selected-text-format="count" id= "select-SubCategoria" multiple data-live-search="true">
+
+                    {%for SubCategoria in SubCategoria_list %}
+                        <option  data-active-count={{SubCategoria.Categoria_ids|count}} value="{{SubCategoria.code}}" class="select-option {{SubCategoria.class}} ">{{SubCategoria.title}}</option>
+
+                    {%endfor%}
+                    
+                </select>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-2 text-left ">
+            <div class="row" style="position: absolute; bottom:15px">
+                <a id="filter_clear">filter clear</a>
+            </div>
+            
+        </div>
+
+        <div class="col-md-2 button-new">
+            <button id="confirm_draft"  disabled class="button-master button-default" style="width: 100%; " >CONFIRM ORDER</button>
+        </div>
+        <div class="col-md-2 button-new">
+            <button class="button-master button-default" disabled id= "save_draft" style="width: 100%;" >SAVE DRAFT</button>
+        </div>
+    </div>
+    
+    <div class="row">
+        
+    </div>
+    <input type="hidden" id="is_filter_abc" value="{{is_filter_abc}}">
+    <div class="row " >
+        <div class="col-sm-5 text-left row-abc">
+            <input type="text" id = "filter_text" class="form-control" name="" id="" placeholder="Search by name">
+        </div>
+        <div class="col-sm-7 text-right row-abc filter-abc">
+            <span class= "filter_label">Name: </span> 
+            {%for abc in filter_abc%}
+                <a class="link_abc" data-value="{{abc}}">{{abc}}</a>
+            {%endfor%}      
+        </div>     
+    </div>
+    <!--p>hover on the button below to check the results</p>
+    <button class="tool-tip">Here I am</button-->
+{% endblock %}
+{% block principal_content %}
+    <div class="alert alert-danger connection-alert" style="display: none;" role="alert">
+        Fail connection to internet network
+    </div>
+    <div id="table_content">
+        <input type="hidden" data-time = "{{autosave_control}}" value = "0" id = "save_control">
+        {% include "qp_phonix_front/templates/item_formulary/table.html" %}    
+    </div>
+
+
+<!-- The Modal -->
+<div id="myModal" class="modal_img">
+
+    <!-- The Close Button -->
+    <span class="close_mymodal">&times;</span>
+        <img class="modal-content-img" id="img01" alt="asdasdasd">
+        
+    <div id="caption" >This is a reference image, the product may vary</div>
+
+    <!-- Modal Content (The Image) -->
+  
+    <!-- Modal Caption (Image Text) -->
+
+  </div>
+
+
+{% endblock %}

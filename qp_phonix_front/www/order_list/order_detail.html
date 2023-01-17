@@ -1,0 +1,267 @@
+{% extends "qp_phonix_front/templates/main.html" %}
+
+{% block section_title %}
+    {%if is_valid%}                
+        {{ _("Your Order") }} #{{order.so_name}} : {{order.status}} - {{order.qp_gp_status}}
+    {%endif%}
+{% endblock %}
+
+{% block button_title %}
+    <a id="btn_back_orders" class="btn button-master button-back">
+        {{ _("BACK TO ORDERS") }}
+    </a> 
+            
+{% endblock %}
+
+{% block principal_content %}
+
+<style>
+    .datepicker_confirm{
+        background: rgba(77, 100, 68, 0.07);
+        color: #4D6444;
+        box-shadow: none;
+        width: 100%;
+        height: 47px;
+    }
+
+    .form-control.quantity{
+        height:100% !important; 
+        margin: 0 !important; 
+        padding: 0 !important;
+    }
+
+
+    .cell_empty{
+        height: 38px;
+        
+    }
+
+    .modal .modal-footer{
+        justify-content: right;
+    }
+
+    .modal-message{
+        text-align: left;
+        font: normal normal 600 24px/36px Montserrat;
+        letter-spacing: 0px;
+        color: #666A65;
+        opacity: 1;
+        margin-bottom: 10px;
+
+    }
+
+    .modal-title{
+        text-align: left;
+        font: normal normal bold 30px/82px Montserrat;
+        letter-spacing: 0px;
+        color: #4D6444;
+        opacity: 1;
+        margin-top: 50px;
+    }
+
+</style>
+
+
+
+<div class="row"  style="margin-top: 30px;">
+    {%if is_valid%}
+
+        <div class="col-sm-3" style="margin-right: 1em; max-width: 23%;">
+            <div class="row shadow p-3 mb-5 bg-white rounded">
+                <div class="col-md-12 subtitle">
+                    Your information
+                </div>
+                <div class="col-md-12 label">
+                    Company
+                </div>
+                <div class="col-md-12 info background-info information_label">
+                    {{order.company}}
+                </div>
+                <div class="col-md-12 label">
+                    Name
+                </div>
+                <div class="col-md-12 info background-info information_label">
+                    {{order.customer_name}}
+                </div>
+                <div class="col-md-12 label">
+                    Address
+                </div>
+                <div class="col-md-12 info background-info information_label">
+                    {{order.address_line1}}
+                </div>
+                <div class="col-md-12 label">
+                    City
+                </div>
+                <div class="col-md-12 info background-info information_label">
+                    {{order.city}}
+                </div>
+                <div class="col-md-12 label">
+                    ZIP codes
+                </div>
+                <div class="col-md-12 info background-info information_label">
+                    {{order.pincode}}
+                </div>
+                <div class="col-md-12 label">
+                    Contact number
+                </div>
+                <div class="col-md-12 info background-info information_label">
+                    {{order.phone}}
+                </div>
+            </div>
+        </div>
+    
+        <div class="col-sm-9">
+            <div class="row">
+            <div class="col-sm-9 shadow p-3 mb-5 bg-white rounded" style="max-width: 72%; margin-right: 0.75em;">
+                <div class="col">
+                    <div class="row">
+                        <div class=" col-md-12 subtitle">
+                            Delivery information
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-8">
+                            Property
+                        </div>
+                        <div class="col-md-4">
+                            Shipping date
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="info background-info information_label">
+                                {{order.qp_reference1}}
+                            </div> 
+                        </div>
+                        <div class="col-md-4">
+                            <div class="background-info information_label">
+                                {{order.shipping_date}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-3 shadow p-3 mb-5 bg-white rounded">
+                <div class=" col-md-12 subtitle">
+                    Total Amount
+                </div>
+                <div class=" col-md-12 title text-right" style="line-height: 48px;">
+                    <span id="total_discount">{{order.total_discount}}</span>
+                </div>
+                <div class=" col-md-12 subtitle text-right">
+                    USD
+                </div>
+            </div>
+        </div>
+            <div class="row">
+                {%if count_change_item_list%}
+                    <div class="col-sm-12">
+                        <div class="alert alert-warning text-center alert-dismissible fade show" role="alert">
+                            Algunos productos fueron eliminados de la listas debido a que ya no estan disponibles
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                              </button>
+                        </div>
+                    </div>
+                {%endif%}
+          
+                <div class="col-sm-12 subtitle">
+                    <div class="row">
+                        <div class="col-sm-3" style="margin-left: -15px; margin-bottom: 15px;">
+                            Products
+                            <input type="hidden" id="order_id" value="{{order.so_name}}">
+                        </div> 
+                    </div>
+                </div>
+                        
+                {%for item in items_select%}
+
+                    <div class="row line row_select" data-price = {{item.price }} data-subtotal = "{{item.price * item.cantidad}}" id = "row-{{item.item_code}}">
+                        <input type="hidden" class="subtotal" value={{item.price * item.cantidad}}>
+                        <div class="col-sm-2" >
+                            <img width="575px" height="575px" class="rounded" src="{{item.image}}" alt="">                       
+                        </div>
+                        <div class="col-sm-10">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <p class="order_id" style="margin-bottom: 0rem;">{{item.item_name}} - {{item.item_group}} &nbsp;
+                                </div>         
+                            </div>
+                            <div class="row label">
+                                <div class="col-sm-2">
+                                    Quantity
+                                </div>
+                                <div class="col-sm-3">
+                                    UOM
+                                </div>
+                                <div class="col-sm-2">
+                                    Price
+                                </div>
+                                <div class="col-sm-1">
+                                    Discount
+                                </div>
+                                <div class="col-sm-2">
+                                    Amount
+                                </div>
+                                <div class="col-sm-2">
+                                    Total
+                                </div>
+                            </div>
+                    
+                            <div class="row info">
+                                <div class="col-sm-2 ">
+                                    <div class="background-info information_label text-right">
+
+                                        <input type="hidden" name="" id="item_id" value="{{item.item_code}}">
+
+                                        {{item.cantidad}}
+
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="background-info information_label">
+                                        Units Increments by {{item.inqt}}
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="background-info information_label text-right">
+                                        {{item.price}}
+                                    </div>
+                                </div>
+                                <div class="col-sm-1">
+                                    <div class="background-info information_label text-right">
+                                        {{item.discount}}
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="background-info information_label text-right">
+                                        {{item.rate}}
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="background-info information_label text-right">
+                                        {{ "%.2f"|format(item.total) }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                            
+                    <hr>
+                    {%endfor%}
+
+
+            </div> 
+        </div> 
+    {%else%}
+    <div class="col-sm-12">    
+        <div class="alert alert-danger text-center" role="alert">
+            Debido a que el producto fue desabilitado la orden ha Sido eliminada
+        </div>
+    </div>
+    {%endif%}
+</div>
+
+{% endblock %}
+
+

@@ -1,0 +1,258 @@
+{% extends "qp_phonix_front/templates/defination.html" %}
+
+
+{% block page_content %}
+{%if has_error%}                      
+        
+    {% include "qp_phonix_front/templates/error_msg.html" %}
+        
+{%else%}
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@1000&display=swap');
+    </style> 
+    <style>
+
+        .ui-datepicker{
+            z-index: 2000 !important;
+            width: 31.5em !important;
+        }
+
+        .ui-datepicker-header{
+            border: 0 !important;
+            color: #4D6444 !important;
+            background: none !important;
+            text-transform: capitalize !important;
+        }
+
+        .ui-datepicker-calendar th{
+            color: #4D6444;
+        }
+
+
+        .ui-datepicker-calendar a{
+            color: #666A65 !important;
+            text-align: center !important;
+        }
+
+        .ui-state-default{
+            text-align: center !important;
+
+        }
+        
+        .ui-state-default{
+            border: 0 !important;
+            background: none !important;
+        }
+
+        .modal-dialog{
+            max-width: 850px !important;
+            margin: 20vh auto;
+        }
+        body {
+            background-image: url("/assets/qp_phonix_front/img/background.png");
+            -webkit-background-size: cover;
+            -moz-background-size: cover;
+            -o-background-size: cover;
+            background-size: cover;
+            overflow: hidden;
+        }
+        .button-master{
+            font-style: normal;
+            font-variant: normal;
+            font-weight: 500;
+            font-family: Montserrat;
+            background: #4D6444 0% 0% no-repeat padding-box;
+            opacity: 1;   
+            color: #FFFFFF !important;
+            border: 0;
+            text-align: center;
+        }
+        .title{
+            margin-top: 0.5em;
+            margin-bottom: 0.5em;
+            text-align: center;
+            font: normal normal bold 28px/44px Montserrat;
+            letter-spacing: 0px;
+            color: #4D6444;
+            opacity: 1;
+        }
+
+        .sub-title{
+            font: normal normal bold 34px/44px Montserrat;
+            padding: 25px;
+        }
+
+        .card-title{
+            text-align: left;
+            font: normal normal bold 33px/48px Montserrat;
+            letter-spacing: 0px;
+            color: #4D6444;
+            opacity: 1;
+        }
+
+        .card-text{
+            text-align: left;
+            font: normal normal medium 16px/20px Montserrat;
+            letter-spacing: 0px;
+            color: #666A65;
+            opacity: 1;
+        }
+    .card{
+        width: 368px; 
+        height: 480px; 
+        box-shadow: 0px 0px 20px #00000029;
+        cursor: pointer;
+    }
+
+
+    .svg-icon {
+    width: 5em;
+    height: 5em;
+    }
+
+    .svg-icon path,
+    .svg-icon polygon,
+    .svg-icon rect {
+    fill: #C5C9C4;
+    }
+
+    .svg-icon circle {
+    stroke: #C5C9C4;
+    stroke-width: 1;
+    }
+
+</style>
+        
+    </style>
+
+    <div class="content">
+        <div class="title">
+            Please select the type <br>
+            of product you want to see
+        </div>
+    </div>
+    <div class="content">
+        <div class="row">
+            <div class="col-sm-12">
+
+        <div id="carouselExampleControls" class="carousel slide" data-interval = "false" data-ride="carousel">
+            <div class="carousel-inner">
+
+            {% for pages in page_item_types %}
+            
+            <div class="carousel-item {{'' if loop.index > 1 else active}}">
+                <div class="content" style="padding: 1em;">
+
+                    
+                    <div class="row">
+                        
+                            {% for item_type in pages %}
+                                <div class="col-sm-4">
+                                    
+                                    <div onclick="openmodal('{{item_type.title}}')" class="card" >
+                                    <!--div onclick="openmodal('hola')" class="card" style="width: 368px; height: 450px; box-shadow: 0px 0px 20px #00000029;"-->
+                                        <img class="card-img-top" style="height: 225px;" src="{{item_type.image}}" alt="Card image cap">
+                                        <div class="card-body">
+                                            <h5 class="card-title">{{item_type.title}}</h5>
+                                            <p class="card-text">{{item_type.description}}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        
+
+                        </div>
+                    </div>
+            
+                </div>
+
+                    {%endfor%}
+        
+            </div>
+        </div>
+            </div>
+        </div>
+
+        {%if total_page > 0%}
+            <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
+                <svg class="svg-icon" viewBox="0 0 20 20">
+                    <path d="M11.739,13.962c-0.087,0.086-0.199,0.131-0.312,0.131c-0.112,0-0.226-0.045-0.312-0.131l-3.738-3.736c-0.173-0.173-0.173-0.454,0-0.626l3.559-3.562c0.173-0.175,0.454-0.173,0.626,0c0.173,0.172,0.173,0.451,0,0.624l-3.248,3.25l3.425,3.426C11.911,13.511,11.911,13.789,11.739,13.962 M18.406,10c0,4.644-3.763,8.406-8.406,8.406S1.594,14.644,1.594,10S5.356,1.594,10,1.594S18.406,5.356,18.406,10 M17.521,10c0-4.148-3.373-7.521-7.521-7.521c-4.148,0-7.521,3.374-7.521,7.521c0,4.148,3.374,7.521,7.521,7.521C14.147,17.521,17.521,14.148,17.521,10"></path>
+                </svg>
+            <span class="sr-only">Previous</span>
+            </a>
+            <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next">
+                <svg class="svg-icon" viewBox="0 0 20 20">
+                    <path d="M12.522,10.4l-3.559,3.562c-0.172,0.173-0.451,0.176-0.625,0c-0.173-0.173-0.173-0.451,0-0.624l3.248-3.25L8.161,6.662c-0.173-0.173-0.173-0.452,0-0.624c0.172-0.175,0.451-0.175,0.624,0l3.738,3.736C12.695,9.947,12.695,10.228,12.522,10.4 M18.406,10c0,4.644-3.764,8.406-8.406,8.406c-4.644,0-8.406-3.763-8.406-8.406S5.356,1.594,10,1.594C14.643,1.594,18.406,5.356,18.406,10M17.521,10c0-4.148-3.374-7.521-7.521-7.521c-4.148,0-7.521,3.374-7.521,7.521c0,4.147,3.374,7.521,7.521,7.521C14.147,17.521,17.521,14.147,17.521,10"></path>
+                </svg>
+            <span class="sr-only">Next</span>
+            </a>
+            {%endif%}
+        </div>
+    </div>
+
+    <div class="modal fade" id="delivery_option_modal" tabindex="-1" role="dialog" aria-labelledby="delivery_option_label" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+            <div class="modal-body">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            
+                                
+                            <div class="title sub-title">
+                                Please select <br>
+                                your delivery information
+                            </div>
+                        
+                            
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12 text-center alert hide" style="color: red;">
+                            You must select the type of delivery and the date
+                        </div>
+                    </div>
+                    <div class="row ">
+                        <input type="hidden" name="" id="item_type">
+                        <div class="col-md-8 offset-md-2">
+                            <select class="form-control"  name="" id="select_shipping_method" aria-placeholder="asd">
+                                <option value="Shinpping type" disabled selected>Shipping type</option>
+                                {%for shipping_method in shipping_method_list %}
+                                    <option value="{{shipping_method.name}}" data-toggle="tooltip" data-placement="top" title="{{shipping_method.tooltip.replace('<ul>','').replace('</ul>','').replace('<li>','').replace('</li>','')}}">{{shipping_method.description}}</option>
+                                {%endfor%}
+                            </select>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="row ">
+                        <div class="col-md-8 offset-md-2">
+                            <div class="input-group date">
+                                <input type="text" id="datepicker" class="form-control" value="">
+                                <div class="input-group-addon">
+                                    <span class="glyphicon glyphicon-th"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12" style="text-align: center; padding: 60px;">
+
+                            <button href="" id="find_product" class="btn button-master button-new">
+                                {{ _("FIND PRODUCTS") }}
+                            </button>   
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            
+        </div>
+        </div>
+    </div>
+
+    <div id="loader" class="loader" style="display: none;"></div> 
+    {%endif%}
+
+{% endblock %}

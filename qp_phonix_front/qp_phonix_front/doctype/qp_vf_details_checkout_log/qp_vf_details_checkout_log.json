@@ -1,0 +1,86 @@
+{
+ "actions": [],
+ "creation": "2022-02-21 17:41:01.445862",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "customer",
+  "customer_name",
+  "item_name",
+  "qty",
+  "qty_gp",
+  "sales_order"
+ ],
+ "fields": [
+  {
+   "fieldname": "customer",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "customer"
+  },
+  {
+   "fieldname": "customer_name",
+   "fieldtype": "Data",
+   "label": "customer_name"
+  },
+  {
+   "fieldname": "item_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "item_name"
+  },
+  {
+   "fieldname": "qty",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "qty"
+  },
+  {
+   "fieldname": "qty_gp",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "qty_gp"
+  },
+  {
+   "fieldname": "sales_order",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "sales_order"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2022-02-24 09:42:06.328045",
+ "modified_by": "Administrator",
+ "module": "Qp Phonix Front",
+ "name": "qp_vf_details_checkout_log",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Sales User",
+   "share": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

@@ -1,0 +1,26 @@
+[
+ {
+  "docstatus": 0,
+  "doctype": "Role Profile",
+  "modified": "2022-02-18 09:52:25.028927",
+  "name": "ValleyFloral Access",
+  "parent": null,
+  "parentfield": null,
+  "parenttype": null,
+  "role_profile": "ValleyFloral Access",
+  "roles": [
+   {
+    "parent": "ValleyFloral Access",
+    "parentfield": "roles",
+    "parenttype": "Role Profile",
+    "role": "Customer"
+   },
+   {
+    "parent": "ValleyFloral Access",
+    "parentfield": "roles",
+    "parenttype": "Role Profile",
+    "role": "Sales User"
+   }
+  ]
+ }
+]

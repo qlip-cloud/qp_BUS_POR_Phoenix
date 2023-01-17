@@ -2,11 +2,11 @@ from . import __version__ as app_version
 
 app_name = "qp_phonix_front"
 app_title = "Qp Phonix Front"
-app_publisher = "Rafael Licett"
-app_description = "Phonix Front"
+app_publisher = "Mentum-Alphas"
+app_description = "App of Velleyfloral front"
 app_icon = "octicon octicon-file-directory"
 app_color = "grey"
-app_email = "rafael.licett@mentum.group"
+app_email = "aryrosa.fuentes@alphas.technology"
 app_license = "MIT"
 
 # Includes in <head>
@@ -18,7 +18,7 @@ app_license = "MIT"
 
 # include js, css files in header of web template
 # web_include_css = "/assets/qp_phonix_front/css/qp_phonix_front.css"
-# web_include_js = "/assets/qp_phonix_front/js/qp_phonix_front.js"
+web_include_js = "/assets/qp_phonix_front/js/qp_phonix_front.js"
 
 # include custom scss in every website theme (without file extension ".scss")
 # website_theme_scss = "qp_phonix_front/public/scss/website"
@@ -97,6 +97,12 @@ app_license = "MIT"
 #	}
 # }
 
+doc_events = {
+ 	"User": {
+ 		"after_insert": "qp_phonix_front.qp_phonix_front.uses_cases.user.user_role.set_role_profile_name",
+	}
+}
+
 # Scheduled Tasks
 # ---------------
 
@@ -172,4 +178,23 @@ user_data_fields = [
 # auth_hooks = [
 # 	"qp_phonix_front.auth.validate"
 # ]
+# fixtures
+# -----------------------------------------
 
+fixtures = [
+    {"doctype": "Role", "filters": [
+        [
+            "name", "in", [
+                "Customer",
+                "Sales User"
+            ]
+        ]
+    ]},
+	{"doctype": "Role Profile", "filters": [
+        [
+            "name", "in", [
+                "ValleyFloral Access"
+            ]
+        ]
+    ]}
+]

@@ -1,0 +1,82 @@
+import frappe
+import json
+from qp_phonix_front.qp_phonix_front.validations.utils import is_guest
+from qp_phonix_front.qp_phonix_front.uses_cases.front.service import set_shipping_data, set_items_data, set_order_data, get_order_item_list
+from qp_phonix_front.qp_phonix_front.services.try_catch import handler as try_catch
+import frappe
+
+def get_context(context):
+
+    is_guest()
+
+    def callback():
+
+        query_params = frappe.request.args
+
+        context.autosave_control =  get_autosave_control()
+
+        order_id = query_params.get("order_id")
+                
+        if order_id:
+
+            setup_edit(context, order_id)
+
+        else:
+
+            setup_new(context)
+
+    try_catch(callback, context)
+
+def setup_new(context):
+
+    query_params = frappe.request.args
+
+    item_group_select = query_params.get("item_group")
+
+    shipping_method_select = query_params.get("shipping_type")
+    
+    shipping_date_select = query_params.get("shipping_date")
+
+    set_shipping_data(context, item_group_select, shipping_method_select, shipping_date_select)
+
+    set_items_data(context, item_group_select)
+
+def setup_edit(context, order_id):
+
+    item_code_list, items_select = setup_order(context, order_id)
+    
+    set_shipping_data(context, context.order.item_group, context.order.shipping_type, context.order.shipping_date)
+
+    set_items_data(context, context.order.item_group, item_code_list, items_select)
+
+def setup_order(context, order_id):
+
+    set_order_data(context, order_id)
+
+    item_code_list = get_item_code_by_order(context.items_select)
+
+    items_select = get_order_item_list(item_code_list)
+
+    add_qty_item_list(context.items_select, items_select)
+
+    return item_code_list, items_select
+
+def get_item_code_by_order(items_select):
+
+    return list(map(lambda item_select: item_select.get("item_code"), items_select))
+
+def add_qty_item_list(items_select, item_list):
+
+    for item_select in items_select:
+
+        for item in item_list:
+
+            if item_select.get("item_code") == item.get("name"):
+
+                item["cantidad"] =  item_select.get("cantidad")
+
+def get_autosave_control():
+
+    company = frappe.get_last_doc('Company')
+
+    return (company.gp_autosave_control or 10) * 1000

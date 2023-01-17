@@ -1,0 +1,9 @@
+    
+
+    #undo, #filter_clear{
+        text-decoration: underline;
+        font-size: 0.75rem;
+        cursor: pointer;
+        color: #666A65 !important;
+
+    }

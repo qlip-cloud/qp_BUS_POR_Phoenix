@@ -1,0 +1,116 @@
+{% extends "qp_phonix_front/templates/main.html" %}
+
+
+    {% block section_title %}                 
+        {{ _("Your Orders") }}
+    {% endblock %}
+
+    {% block button_title %}
+        <a href="/order/new_type" class="btn button-master button-new button-default">
+            {{ _("NEW ORDER") }}
+        </a>              
+    {% endblock %}
+
+
+    {% block principal_content %}
+
+
+    <style>
+    
+        .Delivery{
+            color: #4D6444;
+            font-weight: 600;
+            font-size: 21px;
+
+        }
+
+        .Delivery{
+            color: #DA6047;
+            font-weight: 600;
+            font-size: 21px;
+
+        }
+
+        .Draft{
+            color: #DA6047;
+            font-weight: 600;
+            font-size: 21px;
+
+        }
+
+        .tab-items {
+            width: 100px;
+            cursor: pointer;
+            border-bottom: solid 2.5px #82927c54;
+            color: #82927c54;
+        }
+
+        .tab-items.active{
+            border-bottom: solid 2.5px #4D6444;
+            color: #4D6444;
+            font-size: larger;
+            
+        }
+
+        .margin.left{
+            margin-left: 20px;
+        }
+
+    </style>
+
+
+        {% if(order_list)%}
+            <div class="container">
+
+                <div class="row text-center">
+                    <div class="tab-items active margin-left" >
+                        Draft
+                    </div>
+                    <div class="tab-items">
+                        Orders
+                    </div>
+                </div> 
+                <div class="row" >
+                    <div class="tab-line">
+                    </div>   
+
+                    <div class="tab-line">
+
+                    </div>   
+                </div>   
+            
+                {%for order in order_list%}
+
+                    <div class="tab-section {{'tab-draft' if order.status == 'Draft' else 'tab-all'}}" style="display:none;">
+
+                        {% include "qp_phonix_front/templates/index_list.html" %}
+                        <hr>
+
+                    </div>
+                        
+
+                {%endfor%}
+
+            </div>
+
+        {%else%}
+
+            <div class="col-sm-12 image" >
+                <img class="img" src="/assets/qp_phonix_front/img/flower-bouquet.png" alt="">
+            </div>
+        
+        
+            <div class="col-sm-12 message" style="min-height: 300px;">
+                You still have no orders created, please create one by clicking create new order
+            </div>
+        
+            <div class="col-sm-12 button-second">
+                    
+                    <a href="/order/new_type" class="btn button-master button-content">
+                        NEW ORDER                            
+                    </a>
+            </div>
+
+        {%endif%}
+    {% endblock %}
+

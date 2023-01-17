@@ -1,0 +1,27 @@
+
+<input type="hidden" id="pagination_control" value = 0>
+<input type="hidden" id="petition_control" value = 0>
+<table class = "item_list" id = "table_item_list" width= 100%>
+    <thead >
+        <th width = 10% class="lateralleft "></th>
+        <th width = 26%><div class="margin-left ">Name </div></th>
+
+        <th ><div class="margin-left ">Product ID</div></th>
+        <th ><div class="margin-left ">Price</div></th>
+        <th ><div class="margin-left ">Discount</div></th>
+        <th ><div class="margin-left ">Inventory</div></th>
+        <th width = 10%><div class="margin-left ">Quantity</div></th>
+        <th  ><div class="margin-left ">UOM</div></th>
+        <th  ><div class="margin-left ">SKU</div></th>
+        
+    </thead>
+    <tbody>
+
+        {% include "qp_phonix_front/templates/item_formulary/row.html" %}    
+
+    </tbody>
+</table>
+
+<div id = "loading" class="text-center" style="display: none;">
+    <img src="/assets/qp_phonix_front/img/loading.gif" style="height: 150px !important;" alt="">
+</div>

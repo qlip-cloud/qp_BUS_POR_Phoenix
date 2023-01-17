@@ -1,0 +1,496 @@
+var mouseX;
+var mouseY;
+$(document).mousemove( function(e) {
+   mouseX = e.pageX; 
+   mouseY = e.pageY;
+});  
+$(document).ready(function() {
+
+
+
+    $("#tool-tip-container").on("mouseover", ".dropdown-item", function(e){
+
+        title_new = $(this).children('.text').text().replace(/\s/g, '');
+    
+        text = $(`.tooltip-data[data-name="${title_new}"]`).val()
+
+        $('#tool-tip-div').css({'top':mouseY + 10,'left':mouseX})
+        $("#tool-tip-div").show()
+        $("#tool-tip-div div").html(text);
+
+        
+    });
+
+    $("#tool-tip-container").on("mouseout", ".dropdown-item", function(){
+
+        $("#tool-tip-div").hide()
+    
+    })
+
+    $("#filter_clear").on("click", function(){
+        reset_filter()
+        $(".selectpicker").selectpicker("deselectAll")
+        $(".selectpicker").selectpicker("refresh")
+        active_item()
+
+    })
+
+
+    $("#filter_text").on("keyup", function(){
+        
+        get_filter_text()
+    })
+
+    
+    item_group_active = $("#item_group_active").val()
+
+    $(`.select-principal.${item_group_active}`).show()
+
+    $(`.select-secundary.${item_group_active}`).show()
+
+    item_group_filter_toggle(item_group_active)
+
+    $(".item_group").on("click", function(){
+
+        item_group_default = $(this).data("item-group")
+
+        item_group_filter_toggle(item_group_default)
+
+        $(".item_group").addClass("inactive")
+
+        $(this).removeClass("inactive")
+
+        get_rows()
+    
+        $(`.select-principal`).hide()
+        $(`.select-secundary`).hide()
+
+        $(`.select-principal.${item_group_default}`).show()
+        $(`.select-secundary.${item_group_default}`).show()
+
+
+    })
+
+
+    $('#select-Categoria').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
+
+        if ((clickedIndex === 0) || (clickedIndex > 0)){
+
+            setup_select_multiple(".option.select-Categoria", ".select-principal", previousValue)              
+
+            select = e.target.options[clickedIndex].value
+            
+            select_Categoria = $(this).val()
+
+            $select_option = $(`.select-option.filter`)
+            
+            if (!(isSelected)){
+
+                if (!$(this).val()){
+
+                    reset_filter()
+
+                }else{
+
+                    visible_filter_select($select_option, select_Categoria)
+
+                }
+
+                $(`.select-option.filter.${select}`).removeAttr("selected")
+
+                $("#select-SubCategoria").selectpicker("refresh")
+
+            }else{
+
+
+                visible_filter_select($select_option, select_Categoria)
+
+            }
+            
+            active_item()
+
+            get_rows()
+
+            if (!(isSelected) && (!$(this).val())){
+
+                get_class($('.item-row.filter:visible'))
+
+            }
+
+        }
+    })
+
+    $('#select-SubCategoria').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
+
+        setup_select_multiple(".select-option", ".select-secundary", previousValue)              
+        
+        active_item()
+        
+        get_rows()
+        
+    })
+    $("#filter_text").val("")
+});
+function get_filter_text(){
+    
+    $('.item-row.filter').hide()
+
+    $(".link_abc").removeClass("selected")
+
+    get_rows()
+
+    $items = setup_filter_text()
+
+    $items.show()
+        
+    get_class($('.item-row.filter:visible'))
+}
+function setup_filter_text(){
+
+    let value = $("#filter_text").val().toUpperCase()
+    
+    $items = $('.item-row.filter').filter( function(index){
+
+
+        if ($(this).data("item-name").toUpperCase().indexOf(value, 0) != -1) 
+            return true;
+    });
+
+    return $items
+    
+}
+
+function visible_filter_select($select_option, select_Categoria){
+    
+    $select_option.hide()
+
+    $("#select-SubCategoria").selectpicker("deselectAll")
+
+    $item = $(".item-row.filter:visible") 
+    
+    /*$select_option1 = $select_option.filter(function(option){
+        console.log($item.hasClass($(this).val()),$item.prop("class"),  $(this).val())
+        if ($item.hasClass($(this).val())){
+            return true
+        }
+    })*/
+
+    for(i = 0; i < select_Categoria.length; i++){
+
+        $select_option.filter(`.${select_Categoria[i]}`).show()
+    }
+    $("#select-SubCategoria").selectpicker("refresh")
+}
+ 
+function setup_select_multiple(option, select, previousValue){
+    
+    $item_group = $(".item_group").not(".inactive")
+    
+    item_group_active = $item_group.data("item-group")
+
+    if ($(`${select}.${item_group_active}`).data("select-type") == 0){
+        
+        if (previousValue.length > 0){
+
+            $(`${option}[value=${previousValue}]`).removeAttr("selected")
+
+            $(".selectpicker").selectpicker("refresh")
+        }
+
+    }
+}
+
+function reset_filter(){
+    $(`.select-option.filter`).show()
+    $(`.select-Categoria.filter`).show()
+    $(".link_abc.selected").removeClass("selected")
+    $("#filter_text").val("")
+}
+
+function active_item(){
+
+    letter_filter = $(".link_abc.selected").data("value")
+
+    text_filter = $("#filter_text").val().toUpperCase()
+
+    $item = $(".item-row.filter")
+
+    $item.hide()
+
+    if (letter_filter){
+        $item = $item.filter(`.${letter_filter}`)
+    }
+
+    if (letter_filter){
+        $item = $item.filter(`.${letter_filter}`)
+    }
+
+    if (text_filter){
+
+        $item = setup_filter_text()
+    }
+
+    select_Categoria = format_class($("#select-Categoria").val());
+
+    select_SubCategoria = format_class($("#select-SubCategoria").val());
+
+    if ((select_Categoria) || (select_SubCategoria)){
+
+        if ((select_Categoria) && (select_SubCategoria)){
+
+            result = select_Categoria.map((Categoria) => {
+    
+                format = select_SubCategoria.map((SubCategoria)=>{
+                    return Categoria + SubCategoria
+                })
+                
+                return format.join(",")
+            });
+    
+        }else{
+    
+            result = select_Categoria ? select_Categoria : select_SubCategoria
+        }
+        
+        result = result.join(",")
+    
+        $item.filter(result).show()
+
+    }else{
+
+        $item.show()
+
+    }
+
+}
+
+
+function format_class(list_id){
+
+    if (list_id){
+        return list_id.map((id)=>{
+            return `.${id}`
+        })
+    }
+    
+    return null
+
+}
+
+function active_filter_abc(item_group = null){
+
+
+    if (!(item_group)){
+
+        item_group = $("#item_group_active").val()
+
+    }
+
+    is_filter_abc = $(`#item_group_${item_group}`).val()
+    
+    $(".link_abc.selected").removeClass("selected")
+
+    if (is_filter_abc != "0"){
+        $(".filter-abc").show()
+    }
+    else{
+        $(".filter-abc").hide()
+
+    }
+}
+
+function item_group_filter_toggle(item_group_default){
+
+    active_filter_abc(item_group_default)
+
+    $(".selectpicker option").hide()
+
+    $(".selectpicker option").removeAttr("selected")
+
+    remove_class_filter()
+
+    $Categoria_item = $(`.select-Categoria.${item_group_default}`)
+
+    $Categoria_item.each(function(){
+
+        Categoria_id = $(this).val()
+
+        if (Categoria_id){
+           
+            $SubCategoria_option = $(`.select-option.${Categoria_id}`)
+
+            add_class_filter($SubCategoria_option)
+        }
+        
+    })
+
+    add_class_filter($Categoria_item)
+
+    add_class_filter($(`.item-row.${item_group_default}`))
+
+    filter_show()
+
+    $(".selectpicker").selectpicker("refresh")
+
+}
+
+function add_class_filter($objs){
+
+    $objs.addClass("filter")
+}
+
+function remove_class_filter(){
+
+    $(".filter").hide()
+    $(".filter").removeClass("filter")
+}
+
+function filter_show(){
+    $(".filter").show()
+}
+
+
+
+
+$(window).scroll(function() {
+
+	if((($(window).scrollTop() * 2) + $(window).height()) >= $(document).height()){
+
+        get_rows(true)
+    }    
+});	
+
+
+
+function get_rows(is_valid = false, is_letter = false){
+
+    if(window.navigator.onLine){
+
+        $pagination_control = $("#pagination_control")
+
+        $petition_control = $("#petition_control")
+
+        if (!is_valid){
+
+            $pagination_control.val(0)
+        }
+
+        if ( $pagination_control.val() == 0 && $petition_control.val() == 0){
+
+            $petition_control.val(1)
+
+            $("#loading").show()
+
+            $item_group_active = $(".item_group").not(".inactive")
+
+            group_active = $item_group_active.data("item-group")
+
+            row_active_len = $(`.item-row.${group_active}.filter`).length
+
+            Categoria_selected = $("#select-Categoria").val()
+
+            SubCategoria_selected = $("#select-SubCategoria").val()
+
+            letter_filter = $(".link_abc.selected").data("value")
+
+            filter_text = $("#filter_text").val()
+
+            let item_code_list = []
+
+            order_id = $("#order_id").val()
+
+            $(`.item-row`).each(function(){
+                item_code_list.push($(this).data("id"))
+            })
+
+            
+            payload= {
+                order_id,
+                item_code_list,
+                item_group: group_active,
+                item_Categoria: Categoria_selected,
+                item_SubCategoria: SubCategoria_selected,
+                letter_filter,
+                filter_text
+            }
+
+            module_root = "render.item_formulary.item_formulary_render"
+
+            method = "paginator"
+
+            callresponse = (response)=>{
+
+                if(!response.data){
+                    $pagination_control.val(1)
+                }
+
+                $("#table_item_list tbody").append(response.data); 
+
+                $("#loading").hide()
+
+                $petition_control.val(0)
+
+                if (filter_text != $("#filter_text").val()){
+                    get_filter_text()
+                }
+
+                if (is_letter){
+
+                    setup_filter(letter_filter)
+
+                }
+            }
+            
+            send_petition(payload, module_root, method, callresponse)
+        }
+    }
+    
+}
+
+API_ROOT = "qp_phonix_front.resources"
+
+async function send_petition(payload, module_root, method, callresponse = null){
+
+    return new Promise(() => {
+        frappe.call({
+            method: setup_method(API_ROOT, module_root, method),
+            args: payload,
+            async: false,
+            callback: function (r_1) {
+
+                response = r_1.message
+
+                if (response.status == 200) {
+
+                    if (callresponse) {
+
+                        callresponse(response)
+
+                    }
+                }
+                if (response.status == 400) {
+
+                    if (callresponse) {
+
+                        callresponse(response.data)
+
+                    }
+                    frappe.msgprint(__(`error: ${response.msg}`))
+                }
+
+
+            }
+        })
+    })
+    
+}
+
+function setup_method(api_root, module_root, method){
+
+    result =  `${api_root}.${module_root}.${method}`;
+
+    //console.log(result)
+
+    return result
+
+}

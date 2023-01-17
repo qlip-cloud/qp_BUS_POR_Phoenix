@@ -1,0 +1,19 @@
+{%for item in item_list %}
+
+    <tr data-item-name = "{{item.item_name}}" class="{{item.Categoria_code}} {{item.SubCategoria_code}} item-row {{item.name}} {{item.item_group}} {{item.initial}} {{'row_select' if item.cantidad else ''}} {{'filter' if disabled_off else ''}}" style="{{'display: none;' if not disabled_off else ''}}" data-id = '{{item.name}}'>
+        <input type="hidden" id = "item_id" value= "{{item.name}}" >
+        <td class="lateralleft padding_list {{'row_select' if item.cantidad else ''}}"><img src="{{item.image}}" class="rounded float-left item_img" onerror="this.src='/assets/qlip_bussines_theme/images/company_default_logo.jpg'" /> 
+        
+        <td class="{{'item_select' if item.cantidad else ''}} item-name" ><div class="margin-left">{{item.item_name}}</div></td>
+        <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">{{item.name}}</div></td>
+        
+        <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">{{item.price}}</div></td>
+        <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">0</div></td>
+        <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">No</div></td>
+
+        <td class="padding_list {{'item_select' if item.cantidad else ''}}"><input type="number" class="form-control quantity " id="quantity" value={{item.cantidad}} data-value = {{item.cantidad}} data-factor = "{{item.inqt}}" data-select= "{{item.name}}" min = 0 ></td>
+        <td class="lateralright {{'item_select' if item.cantidad else ''}}"><div class="margin-left ">Units <br> Increments by {{item.inqt}}</div></td>
+        <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">{{item.sku}}</div></td>
+    </tr>
+
+{%endfor%}

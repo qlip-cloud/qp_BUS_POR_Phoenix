@@ -1,0 +1,240 @@
+{% extends "qp_phonix_front/templates/main.html" %}
+
+
+    {% block section_title %}                 
+        {{ _("Your Orders") }}
+    {% endblock %}
+
+    {% block button_title %}
+        <a class="btn button-master button-new button-default" onclick="openmodal()">
+            {{ _("LOAD ORDERS") }}
+        </a>
+    {% endblock %}
+
+
+    {% block principal_content %}
+
+
+    <style>
+
+        .button-modal-master{
+            font-style: normal;
+            font-variant: normal;
+            font-weight: 500;
+            font-family: Montserrat;
+            background: #4D6444 0% 0% no-repeat padding-box;
+            opacity: 1;   
+            color: #FFFFFF !important;
+            border: 0;
+            text-align: center;
+        }
+
+        .title-modal{
+            margin-top: 0.5em;
+            margin-bottom: 0.5em;
+            text-align: center;
+            font: normal normal bold 28px/44px Montserrat;
+            letter-spacing: 0px;
+            color: #4D6444;
+            opacity: 1;
+        }
+
+        .sub-title-modal{
+            font: normal normal bold 34px/44px Montserrat;
+            padding: 25px;
+        }
+
+        .background-info-modal{
+            background: rgba(77, 100, 68, 0.07);
+            margin-left: 50px;
+            margin-right: 50px;
+        }
+    
+        .Delivery{
+            color: #4D6444;
+            font-weight: 600;
+            font-size: 21px;
+
+        }
+
+        .Delivery{
+            color: #DA6047;
+            font-weight: 600;
+            font-size: 21px;
+
+        }
+
+        .Draft{
+            color: #DA6047;
+            font-weight: 600;
+            font-size: 21px;
+
+        }
+
+        .tab-items {
+            width: 100px;
+            cursor: pointer;
+            border-bottom: solid 2.5px #82927c54;
+            color: #82927c54;
+        }
+
+        .tab-items.active{
+            border-bottom: solid 2.5px #4D6444;
+            color: #4D6444;
+            font-size: larger;
+            
+        }
+
+        .margin.left{
+            margin-left: 20px;
+        }
+
+        .change_params{
+            color: #DA6047;
+            font-weight: 600;
+            font-size: 12px;
+            transition: box-shadow .3s;
+            width: 60px;
+            height: 20px;
+            margin: 3px;
+            border-radius:10px;
+            border: 1px solid #ccc;
+            background: #fff;
+            float: left;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .change_params:hover {
+            cursor: pointer;
+            box-shadow: 0 0 11px rgba(33,33,33,.2);
+        }
+
+    </style>
+
+    <div class="row" >
+        <div class="tab-line">
+            {{ _("Company") }}: {{ param_company }}
+            <input type="hidden" id="param_company" value="{{param_company}}">
+        </div>
+        <div class="tab-line change_params" onclick="change_params()">
+            {{ _("Change") }}
+        </div>
+    </div>
+    <div class="row" >
+        <div class="tab-line">
+            {{ _("Customer") }}:  {{ param_customer }} - {{ param_customer_name }}
+            <input type="hidden" id="param_customer" value="{{param_customer}}">
+            <input type="hidden" id="param_customer_name" value="{{param_customer_name}}">
+        </div>
+    </div>
+    <br>
+
+        {% if(order_list)%}
+            <div class="container">
+
+                <div class="row text-center">
+                    <div class="tab-items active margin-left" >
+                        Draft
+                    </div>
+                    <div class="tab-items">
+                        Orders
+                    </div>
+                </div> 
+                <div class="row" >
+                    <div class="tab-line">
+                    </div>   
+
+                    <div class="tab-line">
+
+                    </div>   
+                </div>   
+            
+                {%for order in order_list%}
+
+                    <div class="tab-section {{'tab-draft' if order.status == 'Draft' else 'tab-all'}}" style="display:none;">
+
+                        {% include "qp_phonix_front/templates/index_order_list.html" %}
+                        <hr>
+
+                    </div>
+                        
+
+                {%endfor%}
+
+            </div>
+
+        {%else%}
+
+            <div class="col-sm-12 image" >
+                <img class="img" src="/assets/qp_phonix_front/img/flower-bouquet.png" alt="">
+            </div>        
+        
+            <div class="col-sm-12 message" style="min-height: 300px;">
+                You still have no orders created, please create one by clicking load sale orders
+            </div>
+
+        {%endif%}
+    
+    <div class="modal fade" id="load_option_modal" tabindex="-1" role="dialog" aria-labelledby="load_option_label" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+
+            <div class="modal-body">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-12 text-center">
+                            
+                                
+                            <div class="title-modal sub-title-modal">
+                                Load Order
+                            </div>
+                        
+                            
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12 text-center alert hide" style="color: red;">
+                            You must select the file to upload
+                        </div>
+                    </div>
+                    <div class="row background-info-modal information_label" style="padding: 1.5% 1.5%;">
+                        <input type="File" name="" id="fileToUpload" placeholder="Upload file">
+                    </div>
+                    <br>
+                    <div class="information_label  text-center">
+                        {{ _("In this link you can download the template for uploading files") }}
+                    </div>
+                    <div class="information_label  text-center"  style="padding: 0.5% 4.5%;">
+                        <a href="{{ url_exp }}">
+                            {{ _("Loading template") }}
+                        </a>
+                    </div>
+                    <div class="information_label  text-center" style="padding: 0.5% 4.5%;">
+                        <a href="{{ url_exp_data_upd }}">
+                            {{ _("Editing template") }}
+                        </a>
+                    </div>
+                    <div id = "modal_loading_files" class="text-center" style="display: none;">
+                        <img src="/assets/qp_phonix_front/img/loading.gif" style="height: 80px !important;" alt="">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12" style="text-align: center; padding: 60px;">
+
+                            <button href="" id="load_file" class="btn button-modal-master button-new">
+                                {{ _("Load Sale Orders") }}
+                            </button>   
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            
+        </div>
+        </div>
+    </div>
+
+    
+    {% endblock %}
+

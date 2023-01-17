@@ -1,0 +1,101 @@
+{
+ "actions": [],
+ "creation": "2021-11-22 10:29:07.100132",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "item_group",
+  "description",
+  "image_url",
+  "enabled",
+  "position",
+  "activated_filter",
+  "section_item_group_filter",
+  "item_group_filter"
+ ],
+ "fields": [
+  {
+   "fieldname": "item_group",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Item Group",
+   "options": "Item Group",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Long Text",
+   "in_list_view": 1,
+   "label": "Description"
+  },
+  {
+   "fieldname": "image_url",
+   "fieldtype": "Attach Image",
+   "label": "Image URL"
+  },
+  {
+   "default": "0",
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "enabled"
+  },
+  {
+   "fieldname": "position",
+   "fieldtype": "Int",
+   "label": "position"
+  },
+  {
+   "default": "0",
+   "fieldname": "activated_filter",
+   "fieldtype": "Check",
+   "label": "Activated filter"
+  },
+  {
+   "fieldname": "section_item_group_filter",
+   "fieldtype": "Section Break",
+   "label": "Section Item Group Filter"
+  },
+  {
+   "fieldname": "item_group_filter",
+   "fieldtype": "Table",
+   "label": "Item Group Filter",
+   "options": "qp_vf_ItemGroupFilter"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2022-05-19 10:37:11.562781",
+ "modified_by": "Administrator",
+ "module": "Qp Phonix Front",
+ "name": "qp_vf_ItemGroup",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Sales User",
+   "share": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

@@ -1,0 +1,206 @@
+{% extends "qp_phonix_front/templates/main.html" %}
+
+    {% block button_title %}
+    <a class="btn button-master button-new button-default" onclick="assign_settings()">
+        {{ _("CONTINUE") }}
+    </a>
+    {% endblock %}
+
+    {% block principal_content %}
+
+
+    <style>
+
+        .button-modal-master{
+            font-style: normal;
+            font-variant: normal;
+            font-weight: 500;
+            font-family: Montserrat;
+            background: #4D6444 0% 0% no-repeat padding-box;
+            opacity: 1;   
+            color: #FFFFFF !important;
+            border: 0;
+            text-align: center;
+        }
+
+        .title-modal{
+            margin-top: 0.5em;
+            margin-bottom: 0.5em;
+            text-align: center;
+            font: normal normal bold 28px/44px Montserrat;
+            letter-spacing: 0px;
+            color: #4D6444;
+            opacity: 1;
+        }
+
+        .sub-title-modal{
+            font: normal normal bold 34px/44px Montserrat;
+            padding: 25px;
+        }
+
+        .background-info-modal{
+            background: rgba(77, 100, 68, 0.07);
+            margin-left: 50px;
+            margin-right: 50px;
+        }
+    
+        .Delivery{
+            color: #4D6444;
+            font-weight: 600;
+            font-size: 21px;
+
+        }
+
+        .Delivery{
+            color: #DA6047;
+            font-weight: 600;
+            font-size: 21px;
+
+        }
+
+        .Draft{
+            color: #DA6047;
+            font-weight: 600;
+            font-size: 21px;
+
+        }
+
+        .tab-items {
+            width: 100px;
+            cursor: pointer;
+            border-bottom: solid 2.5px #82927c54;
+            color: #82927c54;
+        }
+
+        .tab-items.active{
+            border-bottom: solid 2.5px #4D6444;
+            color: #4D6444;
+            font-size: larger;
+            
+        }
+
+        .margin.left{
+            margin-left: 20px;
+        }
+
+        .cursor_customer:hover {
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .bolded_subtit {
+            font-weight: bold;
+        }
+
+
+        #myInput {
+        background-image: url('/assets/qp_phonix_front/img/search.svg'); /* Add a search icon to input */
+        background-position: 10px 12px; /* Position the search icon */
+        background-repeat: no-repeat; /* Do not repeat the icon image */
+        width: 100%; /* Full-width */
+        font-size: 16px; /* Increase font-size */
+        padding: 12px 20px 12px 40px; /* Add some padding */
+        border: 1px solid #ddd; /* Add a grey border */
+        margin-bottom: 12px; /* Add some space below the input */
+        }
+
+        #myUL {
+        /* Remove default list styling */
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+        }
+
+        #myUL li a {
+        border: 1px solid #ddd; /* Add a border to all links */
+        margin-top: -1px; /* Prevent double borders */
+        background-color: #f6f6f6; /* Grey background color */
+        padding: 12px; /* Add some padding */
+        text-decoration: none; /* Remove default text underline */
+        font-size: 18px; /* Increase the font-size */
+        color: #666A65; /* Add a black text color */
+        display: block; /* Make it into a block element to fill the whole list */
+        }
+
+        #myUL li a:hover:not(.header) {
+        background-color: #eee; /* Add a hover effect to all links, except for headers */
+        }
+
+    </style>
+
+    <div class="content_block" style="{{'display: none;' if hide_block else ''}}" >
+
+
+        {% if(is_on_settings)%}
+
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-12 text-center">
+
+                        <div class="title-modal sub-title-modal">
+                            Select company and client
+                            <input type="hidden" id="updt" value="{{updt}}">
+                        </div>
+
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12 text-center alert hide" style="color: red;">
+                        You must select the company and client
+                    </div>
+                </div>
+
+                <div class="row ">
+                    <div class="col-md-8 offset-md-2">
+                        <select class="form-control"  name="" id="select_company" aria-placeholder="asd" onchange="hide_alert()">
+                            <option value="Company List" disabled selected>Company List</option>
+                            {%for company_item in company_list %}
+                                <option value="{{company_item.name}}">{{company_item.name}}</option>
+                            {%endfor%}
+                        </select>
+                    </div>
+                </div>
+                <br>
+                <div class="row">
+                    <input type="hidden" id="customer_id" value="{{customer_id}}">
+                    <input type="text" id = "customer_name" value="{{customer_name}}" class="col-md-8 offset-md-2 form-control" placeholder="Customer Name" readonly onchange="hide_alert()">
+                </div>
+                <br>
+                <br>
+
+                <div class="row"></div>
+                    <div class="col-md-8 offset-md-2 tab-items.active bolded_subtit">
+                        Customer List
+                    </div>
+                    <br>
+                    <div class="col-md-8 offset-md-2 bolded_subtit">
+                        <input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search for names..">
+                    </div>
+                    <br>
+                    <div class="col-md-8 offset-md-2">
+                        <ul id="myUL">
+                            {%for cust in is_on_settings %}
+                                <li><a class="cursor_customer" onclick="set_customer('{{cust.name}}', '{{cust.customer_name}}')">{{cust.customer_name}}</a></li>
+                            {%endfor%}
+                        </ul>
+                    </div>
+
+                </div>
+
+            </div>
+
+        {%else%}
+
+            <div class="col-sm-12 image" >
+                <img class="img" src="/assets/qp_phonix_front/img/flower-bouquet.png" alt="">
+            </div>        
+        
+            <div class="col-sm-12 message" style="min-height: 300px;">
+                You still have no associated default client, please contact the administrator.
+            </div>
+
+        {%endif%}
+    </div>
+
+    {% endblock %}
+

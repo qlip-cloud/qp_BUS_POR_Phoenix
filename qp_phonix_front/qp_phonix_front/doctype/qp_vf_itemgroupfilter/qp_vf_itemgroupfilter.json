@@ -1,0 +1,47 @@
+{
+ "actions": [],
+ "creation": "2022-05-19 10:32:24.381350",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "item_attribute",
+  "label",
+  "filter_multiselect"
+ ],
+ "fields": [
+  {
+   "fieldname": "item_attribute",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Item Attribute",
+   "reqd": 1
+  },
+  {
+   "fieldname": "label",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Label",
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "filter_multiselect",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Multiselect"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2022-05-19 13:56:25.654419",
+ "modified_by": "Administrator",
+ "module": "Qp Phonix Front",
+ "name": "qp_vf_ItemGroupFilter",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

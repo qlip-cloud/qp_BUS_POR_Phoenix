@@ -1,0 +1,31 @@
+{% extends "frappe/templates/web.html" %}
+
+{% block title %}{{ _("Phonix") }}{% endblock %}
+
+{% block alphas_js %}
+<script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js" integrity="sha256-hlKLmzaRlE8SCJC1Kw8zoUbU8BxA+8kR3gseuKfMjxA=" crossorigin="anonymous"></script>
+
+<script src="/assets/qp_phonix_front/js/api_connection.js"></script>
+<script src="/assets/qp_phonix_front/js/select_tooltip.js"></script>
+
+
+{% endblock %}
+{% block alphas_ccs %}
+
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/font/css/open-iconic-bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="/assets/qp_phonix_front/css/loader.css">
+<link rel="stylesheet" href="/assets/qp_phonix_front/css/general.css">
+<link rel="stylesheet" href="/assets/qp_phonix_front/css/select_tooltip.css">
+
+{% endblock %}
+
+
+<div>
+    {% block page_content %}
+
+
+
+    {% endblock %}
+</div>
