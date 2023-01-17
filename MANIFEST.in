@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include qp_phonix_front *.css
+recursive-include qp_phonix_front *.csv
+recursive-include qp_phonix_front *.html
+recursive-include qp_phonix_front *.ico
+recursive-include qp_phonix_front *.js
+recursive-include qp_phonix_front *.json
+recursive-include qp_phonix_front *.md
+recursive-include qp_phonix_front *.png
+recursive-include qp_phonix_front *.py
+recursive-include qp_phonix_front *.svg
+recursive-include qp_phonix_front *.txt
+recursive-exclude qp_phonix_front *.pyc
