@@ -3,11 +3,14 @@ import json
 from qp_phonix_front.qp_phonix_front.validations.utils import is_guest
 from qp_phonix_front.qp_phonix_front.uses_cases.front.service import set_shipping_data, set_items_data, set_order_data, get_order_item_list
 from qp_phonix_front.qp_phonix_front.services.try_catch import handler as try_catch
+from gp_phonix_integration.gp_phonix_integration.use_case.get_item_inventary import handler as get_item_inventary
 import frappe
 
 def get_context(context):
 
     is_guest()
+
+    
 
     def callback():
 
@@ -16,7 +19,22 @@ def get_context(context):
         context.autosave_control =  get_autosave_control()
 
         order_id = query_params.get("order_id")
-                
+
+        email = frappe.session.user
+        sql = """SELECT 
+                    role_profile_name
+                FROM
+                    tabUser as user
+                where user.name = '{}';""".format(email)
+
+        is_internal =  frappe.db.sql(sql, as_dict=1)
+
+        if not is_internal:
+
+            frappe.throw("Este usuario no esta configurado")
+
+        context.is_internal =  True if is_internal[0]["role_profile_name"]  == "Phonix internal" else False
+
         if order_id:
 
             setup_edit(context, order_id)
@@ -40,6 +58,9 @@ def setup_new(context):
     set_shipping_data(context, item_group_select, shipping_method_select, shipping_date_select)
 
     set_items_data(context, item_group_select)
+
+    context.item_list = get_item_inventary(context.item_list)
+
 
 def setup_edit(context, order_id):
 

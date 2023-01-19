@@ -26,7 +26,23 @@ def paginator(order_id = None, item_group = None, item_Categoria = None, item_Su
 
             add_qty_item_list(item_list, items_select)
 
-        rows = frappe.render_template("templates/item_formulary/row.html", {"item_list" : item_list, "disabled_off": True})
+        email = frappe.session.user
+
+        sql = """SELECT 
+                    role_profile_name
+                FROM
+                    tabUser as user
+                where user.name = '{}';""".format(email)
+
+        is_internal =  frappe.db.sql(sql, as_dict=1)
+
+        if not is_internal:
+
+            frappe.throw("Este usuario no esta configurado")
+
+        is_internal =  True if is_internal[0]["role_profile_name"]  == "Phonix internal" else False
+
+        rows = frappe.render_template("templates/item_formulary/row.html", {"item_list" : item_list, "disabled_off": True, "is_internal": is_internal})
 
         return {
             "status": 200,

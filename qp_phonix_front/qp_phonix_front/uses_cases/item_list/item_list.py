@@ -1,5 +1,7 @@
 import frappe
 import json
+from gp_phonix_integration.gp_phonix_integration.use_case.get_item_inventary import handler as get_item_inventary
+
 URL_IMG_EMPTY = "/assets/qlip_bussines_theme/images/company_default_logo.jpg"
 
 
@@ -14,8 +16,12 @@ def paginator_item_list(item_group = None, item_Categoria = None, item_SubCatego
 
     setup = get_table_and_condition(item_group, item_Categoria, item_SubCategoria, item_code_list, letter_filter, filter_text = filter_text)
     
-    return __get_product_list(setup.get("tbl_product_list"), setup.get("tlb_product_attr_select"), setup.get("tlb_product_attr_body"),
+    result =  __get_product_list(setup.get("tbl_product_list"), setup.get("tlb_product_attr_select"), setup.get("tlb_product_attr_body"),
                     setup.get("cond_c"), setup.get("cond_t"))
+
+    response = get_item_inventary(result)
+
+    return response
 
 def get_item_list(item_code_list):
 

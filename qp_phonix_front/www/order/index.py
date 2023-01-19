@@ -6,8 +6,7 @@ from qp_phonix_front.qp_phonix_front.services.try_catch import handler as try_ca
 
 def get_context(context):
 
-    is_guest()
-
+    
     def callback():
         
         context.order_list = sales_order_list()

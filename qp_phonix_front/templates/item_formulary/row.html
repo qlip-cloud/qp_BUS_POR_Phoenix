@@ -9,11 +9,21 @@
         
         <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">{{item.price}}</div></td>
         <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">0</div></td>
-        <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">No</div></td>
+        
+        <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">
+            {% if is_internal%}
+                {{item.quantity}}
+            {%else%}
+            {{'Si' if item.quantity > 0 else 'No'}}
+            {%endif%}
+        </div></td>
 
         <td class="padding_list {{'item_select' if item.cantidad else ''}}"><input type="number" class="form-control quantity " id="quantity" value={{item.cantidad}} data-value = {{item.cantidad}} data-factor = "{{item.inqt}}" data-select= "{{item.name}}" min = 0 ></td>
         <td class="lateralright {{'item_select' if item.cantidad else ''}}"><div class="margin-left ">Units <br> Increments by {{item.inqt}}</div></td>
-        <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">{{item.sku}}</div></td>
+        {% if is_internal%}
+
+            <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">{{item.sku}}</div></td>
+        {%endif%}
     </tr>
 
 {%endfor%}

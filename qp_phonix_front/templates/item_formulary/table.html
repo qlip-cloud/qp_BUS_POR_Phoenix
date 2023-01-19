@@ -7,13 +7,16 @@
         <th width = 26%><div class="margin-left ">Name </div></th>
 
         <th ><div class="margin-left ">Product ID</div></th>
-        <th ><div class="margin-left ">Price</div></th>
+        <th ><div class="margin-left ">Price</div></th> 
         <th ><div class="margin-left ">Discount</div></th>
         <th ><div class="margin-left ">Inventory</div></th>
         <th width = 10%><div class="margin-left ">Quantity</div></th>
         <th  ><div class="margin-left ">UOM</div></th>
-        <th  ><div class="margin-left ">SKU</div></th>
-        
+
+        {% if is_internal%}
+
+            <th  ><div class="margin-left ">SKU</div></th>
+        {%endif%}
     </thead>
     <tbody>
 
