@@ -4,9 +4,9 @@ from qp_phonix_front.qp_phonix_front.uses_cases.shipping_method.shipping_method_
 from qp_phonix_front.qp_phonix_front.uses_cases.item_list.item_list import vf_item_list, get_item_list
 from qp_phonix_front.qp_phonix_front.uses_cases.sales_order.sales_order import get_sales_order
 
-def set_items_data(context, item_group_select, item_code_list = None, items_select = []):
+def set_items_data(context, item_group_select, item_code_list = None, items_select = [], idlevel = None):
 
-    product_response = vf_item_list(item_group =item_group_select, item_code_list = item_code_list)
+    product_response = vf_item_list(item_group =item_group_select, item_code_list = item_code_list, idlevel = idlevel)
 
     __setup_item_list(context, items_select, product_response.get("product_list"))
 

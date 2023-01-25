@@ -394,7 +394,7 @@ function get_rows(is_valid = false, is_letter = false){
             letter_filter = $(".link_abc.selected").data("value")
 
             filter_text = $("#filter_text").val()
-
+            idlevel = $("#idlevel").val()
             let item_code_list = []
 
             order_id = $("#order_id").val()
@@ -411,7 +411,8 @@ function get_rows(is_valid = false, is_letter = false){
                 item_Categoria: Categoria_selected,
                 item_SubCategoria: SubCategoria_selected,
                 letter_filter,
-                filter_text
+                filter_text,
+                idlevel
             }
 
             module_root = "render.item_formulary.item_formulary_render"

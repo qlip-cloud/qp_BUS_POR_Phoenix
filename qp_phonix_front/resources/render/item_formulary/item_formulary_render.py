@@ -6,7 +6,7 @@ from qp_phonix_front.qp_phonix_front.uses_cases.sales_order.sales_order import g
 from qp_phonix_front.www.order.item_formulary import add_qty_item_list
 
 @frappe.whitelist()
-def paginator(order_id = None, item_group = None, item_Categoria = None, item_SubCategoria = None, item_code_list = None, letter_filter = None, filter_text = None):
+def paginator(order_id = None, item_group = None, item_Categoria = None, item_SubCategoria = None, item_code_list = None, letter_filter = None, filter_text = None, idlevel = None):
     
     origin = "render item formulary paginator"
 
@@ -14,7 +14,7 @@ def paginator(order_id = None, item_group = None, item_Categoria = None, item_Su
     
     def callback():
 
-        item_list = paginator_item_list(item_group, item_Categoria, item_SubCategoria, item_code_list, letter_filter, filter_text)
+        item_list = paginator_item_list(item_group, item_Categoria, item_SubCategoria, item_code_list, letter_filter, filter_text, idlevel = idlevel)
         
         list(map(lambda x: x.update({"initial": x.item_name[0].upper()}), item_list))
 

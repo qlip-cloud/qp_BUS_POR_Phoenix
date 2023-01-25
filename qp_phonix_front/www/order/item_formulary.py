@@ -20,20 +20,9 @@ def get_context(context):
 
         order_id = query_params.get("order_id")
 
-        email = frappe.session.user
-        sql = """SELECT 
-                    role_profile_name
-                FROM
-                    tabUser as user
-                where user.name = '{}';""".format(email)
+        get_is_internal(context)
 
-        is_internal =  frappe.db.sql(sql, as_dict=1)
-
-        if not is_internal:
-
-            frappe.throw("Este usuario no esta configurado")
-
-        context.is_internal =  True if is_internal[0]["role_profile_name"]  == "Phonix internal" else False
+        get_idlevel(context)
 
         if order_id:
 
@@ -45,6 +34,43 @@ def get_context(context):
 
     try_catch(callback, context)
 
+def get_is_internal(context):
+
+    email = frappe.session.user
+
+    sql = """SELECT 
+                role_profile_name
+            FROM
+                tabUser as user
+            where user.name = '{}';""".format(email)
+
+    is_internal =  frappe.db.sql(sql, as_dict=1)
+    
+    if not is_internal:
+
+        frappe.throw("Este usuario no esta configurado")
+
+    context.is_internal =  True if is_internal[0]["role_profile_name"]  == "Phonix internal" else False
+
+def get_idlevel(context):
+
+    email = frappe.session.user
+
+    sql = """SELECT 
+                customer.customer_group
+            FROM
+                tabContact as contact
+            inner join
+                `tabDynamic Link` as link
+                on (contact.name = link.parent)
+            inner join
+                `tabCustomer` as customer
+                on(link.link_name = customer.name)
+            where contact.email_id = '{}';""".format(email)
+    result =  frappe.db.sql(sql, as_dict=1)
+
+    context.idlevel = result[0]["customer_group"]
+    
 def setup_new(context):
 
     query_params = frappe.request.args
@@ -55,9 +81,10 @@ def setup_new(context):
     
     shipping_date_select = query_params.get("shipping_date")
 
+
     set_shipping_data(context, item_group_select, shipping_method_select, shipping_date_select)
 
-    set_items_data(context, item_group_select)
+    set_items_data(context, item_group_select, idlevel = context.idlevel)
 
     context.item_list = get_item_inventary(context.item_list)
 

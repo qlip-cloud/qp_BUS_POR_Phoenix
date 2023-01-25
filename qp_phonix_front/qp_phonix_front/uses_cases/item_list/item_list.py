@@ -7,14 +7,14 @@ URL_IMG_EMPTY = "/assets/qlip_bussines_theme/images/company_default_logo.jpg"
 
 
 @frappe.whitelist()
-def paginator_item_list(item_group = None, item_Categoria = None, item_SubCategoria = None, item_code_list = None, letter_filter = None, filter_text = None):
+def paginator_item_list(item_group = None, item_Categoria = None, item_SubCategoria = None, item_code_list = None, letter_filter = None, filter_text = None, idlevel = None):
 
 
     item_Categoria = json.loads(item_Categoria) if item_Categoria else None
     item_SubCategoria = json.loads(item_SubCategoria) if item_SubCategoria else None
     item_code_list = json.loads(item_code_list) if item_code_list else None
 
-    setup = get_table_and_condition(item_group, item_Categoria, item_SubCategoria, item_code_list, letter_filter, filter_text = filter_text)
+    setup = get_table_and_condition(item_group, item_Categoria, item_SubCategoria, item_code_list, letter_filter, filter_text = filter_text, idlevel = idlevel)
     
     result =  __get_product_list(setup.get("tbl_product_list"), setup.get("tlb_product_attr_select"), setup.get("tlb_product_attr_body"),
                     setup.get("cond_c"), setup.get("cond_t"))
@@ -23,20 +23,20 @@ def paginator_item_list(item_group = None, item_Categoria = None, item_SubCatego
 
     return response
 
-def get_item_list(item_code_list):
+def get_item_list(item_code_list, idlevel = None):
 
 
-    setup = get_table_and_condition(item_code_list = item_code_list, is_equal= True)
+    setup = get_table_and_condition(item_code_list = item_code_list, is_equal= True, idlevel = idlevel)
 
     return __get_product_list(setup.get("tbl_product_list"), setup.get("tlb_product_attr_select"), setup.get("tlb_product_attr_body"),
                     setup.get("cond_c"), setup.get("cond_t"), has_limit = False)
 
 @frappe.whitelist()
-def vf_item_list(item_group=None, item_Categoria=None, item_SubCategoria=None, item_code_list = None):
+def vf_item_list(item_group=None, item_Categoria=None, item_SubCategoria=None, item_code_list = None, idlevel = None):
 
     try:
         
-        setup = get_table_and_condition(item_group, item_Categoria, item_SubCategoria, item_code_list = item_code_list)
+        setup = get_table_and_condition(item_group, item_Categoria, item_SubCategoria, item_code_list = item_code_list, idlevel = idlevel)
 
         product_list = __get_product_list(setup.get("tbl_product_list"), setup.get("tlb_product_attr_select"), setup.get("tlb_product_attr_body"),
                         setup.get("cond_c"), setup.get("cond_t"))
@@ -221,11 +221,12 @@ def get_filter_SubCategoria_option(price_list):
     return SubCategoria_dict
 
 
-def get_table_and_condition(item_group = None, item_Categoria = None, item_SubCategoria = None, item_code_list = None, letter_filter = None, is_equal = False, filter_text = None):
+def get_table_and_condition(item_group = None, item_Categoria = None, item_SubCategoria = None, item_code_list = None, letter_filter = None, 
+                is_equal = False, filter_text = None, idlevel= None):
 
     where_base = get_where_base()
 
-    from_base = get_from_base()
+    from_base = get_from_base(idlevel)
     
     tbl_product_list = get_tbl_product_list(item_group, from_base, where_base, item_code_list, letter_filter, is_equal, filter_text = filter_text)
 
@@ -334,12 +335,13 @@ def get_attrs_filters_item_group(item_group):
     return res
 
 
-def get_from_base():
+def get_from_base(idlevel):
 
     return """
         tabItem as prod 
         inner join `tabItem Price` as price on prod.name = price.item_code
-    """
+        inner join `tabqp_GP_Level` as gp_level on (prod.qp_phonix_class = gp_level.group_type and gp_level.idlevel = '{}')
+    """.format(idlevel)
 
 def get_where_base():
 
@@ -383,7 +385,8 @@ def get_tbl_product_list(item_group, from_base, where_base, item_code_list = Non
             0 as cantidad,
             prod.stock_uom,
             prod.item_group,
-            prod.sku
+            prod.sku,
+            gp_level.discountpercentage
             """ % (URL_IMG_EMPTY) 
     
     if item_group:
@@ -458,8 +461,8 @@ def __get_product_list(tbl_product_list, tlb_product_attr_select, tlb_product_at
                     prod.cantidad,
                     prod.stock_uom,
                     prod.item_group,
-                    prod.sku
-
+                    prod.sku,
+                    prod.discountpercentage
                 from
                     (%s) as prod
                     %s
@@ -470,6 +473,7 @@ def __get_product_list(tbl_product_list, tlb_product_attr_select, tlb_product_at
 
     """ % (select_attr_base, tlb_product_attr_select, tbl_product_list, tlb_product_attr_body, cond_c, cond_t, limit)
 
+    #frappe.throw("rompete bobo")
     product_list = frappe.db.sql(sql_product_list, as_dict=1)
 
     for item in product_list:
@@ -548,7 +552,9 @@ def __get_select_attr_base():
             cantidad,
             stock_uom,
             item_group,
-            sku
+            sku,
+            discountpercentage,
+            ((price * discountpercentage) / 100) as price_discount
     """
 
     return sql_base_attr

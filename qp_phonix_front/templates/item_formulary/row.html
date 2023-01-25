@@ -7,8 +7,19 @@
         <td class="{{'item_select' if item.cantidad else ''}} item-name" ><div class="margin-left">{{item.item_name}}</div></td>
         <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">{{item.name}}</div></td>
         
-        <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">{{item.price}}</div></td>
-        <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">0</div></td>
+        <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">{{item.discountpercentage}} %</div></td>
+        <td class="{{'item_select' if item.cantidad else ''}}">
+            <div class="margin-left">
+                {% if item.price_discount > 0 %}
+                    <del style="color:red">
+                        {{item.price}}
+                    </del>
+                    <br>
+                    {{item.price_discount}}
+                {% else %}
+                    {{item.price}}
+                {% endif%}
+            </div></td>
         
         <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">
             {% if is_internal%}
@@ -22,7 +33,7 @@
         <td class="lateralright {{'item_select' if item.cantidad else ''}}"><div class="margin-left ">Units <br> Increments by {{item.inqt}}</div></td>
         {% if is_internal%}
 
-            <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">{{item.sku}}</div></td>
+            <td class="lateralright {{'item_select' if item.cantidad else ''}}"><div class="margin-left">{{item.sku}}</div></td>
         {%endif%}
     </tr>
 
