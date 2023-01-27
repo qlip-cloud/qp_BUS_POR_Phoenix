@@ -6,6 +6,7 @@
  "engine": "InnoDB",
  "field_order": [
   "item_group",
+  "title",
   "description",
   "image_url",
   "enabled",
@@ -63,11 +64,16 @@
    "fieldtype": "Table",
    "label": "Item Group Filter",
    "options": "qp_vf_ItemGroupFilter"
+  },
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "label": "title"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-05-19 10:37:11.562781",
+ "modified": "2023-01-27 07:29:54.554479",
  "modified_by": "Administrator",
  "module": "Qp Phonix Front",
  "name": "qp_vf_ItemGroup",

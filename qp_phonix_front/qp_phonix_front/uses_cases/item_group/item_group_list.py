@@ -7,7 +7,7 @@ def vf_item_group_list():
         filters={
             'enabled': 1
         },
-        fields=['image_url as image', 'item_group as title', 'description', 'activated_filter', 'name'],
+        fields=['image_url as image', 'item_group as title','title as title_pretty', 'description', 'activated_filter', 'name'],
         order_by="position"
     )
 

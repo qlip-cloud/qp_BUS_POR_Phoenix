@@ -153,7 +153,7 @@
                                     <!--div onclick="openmodal('hola')" class="card" style="width: 368px; height: 450px; box-shadow: 0px 0px 20px #00000029;"-->
                                         <img class="card-img-top" style="height: 225px;" src="{{item_type.image}}" alt="Card image cap">
                                         <div class="card-body">
-                                            <h5 class="card-title">{{item_type.title}}</h5>
+                                            <h5 class="card-title">{{item_type.title_pretty if item_type.title_pretty else item_type.title}}</h5>
                                             <p class="card-text">{{item_type.description}}</p>
                                         </div>
                                     </div>

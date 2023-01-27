@@ -22,13 +22,15 @@ $(document).ready(function() {
         $("#table_content").on('blur mouseup', ".quantity",function () {
 
                 let value = $(this).val()   
-                    
+                let is_internal = $(this).data("is_internal")
+                let max_value = $(this).data("quantity")
+                let item_name = $(this).data("select")
+
 
                 if (value > 0){
                
                     factor = parseInt($(this).data("factor"))
-                    //factor = 5
-        
+                            
                     if (value % factor != 0){
         
                         result = parseInt(value / factor) + 1;
@@ -38,11 +40,20 @@ $(document).ready(function() {
                         $(this).val(value)
                         
                     }
+                    
                         
+                }
+                $inventory_quantity = $(`#table_content #inventory_quantity-${item_name}`);
+
+                if (is_internal == "False" && (value > max_value) ){
+                
+                        $inventory_quantity.html("No");
+                }
+                else{
+                        $inventory_quantity.html("Si");
                 }
 
                 $line = $(this).parents(".line")
-
 
                 price = parseFloat($line.data("price"))
                 
@@ -54,9 +65,7 @@ $(document).ready(function() {
 
                 total_update()
 
-                
-                delay_save_or_update()
-                
+                //delay_save_or_update()
 
             })
 

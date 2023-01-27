@@ -4,19 +4,31 @@
 <table class = "item_list" id = "table_item_list" width= 100%>
     <thead >
         <th width = 10% class="lateralleft "></th>
-        <th width = 26%><div class="margin-left ">Name </div></th>
+        <th width = 26%><div class="margin-left ">Nombre </div></th>
 
-        <th ><div class="margin-left ">Product ID</div></th>
-        <th ><div class="margin-left ">Discount</div></th>
-        <th ><div class="margin-left ">Price</div></th> 
-        <th ><div class="margin-left ">Inventory</div></th>
-        <th width = 10%><div class="margin-left ">Quantity</div></th>
-        <th  ><div class="margin-left ">UOM</div></th>
-
-        {% if is_internal%}
-
-            <th  ><div class="margin-left ">SKU</div></th>
+        <th ><div class="margin-left ">Producto ID</div></th>
+        
+        {% if not is_internal%}
+            <th ><div class="margin-left ">Precio Lista</div></th> 
+            <th ><div class="margin-left ">Descuento</div></th>
         {%endif%}
+
+        <th ><div class="margin-left ">Precio</div></th> 
+        <th ><div class="margin-left ">Inventario</div></th>
+        
+        {% if not is_internal%}
+            <th width = 10%><div class="margin-left ">Cantidad</div></th>
+        {%endif%}
+
+        <th  ><div class="margin-left ">Multiplo</div></th>
+
+        
+            <th  ><div class="margin-left ">UDM</div></th>
+        {% if is_internal%}
+            <th  ><div class="margin-left ">SKU</div></th>
+
+        {%endif%}
+    
     </thead>
     <tbody>
 

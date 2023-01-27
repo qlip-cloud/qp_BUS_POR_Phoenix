@@ -67,6 +67,7 @@ def get_idlevel(context):
                 `tabCustomer` as customer
                 on(link.link_name = customer.name)
             where contact.email_id = '{}';""".format(email)
+    
     result =  frappe.db.sql(sql, as_dict=1)
 
     context.idlevel = result[0]["customer_group"]

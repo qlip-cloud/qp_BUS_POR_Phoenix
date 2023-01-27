@@ -28,7 +28,7 @@
     <input type="hidden" id="item_group_{{item_group.title}}" value="{{item_group.activated_filter}}">
     
     {%if item_group.title.lower() == item_group_select.lower() %}
-        <a  data-item-group = "{{item_group.title}}" class="item_group">{{item_group.title}}</a>
+        <a  data-item-group = "{{item_group.title}}" class="item_group">{{item_group.title_pretty if item_group.title_pretty else item_group.title}} </a>
     {%else%}
         <a  data-item-group = "{{item_group.title}}" data-shipping-type = "{{shipping_method_select}}" data-shipping-date = "{{shipping_date_select}}" class="inactive item_group">{{item_group.title}}</a>
     {%endif%}
@@ -230,16 +230,16 @@ button {
 
         <div class="col-md-2 text-left ">
             <div class="row" style="position: absolute; bottom:15px">
-                <a id="filter_clear">filter clear</a>
+                <a id="filter_clear">LIMPIAR FILTRO</a>
             </div>
             
         </div>
 
         <div class="col-md-2 button-new">
-            <button id="confirm_draft"  disabled class="button-master button-default" style="width: 100%; " >CONFIRM ORDER</button>
+            <button id="confirm_draft"  disabled class="button-master button-default" style="width: 100%; " >CONFIRMAR</button>
         </div>
         <div class="col-md-2 button-new">
-            <button class="button-master button-default" disabled id= "save_draft" style="width: 100%;" >SAVE DRAFT</button>
+            <button class="button-master button-default" disabled id= "save_draft" style="width: 100%;" >GUARDAR</button>
         </div>
     </div>
     
@@ -250,10 +250,10 @@ button {
     <input type="hidden" id="idlevel" value="{{idlevel}}">
     <div class="row " >
         <div class="col-sm-5 text-left row-abc">
-            <input type="text" id = "filter_text" class="form-control" name="" id="" placeholder="Search by name">
+            <input type="text" id = "filter_text" class="form-control" name="" id="" placeholder="Buscar por nombre">
         </div>
         <div class="col-sm-7 text-right row-abc filter-abc">
-            <span class= "filter_label">Name: </span> 
+            <span class= "filter_label">Nombre: </span> 
             {%for abc in filter_abc%}
                 <a class="link_abc" data-value="{{abc}}">{{abc}}</a>
             {%endfor%}      
@@ -264,8 +264,9 @@ button {
 {% endblock %}
 {% block principal_content %}
     <div class="alert alert-danger connection-alert" style="display: none;" role="alert">
-        Fail connection to internet network
+        Fallo conexion a internet
     </div>
+
     <div id="table_content">
         <input type="hidden" data-time = "{{autosave_control}}" value = "0" id = "save_control">
         {% include "qp_phonix_front/templates/item_formulary/table.html" %}    
@@ -277,9 +278,9 @@ button {
 
     <!-- The Close Button -->
     <span class="close_mymodal">&times;</span>
-        <img class="modal-content-img" id="img01" alt="asdasdasd">
+        <img class="modal-content-img" id="img01" alt="Esta es una imagen de referencia, el producto podria variar">
         
-    <div id="caption" >This is a reference image, the product may vary</div>
+    <div id="caption" >Esta es una imagen de referencia, el producto podria variar</div>
 
     <!-- Modal Content (The Image) -->
   

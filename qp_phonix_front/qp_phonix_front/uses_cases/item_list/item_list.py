@@ -554,7 +554,7 @@ def __get_select_attr_base():
             item_group,
             sku,
             discountpercentage,
-            ((price * discountpercentage) / 100) as price_discount
+            (price - (price * discountpercentage) / 100) as price_discount
     """
 
     return sql_base_attr

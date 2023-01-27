@@ -6,34 +6,33 @@
         
         <td class="{{'item_select' if item.cantidad else ''}} item-name" ><div class="margin-left">{{item.item_name}}</div></td>
         <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">{{item.name}}</div></td>
+        <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">{{item.price}}</div></td>
+
+        {% if not is_internal%}
+            <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">{{item.discountpercentage}} %</div></td>
+            <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">{{item.price_discount}}</div></td>
+
+        {%endif%}
+
         
-        <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">{{item.discountpercentage}} %</div></td>
         <td class="{{'item_select' if item.cantidad else ''}}">
-            <div class="margin-left">
-                {% if item.price_discount > 0 %}
-                    <del style="color:red">
-                        {{item.price}}
-                    </del>
-                    <br>
-                    {{item.price_discount}}
-                {% else %}
-                    {{item.price}}
-                {% endif%}
-            </div></td>
+            <div class="margin-left" id = "inventory_quantity-{{item.name}}">
+                {% if is_internal%}
+                    {{item.quantity|int}}
+                {%else%}
+                    {{'Si' if item.quantity > 0 else 'No'}}
+                {%endif%}
+            </div>
+        </td>
+        {% if not is_internal%}
+            <td class="padding_list {{'item_select' if item.cantidad else ''}}"><input type="number" class="form-control quantity " id="quantity" value={{item.cantidad}} data-is_internal = "{{is_internal}}" data-quantity = "{{item.quantity}}" data-value = {{item.cantidad}} data-factor = "{{item.inqt}}" data-select= "{{item.name}}" min = 0 max = {{item.quantity}} ></td>
+        {%endif%}
         
-        <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">
-            {% if is_internal%}
-                {{item.quantity}}
-            {%else%}
-            {{'Si' if item.quantity > 0 else 'No'}}
-            {%endif%}
-        </div></td>
-
-        <td class="padding_list {{'item_select' if item.cantidad else ''}}"><input type="number" class="form-control quantity " id="quantity" value={{item.cantidad}} data-value = {{item.cantidad}} data-factor = "{{item.inqt}}" data-select= "{{item.name}}" min = 0 ></td>
-        <td class="lateralright {{'item_select' if item.cantidad else ''}}"><div class="margin-left ">Units <br> Increments by {{item.inqt}}</div></td>
+        <td class="lateralright {{'item_select' if item.cantidad else ''}}"><div class="margin-left ">Unidad <br> x {{item.inqt}}</div></td>
+        <td class="lateralright {{'item_select' if item.cantidad else ''}}"><div class="margin-left">{{item.sku}}</div></td>
+        
         {% if is_internal%}
-
-            <td class="lateralright {{'item_select' if item.cantidad else ''}}"><div class="margin-left">{{item.sku}}</div></td>
+            <td class="lateralright {{'item_select' if item.cantidad else ''}}"><div class="margin-left">Si</div></td>
         {%endif%}
     </tr>
 
