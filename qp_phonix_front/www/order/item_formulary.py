@@ -11,7 +11,6 @@ def get_context(context):
     is_guest()
 
     
-
     def callback():
 
         query_params = frappe.request.args

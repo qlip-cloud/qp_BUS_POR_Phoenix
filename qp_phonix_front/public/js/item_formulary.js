@@ -1,18 +1,16 @@
 
 $(document).ready(function() {
-    
 
     $('#select_shipping_method').selectpicker();
+
     $(".quantity").each(function(){
         $(this).val($(this).data("value"))
     })
 
-       
     $('.disabled').show();
 
     $(".link_abc").click(function(){
         
-
         if(window.navigator.onLine){
 
             if($(this).hasClass("selected")){
@@ -41,8 +39,6 @@ $(document).ready(function() {
                     
             }
         }
-
-        
     })
 
     $("#table_content").on('keyup mouseup', ".quantity",function () {
@@ -90,7 +86,8 @@ function get_class($item_filter){
 
         group_active = $item_group_active.data("item-group")
 
-        $select_option.filter(`.${group_active}.${array_class[0]}`).show()
+        //$select_option.filter(`.${group_active}.${array_class[0]}`).show()
+        $select_option.filter(`.${array_class[0]}`).show()
 
         $(`#select-SubCategoria option[value='${array_class[1]}']`).show()
 

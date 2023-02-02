@@ -4,9 +4,8 @@ $(document).mousemove( function(e) {
    mouseX = e.pageX; 
    mouseY = e.pageY;
 });  
+
 $(document).ready(function() {
-
-
 
     $("#tool-tip-container").on("mouseover", ".dropdown-item", function(e){
 
@@ -83,11 +82,12 @@ $(document).ready(function() {
             select_Categoria = $(this).val()
 
             $select_option = $(`.select-option.filter`)
-            
-            if (!(isSelected)){
 
+            if (!(isSelected)){
+                
                 if (!$(this).val()){
 
+                    console.log($(this).val())
                     reset_filter()
 
                 }else{
@@ -188,7 +188,8 @@ function setup_select_multiple(option, select, previousValue){
     
     item_group_active = $item_group.data("item-group")
 
-    if ($(`${select}.${item_group_active}`).data("select-type") == 0){
+    //if ($(`${select}.${item_group_active}`).data("select-type") == 0){
+    if ($(`${select}`).data("select-type") == 0){
         
         if (previousValue.length > 0){
 
@@ -300,7 +301,8 @@ function active_filter_abc(item_group = null){
 }
 
 function item_group_filter_toggle(item_group_default){
-
+    
+    
     active_filter_abc(item_group_default)
 
     $(".selectpicker option").hide()
@@ -309,7 +311,9 @@ function item_group_filter_toggle(item_group_default){
 
     remove_class_filter()
 
-    $Categoria_item = $(`.select-Categoria.${item_group_default}`)
+    $Categoria_item = $(`.select-Categoria`)
+
+    //$Categoria_item = $(`.select-Categoria.${item_group_default}`)
 
     $Categoria_item.each(function(){
 
@@ -321,7 +325,6 @@ function item_group_filter_toggle(item_group_default){
 
             add_class_filter($SubCategoria_option)
         }
-        
     })
 
     add_class_filter($Categoria_item)
@@ -331,7 +334,6 @@ function item_group_filter_toggle(item_group_default){
     filter_show()
 
     $(".selectpicker").selectpicker("refresh")
-
 }
 
 function add_class_filter($objs){

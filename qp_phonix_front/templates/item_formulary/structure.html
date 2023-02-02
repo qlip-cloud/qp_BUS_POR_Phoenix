@@ -204,8 +204,9 @@ button {
             <div class="form-group">
                 <select class="selectpicker filter_style" data-selected-text-format="count" id= "select-Categoria" data-array = "{{Categoria_list_array}}" multiple data-live-search="true">
 
-                    {%for Categoria in Categoria_list %}
-                        <option class="option select-Categoria {{Categoria.class}} {{Categoria.id}}" value="{{Categoria.code}}">{{Categoria.title}}</option>
+                    {%for sku in sku_list %}
+
+                        <option class="option select-Categoria {{sku.class}} {{sku.id}}" value="{{sku.code}}">{{sku.title}}</option>
 
                     {%endfor%}
 
@@ -217,8 +218,9 @@ button {
             <div class="form-group">
                 <select class="selectpicker filter_style"   data-selected-text-format="count" id= "select-SubCategoria" multiple data-live-search="true">
 
-                    {%for SubCategoria in SubCategoria_list %}
-                        <option  data-active-count={{SubCategoria.Categoria_ids|count}} value="{{SubCategoria.code}}" class="select-option {{SubCategoria.class}} ">{{SubCategoria.title}}</option>
+                    {%for class in class_list %}
+
+                        <option  data-active-count="" {#SubCategoria.Categoria_ids|count#} value="{{class.code}}" class="select-option {{class.class}} ">{{class.title}}</option>
 
                     {%endfor%}
                     

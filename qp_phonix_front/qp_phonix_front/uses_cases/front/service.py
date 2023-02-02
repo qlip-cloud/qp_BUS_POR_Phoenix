@@ -10,9 +10,13 @@ def set_items_data(context, item_group_select, item_code_list = None, items_sele
 
     __setup_item_list(context, items_select, product_response.get("product_list"))
 
-    __setup_Categoria_list(context, product_response.get("Categoria_list"))
+    #__setup_Categoria_list(context, product_response.get("Categoria_list"))
 
-    __setup_SubCategoria_list(context, product_response.get("SubCategoria_list"))
+    #__setup_SubCategoria_list(context, product_response.get("SubCategoria_list"))
+
+    __setup_class_list(context, product_response.get("class_list"))
+
+    __setup_sku_list(context, product_response.get("sku_list"))
 
     __setup_item_group(context)
 
@@ -23,6 +27,14 @@ def __setup_item_group(context):
     context.item_groups = vf_item_group_list()
 
     context.select_filter = list(map(lambda x: {"group": x.title, "select_setup": x.ig_filter}, context.item_groups))
+
+def __setup_class_list(context, class_list):
+
+    context.class_list = class_list
+
+def __setup_sku_list(context, sku_list):
+    print(sku_list)
+    context.sku_list = sku_list
 
 def __setup_SubCategoria_list(context, SubCategoria_list):
 

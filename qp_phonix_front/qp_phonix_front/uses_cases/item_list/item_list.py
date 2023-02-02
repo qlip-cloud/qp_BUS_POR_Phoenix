@@ -11,13 +11,15 @@ def paginator_item_list(item_group = None, item_Categoria = None, item_SubCatego
 
 
     item_Categoria = json.loads(item_Categoria) if item_Categoria else None
+    
     item_SubCategoria = json.loads(item_SubCategoria) if item_SubCategoria else None
+    
     item_code_list = json.loads(item_code_list) if item_code_list else None
 
-    setup = get_table_and_condition(item_group, item_Categoria, item_SubCategoria, item_code_list, letter_filter, filter_text = filter_text, idlevel = idlevel)
+    setup = get_table_and_condition(item_group, item_Categoria, item_SubCategoria, item_code_list = item_code_list, idlevel = idlevel)
     
-    result =  __get_product_list(setup.get("tbl_product_list"), setup.get("tlb_product_attr_select"), setup.get("tlb_product_attr_body"),
-                    setup.get("cond_c"), setup.get("cond_t"))
+    #result =  __get_product_list(setup.get("tbl_product_list"), setup.get("tlb_product_attr_select"), setup.get("tlb_product_attr_body"),
+    result =  __get_product_list(setup.get("tbl_product_list"), setup.get("cond_c"), setup.get("cond_t"))
 
     response = get_item_inventary(result)
 
@@ -25,11 +27,10 @@ def paginator_item_list(item_group = None, item_Categoria = None, item_SubCatego
 
 def get_item_list(item_code_list, idlevel = None):
 
-
     setup = get_table_and_condition(item_code_list = item_code_list, is_equal= True, idlevel = idlevel)
+    #return __get_product_list(setup.get("tbl_product_list"), setup.get("tlb_product_attr_select"), setup.get("tlb_product_attr_body"),
 
-    return __get_product_list(setup.get("tbl_product_list"), setup.get("tlb_product_attr_select"), setup.get("tlb_product_attr_body"),
-                    setup.get("cond_c"), setup.get("cond_t"), has_limit = False)
+    return __get_product_list(setup.get("tbl_product_list"), setup.get("cond_c"), setup.get("cond_t"), has_limit = False)
 
 @frappe.whitelist()
 def vf_item_list(item_group=None, item_Categoria=None, item_SubCategoria=None, item_code_list = None, idlevel = None):
@@ -38,16 +39,21 @@ def vf_item_list(item_group=None, item_Categoria=None, item_SubCategoria=None, i
         
         setup = get_table_and_condition(item_group, item_Categoria, item_SubCategoria, item_code_list = item_code_list, idlevel = idlevel)
 
-        product_list = __get_product_list(setup.get("tbl_product_list"), setup.get("tlb_product_attr_select"), setup.get("tlb_product_attr_body"),
-                        setup.get("cond_c"), setup.get("cond_t"))
+        #product_list = __get_product_list(setup.get("tbl_product_list"), setup.get("tlb_product_attr_select"), setup.get("tlb_product_attr_body"),
+
+        product_list = __get_product_list(setup.get("tbl_product_list"), setup.get("cond_c"), setup.get("cond_t"))
 
         price_list = frappe.db.get_single_value("Selling Settings", "selling_price_list")
 
-        SubCategoria_list = get_filter_SubCategoria_option(price_list)
+        #SubCategoria_list = get_filter_SubCategoria_option(price_list)
 
-        Categoria_list = get_filter_option("Categoria", price_list)
+        #Categoria_list = get_filter_option("Categoria", price_list)
 
-        attribute_list = __get_attr_list(setup.get("tbl_product_list"), setup.get("list_attr"))
+        #attribute_list = __get_attr_list(setup.get("tbl_product_list"), setup.get("list_attr"))
+
+        product_class = __get_product_class()
+
+        product_sku = __get_product_sku()
 
     except Exception as error:
 
@@ -58,17 +64,49 @@ def vf_item_list(item_group=None, item_Categoria=None, item_SubCategoria=None, i
         SubCategoria_list = []
 
         attribute_list = []
-
+        
+        product_class = []
+        
+        product_sku = []
+        
         frappe.log_error(message=frappe.get_traceback(), title="Item List")
 
         pass
 
     return {
         'product_list': product_list,
-        'Categoria_list': Categoria_list,
-        'SubCategoria_list': SubCategoria_list,
-        'attr_list': attribute_list
+        'Categoria_list': [],
+        'SubCategoria_list': [],
+        'class_list': product_class,
+        'attr_list': [],
+        'sku_list': product_sku,
     }
+
+def __get_product_class():
+    sql = """
+        SELECT
+            qp_phonix_class as id,
+            qp_phonix_class as code,
+            qp_phonix_class as title,
+            REPLACE(group_concat(distinct sku),","," ")  as class
+        FROM tabItem
+        group by qp_phonix_class
+    """
+
+    return frappe.db.sql(sql, as_dict=1)
+
+def __get_product_sku():
+    sql = """
+        SELECT
+            sku as id,
+            sku as code,
+            sku as title,
+            REPLACE(group_concat(distinct qp_phonix_class),","," ")  as class
+        FROM tabItem
+        group by sku
+    """
+
+    return frappe.db.sql(sql, as_dict=1)
 
 def get_filter_option(option, price_list):
 
@@ -230,10 +268,13 @@ def get_table_and_condition(item_group = None, item_Categoria = None, item_SubCa
     
     tbl_product_list = get_tbl_product_list(item_group, from_base, where_base, item_code_list, letter_filter, is_equal, filter_text = filter_text)
 
-    tlb_product_attr_select, tlb_product_attr_body, list_attr = __get_product_attr(from_base, where_base)
+    #tlb_product_attr_select, tlb_product_attr_body, list_attr = __get_product_attr(from_base, where_base)
 
     attr_dict = get_attr_group(item_group)
+    cond_c = __get_cond("sku",item_Categoria)
+    cond_t = __get_cond("qp_phonix_class",item_SubCategoria)
 
+    """
     filter01, filter02 = __get_attr_filter_options(attr_dict.get('field'))
 
     tbl_SubCategoria_product_list = __get_sql_attr(filter02, from_base, where_base)
@@ -242,18 +283,18 @@ def get_table_and_condition(item_group = None, item_Categoria = None, item_SubCa
 
     cond_t = __get_cond(filter01, item_Categoria)
 
-    cond_c = __get_cond(filter02, item_SubCategoria)
+    cond_c = __get_cond(filter02, item_SubCategoria)"""
 
     return {
 
         "tbl_product_list": tbl_product_list,
-        "tlb_product_attr_select": tlb_product_attr_select,
-        "tbl_SubCategoria_product_list": tbl_SubCategoria_product_list,
-        "tbl_Categoria_product_list": tbl_Categoria_product_list,
+        #"tlb_product_attr_select": tlb_product_attr_select,
+        #"tbl_SubCategoria_product_list": tbl_SubCategoria_product_list,
+        #"tbl_Categoria_product_list": tbl_Categoria_product_list,
         "cond_t": cond_t,
         "cond_c": cond_c,
-        "tlb_product_attr_body": tlb_product_attr_body,
-        "list_attr": list_attr
+        #"tlb_product_attr_body": tlb_product_attr_body,
+        #"list_attr": list_attr
 
     }
 
@@ -386,6 +427,7 @@ def get_tbl_product_list(item_group, from_base, where_base, item_code_list = Non
             prod.stock_uom,
             prod.item_group,
             prod.sku,
+            qp_phonix_class,
             gp_level.discountpercentage
             """ % (URL_IMG_EMPTY) 
     
@@ -430,19 +472,20 @@ def __get_cond(attribute, item_value):
 
     if item_value and len(item_value) == 1:
 
-        # cond_attr = "attr_%s.code = '%s'" % (attribute, tuple(item_value))
-
-        cond_attr = "attr_{0}.code = '{1}'".format(attribute, item_value[0])
+        cond_attr = "{0} = '{1}'".format(attribute, item_value[0])
+        #cond_attr = "attr_{0}.code = '{1}'".format(attribute, item_value[0])
 
     elif item_value and len(item_value) > 1:
 
-        cond_attr = "attr_{0}.code in {1}".format(attribute, tuple(item_value))
+        #cond_attr = "attr_{0}.code in {1}".format(attribute, tuple(item_value))
+        cond_attr = "{0} in {1}".format(attribute, tuple(item_value))
 
     return cond_attr
 
 
 
-def __get_product_list(tbl_product_list, tlb_product_attr_select, tlb_product_attr_body, cond_c, cond_t, has_limit = True ):
+#def __get_product_list(tbl_product_list, tlb_product_attr_select, tlb_product_attr_body, cond_c, cond_t, has_limit = True ):
+def __get_product_list(tbl_product_list, cond_c, cond_t, has_limit = True ):
 
     limit = "LIMIT 0, 10" if has_limit else ""
 
@@ -456,23 +499,23 @@ def __get_product_list(tbl_product_list, tlb_product_attr_select, tlb_product_at
                     prod.name,
                     prod.item_name,
                     prod.image,
-                    %s
                     prod.price,
                     prod.cantidad,
                     prod.stock_uom,
                     prod.item_group,
                     prod.sku,
+                    qp_phonix_class,
                     prod.discountpercentage
                 from
                     (%s) as prod
-                    %s
+                    
                 Where %s and %s
                 order by prod.item_name
                 %s
         ) AS drb_tbl_prod_filter
 
-    """ % (select_attr_base, tlb_product_attr_select, tbl_product_list, tlb_product_attr_body, cond_c, cond_t, limit)
-
+    """ % (select_attr_base, tbl_product_list, cond_c, cond_t, limit)
+    print(sql_product_list)
     #frappe.throw("rompete bobo")
     product_list = frappe.db.sql(sql_product_list, as_dict=1)
 
@@ -553,6 +596,7 @@ def __get_select_attr_base():
             stock_uom,
             item_group,
             sku,
+            qp_phonix_class,
             discountpercentage,
             (price - (price * discountpercentage) / 100) as price_discount
     """
