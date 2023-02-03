@@ -9,6 +9,30 @@ $(document).ready(function() {
 
     $('.disabled').show();
 
+    $("#with_inventary").on("change", function(){
+
+        if ($("#with_inventary").is(':checked')){
+            
+            $('.item-row.filter').not(`.inventary-SI.SI`).hide()
+
+            $(`.item-row.filter.inventary-SI.SI`).show()
+
+        }else{
+
+            $(`.item-row.filter.SI`).show()
+        }
+
+        get_rows()
+
+        
+        select_Categoria = $("#select-Categoria").val()
+
+        $select_option = $(`.select-option.filter`)
+        
+        visible_filter_select($select_option, select_Categoria)
+
+    })
+
     $(".link_abc").click(function(){
         
         if(window.navigator.onLine){
@@ -61,12 +85,14 @@ $(document).ready(function() {
 });
 
 function setup_filter(link_abc){
-    
+
     $('.item-row.filter').not(`.${link_abc}`).hide()
 
     $(`.item-row.filter.${link_abc}`).show()
 
-    get_class($('.item-row.filter:visible'))
+    $item_filter = $('.item-row.filter:visible');
+
+    //get_class($item_filter )
 }
 function get_class($item_filter){
 
@@ -81,15 +107,15 @@ function get_class($item_filter){
     $item_filter.each(function(){
 
         array_class = $(this).attr("class").split(" ")
-     
+
         $item_group_active = $(".item_group").not(".inactive")
 
         group_active = $item_group_active.data("item-group")
 
         //$select_option.filter(`.${group_active}.${array_class[0]}`).show()
-        $select_option.filter(`.${array_class[0]}`).show()
+        $select_option.show()
 
-        $(`#select-SubCategoria option[value='${array_class[1]}']`).show()
+        $(`#select-SubCategoria option[value='${array_class[2]}']`).show()
 
     })
 

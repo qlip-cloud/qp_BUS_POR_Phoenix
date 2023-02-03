@@ -7,6 +7,8 @@ $(document).mousemove( function(e) {
 
 $(document).ready(function() {
 
+    $("#with_inventary").prop("checked", false);
+
     $("#tool-tip-container").on("mouseover", ".dropdown-item", function(e){
 
         title_new = $(this).children('.text').text().replace(/\s/g, '');
@@ -73,21 +75,32 @@ $(document).ready(function() {
 
     $('#select-Categoria').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
 
-        if ((clickedIndex === 0) || (clickedIndex > 0)){
+        if ((clickedIndex === 0) || (clickedIndex > 0)){    
 
-            setup_select_multiple(".option.select-Categoria", ".select-principal", previousValue)              
+            setup_select_multiple(".option.select-Categoria", 0, previousValue)              
 
             select = e.target.options[clickedIndex].value
             
             select_Categoria = $(this).val()
 
+
+            if (select_Categoria && select_Categoria.includes("SI")){
+                $("#with_inventary").prop("checked", false);
+
+                $(".row-inventary").show()
+            }else{
+                $(".row-inventary").hide()
+                $("#with_inventary").prop("checked", false);
+
+            }
+            
             $select_option = $(`.select-option.filter`)
 
             if (!(isSelected)){
-                
+               
                 if (!$(this).val()){
 
-                    console.log($(this).val())
+                    
                     reset_filter()
 
                 }else{
@@ -101,8 +114,7 @@ $(document).ready(function() {
                 $("#select-SubCategoria").selectpicker("refresh")
 
             }else{
-
-
+                
                 visible_filter_select($select_option, select_Categoria)
 
             }
@@ -118,11 +130,17 @@ $(document).ready(function() {
             }
 
         }
+        else{
+
+            $(".row-inventary").hide()
+
+            $("#with_inventary").prop("checked", false);
+        }
     })
 
     $('#select-SubCategoria').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
 
-        setup_select_multiple(".select-option", ".select-secundary", previousValue)              
+        setup_select_multiple(".select-option", 1, previousValue)              
         
         active_item()
         
@@ -181,15 +199,35 @@ function visible_filter_select($select_option, select_Categoria){
     }
     $("#select-SubCategoria").selectpicker("refresh")
 }
- 
-function setup_select_multiple(option, select, previousValue){
+function reorganization_subcategory(){
+
+    $("#select-SubCategoria").selectpicker("deselectAll")
+
+    $select_option = $(".select-option")
+
+    $select_option.hide()
+
+    $item_filter = $(".item-row.filter:visible") 
+
+    $item_filter.each(function(){
+
+        array_class = $(this).attr("class").split(" ")
+
+        $(`#select-SubCategoria option[value='${array_class[2]}']`).show()
+
+    })
+    
+    $(".selectpicker").selectpicker("refresh")
+
+}
+function setup_select_multiple(option, select_type, previousValue){
     
     $item_group = $(".item_group").not(".inactive")
     
     item_group_active = $item_group.data("item-group")
 
     //if ($(`${select}.${item_group_active}`).data("select-type") == 0){
-    if ($(`${select}`).data("select-type") == 0){
+    if (select_type == 0){
         
         if (previousValue.length > 0){
 
@@ -222,17 +260,13 @@ function active_item(){
         $item = $item.filter(`.${letter_filter}`)
     }
 
-    if (letter_filter){
-        $item = $item.filter(`.${letter_filter}`)
-    }
-
     if (text_filter){
 
         $item = setup_filter_text()
     }
 
     select_Categoria = format_class($("#select-Categoria").val());
-
+    
     select_SubCategoria = format_class($("#select-SubCategoria").val());
 
     if ((select_Categoria) || (select_SubCategoria)){
@@ -270,7 +304,10 @@ function format_class(list_id){
 
     if (list_id){
         return list_id.map((id)=>{
-            return `.${id}`
+    
+            inventory = $("#with_inventary").is(':checked') ? ".inventary-SI" : ""
+
+            return `.${id}${inventory}`
         })
     }
     
@@ -396,7 +433,11 @@ function get_rows(is_valid = false, is_letter = false){
             letter_filter = $(".link_abc.selected").data("value")
 
             filter_text = $("#filter_text").val()
+            
             idlevel = $("#idlevel").val()
+
+            has_inventary = $("#with_inventary").is(':checked');
+            
             let item_code_list = []
 
             order_id = $("#order_id").val()
@@ -414,7 +455,8 @@ function get_rows(is_valid = false, is_letter = false){
                 item_SubCategoria: SubCategoria_selected,
                 letter_filter,
                 filter_text,
-                idlevel
+                idlevel,
+                has_inventary
             }
 
             module_root = "render.item_formulary.item_formulary_render"
@@ -442,6 +484,12 @@ function get_rows(is_valid = false, is_letter = false){
                     setup_filter(letter_filter)
 
                 }
+                reorganization_subcategory()
+                /*if (has_inventary){
+                    setup_filter("inventary-SI")
+
+                }*/
+                //get_class()
             }
             
             send_petition(payload, module_root, method, callresponse)

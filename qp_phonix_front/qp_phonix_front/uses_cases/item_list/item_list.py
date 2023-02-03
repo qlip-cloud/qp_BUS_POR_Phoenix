@@ -7,21 +7,69 @@ URL_IMG_EMPTY = "/assets/qlip_bussines_theme/images/company_default_logo.jpg"
 
 
 @frappe.whitelist()
-def paginator_item_list(item_group = None, item_Categoria = None, item_SubCategoria = None, item_code_list = None, letter_filter = None, filter_text = None, idlevel = None):
+def paginator_item_list(item_group = None, item_Categoria = None, item_SubCategoria = None, item_code_list = None,
+                letter_filter = None, filter_text = None, idlevel = None, has_inventary = None, item_with_inventary = []):
 
-
+    print(item_Categoria)
     item_Categoria = json.loads(item_Categoria) if item_Categoria else None
     
     item_SubCategoria = json.loads(item_SubCategoria) if item_SubCategoria else None
     
-    item_code_list = json.loads(item_code_list) if item_code_list else None
+    item_code_list = json.loads(item_code_list) if isinstance(item_code_list, str) else item_code_list if item_code_list else None
 
-    setup = get_table_and_condition(item_group, item_Categoria, item_SubCategoria, item_code_list = item_code_list, idlevel = idlevel)
+    #setup = get_table_and_condition(item_group, item_Categoria, item_SubCategoria, item_code_list = item_code_list, idlevel = idlevel)
+    
+    return callback_get_inventary(item_group, item_Categoria, item_SubCategoria, letter_filter, filter_text, 
+    idlevel, has_inventary,item_code_list, [])
+    
+    
     
     #result =  __get_product_list(setup.get("tbl_product_list"), setup.get("tlb_product_attr_select"), setup.get("tlb_product_attr_body"),
+    """result =  __get_product_list(setup.get("tbl_product_list"), setup.get("cond_c"), setup.get("cond_t"))
+
+    response = get_item_inventary(result)
+
+    if has_inventary:
+        
+        if response:
+                 
+            if (not len(item_with_inventary) >= 10):
+        
+                item_with_inventary += list(filter(lambda x: x.quantity > 0 and x.name not in item_code_list,response))
+
+                item_code_list += list(map(lambda x: x.name, response))
+
+                paginator_item_list(item_group , json.dumps(item_Categoria) , json.dumps(item_SubCategoria) , item_code_list , letter_filter, 
+                filter_text , idlevel , has_inventary, item_with_inventary)
+
+        print(item_with_inventary)
+        return item_with_inventary
+    
+    return response"""
+
+def callback_get_inventary(item_group = None, item_Categoria= None, item_SubCategoria= None, letter_filter= None, filter_text= None, 
+    idlevel = None, has_inventary = False,item_code_list = [], item_with_inventary = []):
+    
+    setup = get_table_and_condition(item_group, item_Categoria, item_SubCategoria, item_code_list = item_code_list, idlevel = idlevel)
+    
     result =  __get_product_list(setup.get("tbl_product_list"), setup.get("cond_c"), setup.get("cond_t"))
 
     response = get_item_inventary(result)
+    
+    if has_inventary:
+        
+        if response:
+                 
+            if (not len(item_with_inventary) >= 10):
+        
+                item_with_inventary += list(filter(lambda x: x.quantity > 0,response))
+
+                item_code_list += list(map(lambda x: x.name, response))
+
+                return callback_get_inventary(item_group , item_Categoria, item_SubCategoria , letter_filter, 
+                filter_text , idlevel , has_inventary, item_code_list, item_with_inventary)
+
+        return item_with_inventary
 
     return response
 
@@ -51,9 +99,9 @@ def vf_item_list(item_group=None, item_Categoria=None, item_SubCategoria=None, i
 
         #attribute_list = __get_attr_list(setup.get("tbl_product_list"), setup.get("list_attr"))
 
-        product_class = __get_product_class()
+        product_class = __get_product_class(idlevel)
 
-        product_sku = __get_product_sku()
+        product_sku = __get_product_sku(idlevel)
 
     except Exception as error:
 
@@ -82,29 +130,37 @@ def vf_item_list(item_group=None, item_Categoria=None, item_SubCategoria=None, i
         'sku_list': product_sku,
     }
 
-def __get_product_class():
+def __get_product_class(idlevel):
     sql = """
         SELECT
             qp_phonix_class as id,
             qp_phonix_class as code,
             qp_phonix_class as title,
             REPLACE(group_concat(distinct sku),","," ")  as class
-        FROM tabItem
+        FROM tabItem as item
+        inner join 
+            tabqp_GP_Level as level
+        on (level.group_type = item.qp_phonix_class)
+        where level.idlevel = '{}'
         group by qp_phonix_class
-    """
+    """.format(idlevel)
 
     return frappe.db.sql(sql, as_dict=1)
 
-def __get_product_sku():
+def __get_product_sku(idlevel):
     sql = """
         SELECT
             sku as id,
             sku as code,
             sku as title,
             REPLACE(group_concat(distinct qp_phonix_class),","," ")  as class
-        FROM tabItem
+        FROM tabItem as item
+        inner join 
+            tabqp_GP_Level as level
+        on (level.group_type = item.qp_phonix_class)
+        where level.idlevel = '{}'
         group by sku
-    """
+    """.format(idlevel)
 
     return frappe.db.sql(sql, as_dict=1)
 
@@ -515,7 +571,7 @@ def __get_product_list(tbl_product_list, cond_c, cond_t, has_limit = True ):
         ) AS drb_tbl_prod_filter
 
     """ % (select_attr_base, tbl_product_list, cond_c, cond_t, limit)
-    print(sql_product_list)
+    #print(sql_product_list)
     #frappe.throw("rompete bobo")
     product_list = frappe.db.sql(sql_product_list, as_dict=1)
 
