@@ -10,7 +10,7 @@ URL_IMG_EMPTY = "/assets/qlip_bussines_theme/images/company_default_logo.jpg"
 def paginator_item_list(item_group = None, item_Categoria = None, item_SubCategoria = None, item_code_list = None,
                 letter_filter = None, filter_text = None, idlevel = None, has_inventary = None, item_with_inventary = []):
 
-    print(item_Categoria)
+    
     item_Categoria = json.loads(item_Categoria) if item_Categoria else None
     
     item_SubCategoria = json.loads(item_SubCategoria) if item_SubCategoria else None

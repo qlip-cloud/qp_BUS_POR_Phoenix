@@ -144,7 +144,7 @@ $(document).ready(function() {
         
         active_item()
         
-        get_rows()
+        //get_rows()
         
     })
     $("#filter_text").val("")
