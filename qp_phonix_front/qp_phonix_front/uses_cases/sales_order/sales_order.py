@@ -10,7 +10,7 @@ from qp_phonix_front.qp_phonix_front.uses_cases.item_list.item_list import get_a
 from qp_phonix_front.qp_phonix_front.uses_cases.check_out_art.check_out_art import send_check_out_so
 from qp_phonix_front.qp_phonix_front.uses_cases.gp_service.gp_service import send_sales_order
 from qp_phonix_front.qp_phonix_front.uses_cases.item_list.item_list import __get_uom_list
-
+from frappe.utils import today
 
 SHIPPING_DEFAULT = 'N/S'
 DATE_DELIVERY_FORMAT_FIELD = "%Y-%m-%d"
@@ -222,8 +222,9 @@ def create_sales_order(order_json):
 
         rec_result['msg'] = "Success"
         
-        #frappe.db.commit()
+        frappe.db.commit()
         
+        print("aki 2")
         """headers = _get_header(api_key, generated_secret)
 
         result =  requests.post(url=url, data=string_obj, headers=headers)
@@ -503,7 +504,7 @@ def __get_body(json_data):
 
     obj_data = {
         "customer": customer.name,
-        "delivery_date": json_data.get('delivery_date'),
+        "delivery_date": today(),
         "items": json_data.get('items'),
         "doctype": "Sales Order"
     }

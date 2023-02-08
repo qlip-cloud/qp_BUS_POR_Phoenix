@@ -317,9 +317,9 @@ function save_order(url, redirect_link, action = null, valid_empty = true, order
 
         let method = `${base_url}.${url}`
         
-        let delivery_date = $("#datepicker").val()
+        //let delivery_date = $("#datepicker").val()
         
-        let shipping_type = $("#select_shipping_method").val()
+        //let shipping_type = $("#select_shipping_method").val()
 
         let items = []
 
@@ -335,8 +335,8 @@ function save_order(url, redirect_link, action = null, valid_empty = true, order
                 obj = {
                     qty: $(this).find("#quantity").val(),
                     item_code: $(this).find("#item_id").val(),
-                    rate: $(this).find("#item_price").val(),
-                    delivery_date
+                    rate: $(this).find("#item_price").val()
+                    //,delivery_date
                 }
                 items.push(obj)
                 len ++
@@ -345,14 +345,17 @@ function save_order(url, redirect_link, action = null, valid_empty = true, order
         });
 
         args = {
-                'order_json': {items, shipping_type, order_id, action}
+                'order_json': {
+                        items
+                        //, shipping_type
+                        , order_id
+                        , action}
         }
 
         if(len){
             if (!is_async)
                 
                 active_block()
-            
             frappe.call({
                 method,
                 args,

@@ -2,15 +2,19 @@
 
 {% block section_title %}
     {%if is_valid%}                
-        {{ _("Your Order") }} #{{order.so_name}}
+        Orden #{{order.so_name}}
     {%endif%}
 {% endblock %}
 
 {% block button_title %}
     <a id="btn_back_orders" class="btn button-master button-back">
-        {{ _("BACK TO ORDERS") }}
+        {{ _("VOLVER A ORDENES") }}
+    </a>
+    <a id="btn_edit_export" href="/api/method/qp_phonix_front.qp_phonix_front.uses_cases.export.order_xlsx.export_xlsx?order_id={{order.so_name}}" target="_blank"class="btn button-master button-default">
+        {{ _("EXPORTAR") }}
     </a> 
-    {%if is_valid and order.status_code == 0%}
+    {#if is_valid and order.status_code == 0#}
+    {%if 0 %}
 
         <a id="btn_edit_order"  class="btn button-master button-default">
             {{ _("EDIT ORDER") }}
@@ -27,7 +31,7 @@
 <style>
     .datepicker_confirm{
         background: rgba(77, 100, 68, 0.07);
-        color: #4D6444;
+        color: #000;
         box-shadow: none;
         width: 100%;
         height: 47px;
@@ -82,34 +86,34 @@
         <div class="col-sm-3" style="margin-right: 1em; max-width: 23%;">
             <div class="row shadow p-3 mb-5 bg-white rounded">
                 <div class="col-md-12 subtitle">
-                    Your information
+                    Información
                 </div>
                 <div class="col-md-12 label">
-                    Name
+                    Nombre
                 </div>
                 <div class="col-md-12 info background-info information_label">
                     {{order.customer_name}}
                 </div>
                 <div class="col-md-12 label">
-                    Address
+                    Dirección
                 </div>
                 <div class="col-md-12 info background-info information_label">
                     {{order.address_line1}}
                 </div>
                 <div class="col-md-12 label">
-                    City
+                    Ciudad
                 </div>
                 <div class="col-md-12 info background-info information_label">
                     {{order.city}}
                 </div>
                 <div class="col-md-12 label">
-                    ZIP codes
+                    Código  Postal
                 </div>
                 <div class="col-md-12 info background-info information_label">
                     {{order.pincode}}
                 </div>
                 <div class="col-md-12 label">
-                    Contact number
+                    Número de contacto
                 </div>
                 <div class="col-md-12 info background-info information_label">
                     {{order.phone}}
@@ -120,7 +124,7 @@
         <div class="col-sm-9">
             <div class="row">
             <div class="col-sm-9 shadow p-3 mb-5 bg-white rounded" style="max-width: 72%; margin-right: 0.75em;">
-                <div class="col">
+                <!--div class="col">
                     <div class="row">
                         <div class=" col-md-12 subtitle">
                             Delivery information
@@ -136,58 +140,58 @@
                     </div>
                     <div class="row ">
                         <div class="col-md-4">
-                            {%if order.status_code == 0%}
+                            {#if order.status_code == 0#}
 
                                 <div class="form-group">
-                                    <select data-value = "{{order.shipping_type}}" data-type-val="true" class="form-control datepicker_confirm shipping_data" id="select_shipping_method">
+                                    <select data-value = "{#order.shipping_type#}" data-type-val="true" class="form-control datepicker_confirm shipping_data" id="select_shipping_method">
                                         <option value="Shinpping type" disabled selected>Shipping type</option>
-                                        {%for shipping_method in shipping_method_list %}
-                                            {%if (shipping_method.name.lower() == order.shipping_type.lower())%}
-                                                <option value="{{shipping_method.name}}" selected>{{shipping_method.description}}</option>
-                                            {%else%}
-                                                <option value="{{shipping_method.name}}">{{shipping_method.description}}</option>
-                                            {%endif%}
-                                        {%endfor%}
+                                        {#for shipping_method in shipping_method_list #}
+                                            {#if (shipping_method.name.lower() == order.shipping_type.lower())#}
+                                                <option value="{#shipping_method.name#}" selected>{#shipping_method.description#}</option>
+                                            {#else#}
+                                                <option value="{#shipping_method.name#}">{#shipping_method.description#}</option>
+                                            {#endif#}
+                                        {#endfor#}
                                         
                                         
                                     </select>
                                 </div>   
                                 
                                 
-                            {%else%}
+                            {#else#}
                                 <div class="background-info information_label">
-                                    {{order.shipping_description}}
+                                    {#order.shipping_description#}
                                 </div>
-                            {%endif%}     
+                            {#endif#}     
                         </div>
                         <div class="col-md-4">
-                            {%if order.status_code == 0%}
+                            {#if order.status_code == 0#}
                                 <div class="form-group">
                                     <div class="input-group date">
-                                        <input data-value="{{order.shipping_date}}" data-type-val="true" type="text" id="datepicker" placeholder = "Shipping date" class="btn text-left datepicker_confirm shipping_data" value="{{order.shipping_date}}" readonly>
+                                        <input data-value="{#order.shipping_date#}" data-type-val="true" type="text" id="datepicker" placeholder = "Shipping date" class="btn text-left datepicker_confirm shipping_data" value="{#order.shipping_date#}" readonly>
                                         <div class="input-group-addon">
                                             <span class="glyphicon glyphicon-th"></span>
                                         </div>
                                     </div>
                                 </div>          
-                            {%else%}
+                            {#else#}
                                 <div class="background-info information_label">
-                                    {{order.shipping_date}}
+                                    {#order.shipping_date#}
                                 </div>
-                            {%endif%}     
+                            {#endif#}
                         </div>
                     </div>
-                </div>
+                </div-->
             </div>
             <div class="col-sm-3 shadow p-3 mb-5 bg-white rounded">
                 <div class=" col-md-12 subtitle">
-                    Total Cost
+                    Costo Total
                 </div>
                 <div class=" col-md-12 title" style="line-height: 48px;">
                     $ <span id="price_total">{{order.total}}</span>
                 </div>
                 <div class=" col-md-12 subtitle">
-                    USD
+                    COP
                 </div>
             </div>
         </div>
@@ -203,7 +207,8 @@
                     </div>
                 {%endif%}
 
-                {%if count_change_price%}
+                {#if count_change_price#}
+                {% if 0 %}
                     <div class="col-sm-12">
                         <div class="alert alert-warning text-center" role="alert">
                             Los precios de algunos productos han sido actualizados
@@ -217,7 +222,7 @@
                 <div class="col-sm-12 subtitle">
                     <div class="row">
                         <div class="col-sm-3" style="margin-left: -15px; margin-bottom: 15px;">
-                            Products
+                            Productos
                             <input type="hidden" id="order_id" value="{{order.so_name}}">
                         </div> 
                         <div class="col-sm-8">
@@ -244,16 +249,17 @@
                             </div>
                             <div class="row label">
                                 <div class="col-sm-3">
-                                    {{item.SubCategoria_title}}
+                                    Código de item
+                                    {#item.SubCategoria_title#}
                                 </div>
                                 <div class="col-sm-2">
-                                    Quantity
+                                    Cantidad
                                 </div>
                                 <div class="col-sm-3">
-                                    UOM
+                                    Múltiplo
                                 </div>
                                 <div class="col-sm-2">
-                                    Price
+                                    Precio
                                 </div>
                                 <div class="col-sm-2">
                                     Total
@@ -262,8 +268,8 @@
                     
                             <div class="row info">
                                 <div class="col-sm-3">
-                                    <div class="background-info information_label {{'' if item.SubCategoria_value else cell_empty}}">
-                                        {{item.SubCategoria_value}}
+                                    <div class="background-info information_label {#'' if item.SubCategoria_value else cell_empty#}">
+                                        {{item.item_code}}
                                     </div>
                                 </div>
         
@@ -281,7 +287,7 @@
                                 </div>
                                 <div class="col-sm-3">
                                     <div class="background-info information_label">
-                                        Units Increments by {{item.inqt}}
+                                        Unidad x {{item.inqt}}
                                     </div>
                                 </div>
                                 <div class="col-sm-2">

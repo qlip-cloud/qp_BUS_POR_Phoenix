@@ -9,6 +9,8 @@ $(document).ready(function() {
 
     $("#with_inventary").prop("checked", false);
 
+    $("#sku_true").prop("checked", false);
+
     $("#tool-tip-container").on("mouseover", ".dropdown-item", function(e){
 
         title_new = $(this).children('.text').text().replace(/\s/g, '');
@@ -72,8 +74,40 @@ $(document).ready(function() {
 
     })
 
+    $("#sku_true").on("change", function(){
 
-    $('#select-Categoria').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
+        $("#with_inventary").prop("checked", false);
+
+        checked_list = ["SI", "NO"];
+
+        class_filter="SI .NO"
+
+        if ($(this).is(':checked')){
+
+            $('.item-row.filter').not(`.SI`).hide()
+
+            $(`.item-row.filter.SI`).show()
+
+            $(".row-inventary").show()
+
+            checked_list = ["SI"];
+
+            class_filter="SI"
+        }
+        else{
+            $(".row-inventary").hide()
+        }
+
+        //setup_filter(class_filter)
+
+        visible_filter_select($(this).is(":checked"))
+
+        //get_rows()
+
+
+    })
+
+    /*$('#select-Categoria').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
 
         if ((clickedIndex === 0) || (clickedIndex > 0)){    
 
@@ -136,19 +170,23 @@ $(document).ready(function() {
 
             $("#with_inventary").prop("checked", false);
         }
-    })
+    })*/
 
     $('#select-SubCategoria').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
 
         setup_select_multiple(".select-option", 1, previousValue)              
-        
+
         active_item()
         
-        //get_rows()
+        get_rows(false, false, true)
         
     })
     $("#filter_text").val("")
 });
+
+
+
+
 function get_filter_text(){
     
     $('.item-row.filter').hide()
@@ -178,7 +216,29 @@ function setup_filter_text(){
     
 }
 
-function visible_filter_select($select_option, select_Categoria){
+function visible_filter_select(select_sku = false){
+
+    $select_option = $(`.select-option.filter`)
+    
+    $select_option.hide()
+
+    $("#select-SubCategoria").selectpicker("deselectAll")
+    
+    if (select_sku){
+
+        $select_option.filter(`.SI`).show()
+
+    }else{
+
+        $select_option.show()
+
+    }
+
+
+    $("#select-SubCategoria").selectpicker("refresh")
+}
+
+/*function visible_filter_select($select_option, select_Categoria){
     
     $select_option.hide()
 
@@ -191,14 +251,14 @@ function visible_filter_select($select_option, select_Categoria){
         if ($item.hasClass($(this).val())){
             return true
         }
-    })*/
-
+    })
+    //$select_option.filter(`.${select_Categoria[i]}`).show()
     for(i = 0; i < select_Categoria.length; i++){
 
         $select_option.filter(`.${select_Categoria[i]}`).show()
     }
     $("#select-SubCategoria").selectpicker("refresh")
-}
+}*/
 function reorganization_subcategory(){
 
     $("#select-SubCategoria").selectpicker("deselectAll")
@@ -265,7 +325,7 @@ function active_item(){
         $item = setup_filter_text()
     }
 
-    select_Categoria = format_class($("#select-Categoria").val());
+    select_Categoria =  format_class($("#sku_true").is(':checked') ? ["SI"] : ["SI", "NO"]);
     
     select_SubCategoria = format_class($("#select-SubCategoria").val());
 
@@ -346,9 +406,19 @@ function item_group_filter_toggle(item_group_default){
 
     $(".selectpicker option").removeAttr("selected")
 
-    remove_class_filter()
+    remove_class_filter()   
 
-    $Categoria_item = $(`.select-Categoria`)
+    $SubCategoria_option = $(`.select-option`)
+
+    
+    if ($("#sku_true").is(":checked")){
+        $SubCategoria_option = $SubCategoria_option.hasClass("SI");
+
+    }
+
+    add_class_filter($SubCategoria_option)
+
+    /*$Categoria_item = $(`.select-Categoria`)
 
     //$Categoria_item = $(`.select-Categoria.${item_group_default}`)
 
@@ -358,13 +428,12 @@ function item_group_filter_toggle(item_group_default){
 
         if (Categoria_id){
            
-            $SubCategoria_option = $(`.select-option.${Categoria_id}`)
 
             add_class_filter($SubCategoria_option)
         }
-    })
+    })*/
 
-    add_class_filter($Categoria_item)
+    //add_class_filter($Categoria_item)
 
     add_class_filter($(`.item-row.${item_group_default}`))
 
@@ -401,7 +470,7 @@ $(window).scroll(function() {
 
 
 
-function get_rows(is_valid = false, is_letter = false){
+function get_rows(is_valid = false, is_letter = false, is_class = false){
 
     if(window.navigator.onLine){
 
@@ -413,7 +482,7 @@ function get_rows(is_valid = false, is_letter = false){
 
             $pagination_control.val(0)
         }
-
+        
         if ( $pagination_control.val() == 0 && $petition_control.val() == 0){
 
             $petition_control.val(1)
@@ -426,7 +495,7 @@ function get_rows(is_valid = false, is_letter = false){
 
             row_active_len = $(`.item-row.${group_active}.filter`).length
 
-            Categoria_selected = $("#select-Categoria").val()
+            Categoria_selected = $("#sku_true").is(":checked") ? ["SI"] : ["SI", "NO"];
 
             SubCategoria_selected = $("#select-SubCategoria").val()
 
@@ -484,11 +553,11 @@ function get_rows(is_valid = false, is_letter = false){
                     setup_filter(letter_filter)
 
                 }
-                reorganization_subcategory()
-                /*if (has_inventary){
-                    setup_filter("inventary-SI")
+                if (has_inventary && !is_class){
+                    
+                    reorganization_subcategory()
 
-                }*/
+                }
                 //get_class()
             }
             

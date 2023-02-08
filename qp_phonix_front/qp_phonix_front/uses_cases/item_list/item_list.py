@@ -10,7 +10,6 @@ URL_IMG_EMPTY = "/assets/qlip_bussines_theme/images/company_default_logo.jpg"
 def paginator_item_list(item_group = None, item_Categoria = None, item_SubCategoria = None, item_code_list = None,
                 letter_filter = None, filter_text = None, idlevel = None, has_inventary = None, item_with_inventary = []):
 
-    
     item_Categoria = json.loads(item_Categoria) if item_Categoria else None
     
     item_SubCategoria = json.loads(item_SubCategoria) if item_SubCategoria else None
@@ -50,7 +49,7 @@ def paginator_item_list(item_group = None, item_Categoria = None, item_SubCatego
 def callback_get_inventary(item_group = None, item_Categoria= None, item_SubCategoria= None, letter_filter= None, filter_text= None, 
     idlevel = None, has_inventary = False,item_code_list = [], item_with_inventary = []):
     
-    setup = get_table_and_condition(item_group, item_Categoria, item_SubCategoria, item_code_list = item_code_list, idlevel = idlevel)
+    setup = get_table_and_condition(item_group, item_Categoria, item_SubCategoria, filter_text = filter_text, item_code_list = item_code_list, idlevel = idlevel)
     
     result =  __get_product_list(setup.get("tbl_product_list"), setup.get("cond_c"), setup.get("cond_t"))
 
@@ -324,6 +323,7 @@ def get_table_and_condition(item_group = None, item_Categoria = None, item_SubCa
     
     tbl_product_list = get_tbl_product_list(item_group, from_base, where_base, item_code_list, letter_filter, is_equal, filter_text = filter_text)
 
+    print(tbl_product_list)
     #tlb_product_attr_select, tlb_product_attr_body, list_attr = __get_product_attr(from_base, where_base)
 
     attr_dict = get_attr_group(item_group)
@@ -472,7 +472,7 @@ def get_tbl_product_list(item_group, from_base, where_base, item_code_list = Non
         
     letter_filter_condition = "AND LEFT (prod.item_name, 1) = '{}'".format(letter_filter) if letter_filter else ""
 
-    text_filter_condition = "AND prod.item_name LIKE '%{}%'".format(filter_text) if filter_text else ""
+    text_filter_condition = "AND prod.name LIKE '%{}'".format(filter_text) if filter_text else ""
 
     select_base = """
             prod.name,

@@ -17,19 +17,20 @@ $(document).ready(function() {
 
             $(`.item-row.filter.inventary-SI.SI`).show()
 
+            get_rows()
+
+
         }else{
+            
+            visible_filter_select($("#sku_true").is(':checked'))
 
             $(`.item-row.filter.SI`).show()
+
+            $("#pagination_control").val(0)
+
         }
 
-        get_rows()
-
-        
-        select_Categoria = $("#select-Categoria").val()
-
-        $select_option = $(`.select-option.filter`)
-        
-        visible_filter_select($select_option, select_Categoria)
+      
 
     })
 
@@ -92,7 +93,7 @@ function setup_filter(link_abc){
 
     $item_filter = $('.item-row.filter:visible');
 
-    //get_class($item_filter )
+    get_class($item_filter )
 }
 function get_class($item_filter){
 
