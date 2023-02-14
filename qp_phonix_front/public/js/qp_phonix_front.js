@@ -84,6 +84,7 @@ $(document).ready(function() {
         })
 
         $("#confirm_draft").on("click", ()=>{
+                
                 order_id = $("#order_id").val()
 
                 if (order_id){

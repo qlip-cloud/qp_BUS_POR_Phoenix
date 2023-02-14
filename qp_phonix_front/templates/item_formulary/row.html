@@ -1,6 +1,6 @@
 {%for item in item_list %}
 
-    <tr data-item-name = "{{item.item_name}}" class="inventary-{{'SI' if item.quantity > 0 else 'NO'}} {{item.sku}} {{item.qp_phonix_class}} item-row {{item.name}} {{item.item_group}} {{item.initial}} {{'row_select' if item.cantidad else ''}} {{'filter' if disabled_off else ''}}" style="{{'display: none;' if not disabled_off else ''}}" data-id = '{{item.name}}'>
+    <tr data-item-name = "{{item.item_name}}" class="inventary-{{'SI' if item.quantity > 0 else 'NO'}} {{item.sku}} {{item.qp_phonix_class}} item-row {{item.name | replace(':','-')}} {{item.item_group}} {{item.initial}} {{'row_select' if item.cantidad else ''}} {{'filter' if disabled_off else ''}}" style="{{'display: none;' if not disabled_off else ''}}" data-id = "{{item.name| replace(':','-')}}">
         <input type="hidden" id = "item_id" value= "{{item.name}}" >
         <td class="lateralleft padding_list {{'row_select' if item.cantidad else ''}}"><img src="{{item.image}}" class="rounded float-left item_img" onerror="this.src='/assets/qlip_bussines_theme/images/company_default_logo.jpg'" /> 
         
@@ -16,7 +16,7 @@
 
         
         <td class="{{'item_select' if item.cantidad else ''}}">
-            <div class="margin-left" id = "inventory_quantity-{{item.name}}">
+            <div class="margin-left" id = "inventory_quantity-{{item.name | replace(':','-')}}">
                 {% if is_internal%}
                     {{item.quantity|int}}
                 {%else%}
@@ -25,7 +25,7 @@
             </div>
         </td>
         {% if not is_internal%}
-            <td class="padding_list {{'item_select' if item.cantidad else ''}}"><input type="number" class="form-control quantity " id="quantity" value={{item.cantidad}} data-is_internal = "{{is_internal}}" data-quantity = "{{item.quantity}}" data-value = {{item.cantidad}} data-factor = "{{item.inqt}}" data-select= "{{item.name}}" min = 0 max = {{item.quantity}} ></td>
+            <td class="padding_list {{'item_select' if item.cantidad else ''}}"><input type="number" class="form-control quantity " id="quantity" value={{item.cantidad}} data-is_internal = "{{is_internal}}" data-quantity = "{{item.quantity}}" data-value = {{item.cantidad}} data-factor = "{{item.inqt}}" data-select= "{{item.name | replace(':','-')}}" min = 0 max = {{item.quantity}} ></td>
         {%endif%}
         
         <td class="lateralright {{'item_select' if item.cantidad else ''}}"><div class="margin-left ">Unidad <br> x {{item.inqt}}</div></td>
