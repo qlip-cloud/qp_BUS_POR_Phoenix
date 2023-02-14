@@ -45,7 +45,7 @@ $(document).ready(function() {
                 }
                 $inventory_quantity = $(`#table_content #inventory_quantity-${item_name}`);
 
-                if (is_internal == "False" && (value > max_value) ){
+                if (is_internal == "False" && (max_value == 0 || value > max_value) ){
                 
                         $inventory_quantity.html("No");
                 }

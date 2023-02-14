@@ -208,7 +208,8 @@ function setup_filter_text(){
     $items = $('.item-row.filter').filter( function(index){
 
 
-        if ($(this).data("item-name").toUpperCase().indexOf(value, 0) != -1) 
+        //if ($(this).data("item-name").toUpperCase().indexOf(value, 0) != -1) 
+        if ($(this).data("id").toUpperCase().indexOf(value, 0) != -1) 
             return true;
     });
 

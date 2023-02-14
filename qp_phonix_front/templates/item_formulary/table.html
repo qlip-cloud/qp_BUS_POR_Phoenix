@@ -3,17 +3,17 @@
 <input type="hidden" id="petition_control" value = 0>
 <table class = "item_list" id = "table_item_list" width= 100%>
     <thead >
-        <th width = 10% class="lateralleft "></th>
+        <th width = 10% class="lateralleft margin-left" style="padding: 10px;">Imagen</th>
         <th width = 26%><div class="margin-left ">Referencia </div></th>
 
         <th ><div class="margin-left ">Código de item</div></th>
         
         {% if not is_internal%}
-            <th ><div class="margin-left ">Precio Lista</div></th> 
+            <th ><div class="margin-left " style="font-size: 13px;">Precio Lista</div></th> 
             <th ><div class="margin-left ">Descuento</div></th>
         {%endif%}
 
-        <th ><div class="margin-left ">Precio</div></th> 
+        <th ><div class="margin-left " style="font-size: 13px;">Precio</div></th> 
         <th ><div class="margin-left ">Inventario</div></th>
         
         {% if not is_internal%}

@@ -6,11 +6,11 @@
         
         <td class="{{'item_select' if item.cantidad else ''}} item-name" ><div class="margin-left">{{item.item_name}}</div></td>
         <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">{{item.name}}</div></td>
-        <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">{{item.price}}</div></td>
+        <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">{{item.price | int}} COP</div></td>
 
         {% if not is_internal%}
             <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">{{item.discountpercentage}} %</div></td>
-            <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">{{item.price_discount}}</div></td>
+            <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">{{item.price_discount | int}} COP</div></td>
 
         {%endif%}
 

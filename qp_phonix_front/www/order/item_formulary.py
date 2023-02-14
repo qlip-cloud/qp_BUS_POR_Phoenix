@@ -81,7 +81,6 @@ def setup_new(context):
     
     shipping_date_select = query_params.get("shipping_date")
 
-
     set_shipping_data(context, item_group_select, shipping_method_select, shipping_date_select)
 
     set_items_data(context, item_group_select, idlevel = context.idlevel)
