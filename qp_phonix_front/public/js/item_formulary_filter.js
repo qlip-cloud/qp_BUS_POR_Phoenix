@@ -203,13 +203,14 @@ function get_filter_text(){
 }
 function setup_filter_text(){
 
-    let value = $("#filter_text").val().toUpperCase()
+    let value = $("#filter_text").val()
     
     $items = $('.item-row.filter').filter( function(index){
 
-
+        console.log($(this).data("id").toString())
+        console.log(value)
         //if ($(this).data("item-name").toUpperCase().indexOf(value, 0) != -1) 
-        if ($(this).data("id").toUpperCase().indexOf(value, 0) != -1) 
+        if ($(this).data("id").toString().indexOf(value, 0) != -1) 
             return true;
     });
 
