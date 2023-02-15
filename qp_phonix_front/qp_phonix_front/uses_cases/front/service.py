@@ -33,7 +33,7 @@ def __setup_class_list(context, class_list):
     context.class_list = class_list
 
 def __setup_sku_list(context, sku_list):
-    print(sku_list)
+
     context.sku_list = sku_list
 
 def __setup_SubCategoria_list(context, SubCategoria_list):

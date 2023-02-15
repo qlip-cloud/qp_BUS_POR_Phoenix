@@ -132,16 +132,19 @@ def vf_item_list(item_group=None, item_Categoria=None, item_SubCategoria=None, i
 def __get_product_class(idlevel):
     sql = """
         SELECT
-            qp_phonix_class as id,
-            qp_phonix_class as code,
-            qp_phonix_class as title,
+            levelGroup.name as id,
+            levelGroup.name as code,
+            levelGroup.title as title,
             REPLACE(group_concat(distinct sku),","," ")  as class
         FROM tabItem as item
         inner join 
+            tabqp_GP_LevelGroup as levelGroup
+        on (levelGroup.name = item.qp_phonix_class)
+        inner join 
             tabqp_GP_Level as level
-        on (level.group_type = item.qp_phonix_class)
+        on (levelGroup.name = level.group_type)
         where level.idlevel = '{}'
-        group by qp_phonix_class
+        group by levelGroup.name, levelGroup.title
     """.format(idlevel)
 
     return frappe.db.sql(sql, as_dict=1)

@@ -224,7 +224,8 @@ button {
 
                     {%for class in class_list %}
 
-                        <option  data-active-count="" {#SubCategoria.Categoria_ids|count#} value="{{class.code}}" class="select-option {{class.class}} ">{{class.title}}</option>
+                        <option  data-active-count="" {#SubCategoria.Categoria_ids|count#} value="{{class.code}}" class="select-option {{class.class}} ">
+                            {{class.title if class.title else class.code}}</option>
 
                     {%endfor%}
                     
