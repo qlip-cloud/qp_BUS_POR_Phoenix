@@ -188,7 +188,7 @@
                     Costo Total
                 </div>
                 <div class=" col-md-12 title" style="line-height: 48px;">
-                    $ <span id="price_total">{{order.total}}</span>
+                    $ <span id="price_total">{{order.total_format}}</span>
                 </div>
                 <div class=" col-md-12 subtitle">
                     COP
@@ -292,12 +292,12 @@
                                 </div>
                                 <div class="col-sm-2">
                                     <div class="background-info information_label">
-                                        $ {{item.price}}
+                                        $ {{item.price_format}}
                                     </div>
                                 </div>
                                 <div class="col-sm-2">
                                     <div class="background-info information_label">
-                                        {{ "$ %.2f"|format(item.total) }}
+                                        $ {{item.total_format }}
                                     </div>
                                 </div>
                             </div>

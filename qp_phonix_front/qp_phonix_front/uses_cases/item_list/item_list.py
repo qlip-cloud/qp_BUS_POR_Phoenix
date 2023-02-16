@@ -651,13 +651,15 @@ def __get_select_attr_base():
             item_name,
             image,
             price,
+            format(price,0) as price_format,
             cantidad,
             stock_uom,
             item_group,
             sku,
             qp_phonix_class,
             discountpercentage,
-            (price - (price * discountpercentage) / 100) as price_discount
+            (price - (price * discountpercentage) / 100) as price_discount,
+            format((price - (price * discountpercentage) / 100),0) as price_discount_format
     """
 
     return sql_base_attr

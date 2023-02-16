@@ -50,6 +50,7 @@ def get_is_internal(context):
         frappe.throw("Este usuario no esta configurado")
 
     context.is_internal =  True if is_internal[0]["role_profile_name"]  == "Phonix internal" else False
+    context.rol =  is_internal[0]["role_profile_name"]
 
 def get_idlevel(context):
 

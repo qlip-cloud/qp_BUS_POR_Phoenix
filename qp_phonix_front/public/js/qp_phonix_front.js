@@ -254,6 +254,8 @@ function valid_change(redirect_url){
 
 function total_update(){
 
+        const formato = new Intl.NumberFormat('en-US');
+        
         let total = 0
 
         $(".row_select .subtotal").each(function(){
@@ -263,7 +265,7 @@ function total_update(){
                 total += subtotal;
         })
 
-        $("#price_total").html(total.toFixed(2))
+        $("#price_total").html(formato.format(total))
 }
 function update_modal(type, data_no = 0){
 

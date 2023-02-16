@@ -8,23 +8,30 @@
 
         <th ><div class="margin-left ">Código de item</div></th>
         
-        {% if not is_internal%}
+        {% if rol == "Phonix external" %}
             <th ><div class="margin-left " style="font-size: 13px;">Precio Lista</div></th> 
             <th ><div class="margin-left ">Descuento</div></th>
         {%endif%}
 
-        <th ><div class="margin-left " style="font-size: 13px;">Precio</div></th> 
+        {% if rol != "Phonix external technical"%}
+
+            <th ><div class="margin-left " style="font-size: 13px;">Precio</div></th> 
+        {%endif%}
+
         <th ><div class="margin-left ">Inventario</div></th>
         
-        {% if not is_internal%}
+        {% if rol != "Phonix internal"%}
             <th width = 10%><div class="margin-left ">Cantidad</div></th>
         {%endif%}
 
         <th  ><div class="margin-left ">Múltiplo</div></th>
 
+        {% if rol != "Phonix external technical"%}
         
             <th  ><div class="margin-left ">UDM</div></th>
-        {% if is_internal%}
+        {%endif%}
+        
+        {% if rol != "Phonix external"%}
             <th  ><div class="margin-left ">SKU</div></th>
 
         {%endif%}

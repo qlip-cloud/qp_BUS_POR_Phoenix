@@ -1,4 +1,5 @@
 $(document).ready(function() {
+    
     sessionStorage.removeItem("order_id")
 
     $(".quantity").bind('blur mouseup', function () {

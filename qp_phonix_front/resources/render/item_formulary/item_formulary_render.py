@@ -43,8 +43,10 @@ def paginator(order_id = None, item_group = None, item_Categoria = None, item_Su
             frappe.throw("Este usuario no esta configurado")
 
         is_internal =  True if is_internal[0]["role_profile_name"]  == "Phonix internal" else False
+        
+        rol =  is_internal[0]["role_profile_name"]
 
-        rows = frappe.render_template("templates/item_formulary/row.html", {"item_list" : item_list, "disabled_off": True, "is_internal": is_internal})
+        rows = frappe.render_template("templates/item_formulary/row.html", {"item_list" : item_list, "disabled_off": True, "is_internal": is_internal, "rol":rol})
 
         return {
             "status": 200,

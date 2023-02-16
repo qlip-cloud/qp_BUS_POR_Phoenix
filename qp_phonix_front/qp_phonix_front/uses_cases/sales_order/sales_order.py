@@ -117,12 +117,21 @@ def get_sales_order(sales_order):
         customer = __get_customer()
 
         sql_so_obj = """
-            Select Distinct so.name as so_name, so.status, item.item_group,
-            so.customer_name, addr.address_line1, addr.address_line1, addr.city, addr.pincode, addr.phone,
-            IF(so.qp_shipping_type IS NULL or so.qp_shipping_type = '', '%s',  so.qp_shipping_type) as shipping_type,
-            IF(shipping_type.description IS NULL or shipping_type.description = '', shipping_type.name,  shipping_type.description) as shipping_description,
-            DATE_FORMAT(so.delivery_date, '%s') as shipping_date, DATE_FORMAT(so.delivery_date, '%s') as shipping_date_format,
-            so.total
+            Select Distinct 
+                so.name as so_name, 
+                so.status, 
+                item.item_group,
+                so.customer_name, 
+                addr.address_line1, 
+                addr.address_line1, 
+                addr.city, 
+                addr.pincode, 
+                addr.phone,
+                IF(so.qp_shipping_type IS NULL or so.qp_shipping_type = '', '%s',  so.qp_shipping_type) as shipping_type,
+                IF(shipping_type.description IS NULL or shipping_type.description = '', shipping_type.name,  shipping_type.description) as shipping_description,
+                DATE_FORMAT(so.delivery_date, '%s') as shipping_date, DATE_FORMAT(so.delivery_date, '%s') as shipping_date_format,
+                so.total,
+                format(so.total,0) as total_format
             from `tabSales Order` as so
             inner join `tabSales Order Item` as so_items on so.name = so_items.parent
             inner join tabItem as item on item.name = so_items.item_code
@@ -140,10 +149,13 @@ def get_sales_order(sales_order):
                 so_items.item_name,
                 IF(so_items.image IS NULL or so_items.image = '', '%s', so_items.image) as image,
                 so_items.price_list_rate as price,
+                FORMAT(so_items.price_list_rate,0) as price_format,
+
                 so_items.qty as cantidad,
                 so_items.stock_uom,
                 so_items.amount,
-                ROUND(so_items.price_list_rate * so_items.qty,2) as total
+                ROUND(so_items.price_list_rate * so_items.qty,2) as total,
+                format(so_items.price_list_rate * so_items.qty,0) as total_format
                 from `tabSales Order` as so
                 inner join `tabSales Order Item` as so_items on so.name = so_items.parent
                 inner join tabItem as item on item.name = so_items.item_code
