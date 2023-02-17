@@ -172,7 +172,7 @@ function updateIndicator() {
                 $disabled_inpuut.prop("disabled", true)
                 
         }
-        $('.selectpicker').selectpicker('refresh');
+        //$('.selectpicker').selectpicker('refresh');
 
 
 }
@@ -254,7 +254,9 @@ function valid_change(redirect_url){
 
 function total_update(){
 
-        const formato = new Intl.NumberFormat('en-US');
+        const formato = new Intl.NumberFormat('en-US', {
+                maximumFractionDigits: 0,
+              });
         
         let total = 0
 
@@ -338,7 +340,9 @@ function save_order(url, redirect_link, action = null, valid_empty = true, order
                 obj = {
                     qty: $(this).find("#quantity").val(),
                     item_code: $(this).find("#item_id").val(),
-                    rate: $(this).find("#item_price").val()
+                    rate: $(this).find("#item_price").val(),
+                    discount_percentage: $(this).find("#item_discount").val()
+
                     //,delivery_date
                 }
                 items.push(obj)
@@ -346,6 +350,7 @@ function save_order(url, redirect_link, action = null, valid_empty = true, order
             }
             
         });
+        console.log(items)
 
         args = {
                 'order_json': {

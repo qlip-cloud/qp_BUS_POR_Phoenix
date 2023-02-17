@@ -130,8 +130,8 @@ def get_sales_order(sales_order):
                 IF(so.qp_shipping_type IS NULL or so.qp_shipping_type = '', '%s',  so.qp_shipping_type) as shipping_type,
                 IF(shipping_type.description IS NULL or shipping_type.description = '', shipping_type.name,  shipping_type.description) as shipping_description,
                 DATE_FORMAT(so.delivery_date, '%s') as shipping_date, DATE_FORMAT(so.delivery_date, '%s') as shipping_date_format,
-                so.total,
-                format(so.total,0) as total_format
+                so.net_total,
+                format(so.net_total,0) as total_format
             from `tabSales Order` as so
             inner join `tabSales Order Item` as so_items on so.name = so_items.parent
             inner join tabItem as item on item.name = so_items.item_code
@@ -148,14 +148,15 @@ def get_sales_order(sales_order):
                 Select so_items.item_code,item.item_group,
                 so_items.item_name,
                 IF(so_items.image IS NULL or so_items.image = '', '%s', so_items.image) as image,
-                so_items.price_list_rate as price,
-                FORMAT(so_items.price_list_rate,0) as price_format,
+                
+                so_items.net_rate as price,
+                FORMAT(so_items.net_rate,0) as price_format,
 
                 so_items.qty as cantidad,
                 so_items.stock_uom,
                 so_items.amount,
-                ROUND(so_items.price_list_rate * so_items.qty,2) as total,
-                format(so_items.price_list_rate * so_items.qty,0) as total_format
+                ROUND(net_amount,2) as total,
+                format(net_amount,0) as total_format
                 from `tabSales Order` as so
                 inner join `tabSales Order Item` as so_items on so.name = so_items.parent
                 inner join tabItem as item on item.name = so_items.item_code
@@ -222,6 +223,7 @@ def create_sales_order(order_json):
         #api_key, generated_secret = __autenticate()
 
         #url = "{0}/api/resource/Sales Order".format(url_base)
+        #print(order_json);
 
 
         string_obj = __get_body(order_json)
@@ -229,19 +231,19 @@ def create_sales_order(order_json):
         sale_order =  frappe.get_doc(string_obj)
 
         sale_order.insert()
-        
+
+        #print(sale_order.as_dict());
+
+        #frappe.throw("rompete")
         rec_result['name'] = sale_order.name
 
         rec_result['msg'] = "Success"
         
         frappe.db.commit()
         
-        print("aki 2")
         """headers = _get_header(api_key, generated_secret)
 
         result =  requests.post(url=url, data=string_obj, headers=headers)
-
-        
 
         rec_result['result'] = result.status_code
 
@@ -518,8 +520,8 @@ def __get_body(json_data):
         "customer": customer.name,
         "delivery_date": today(),
         "items": json_data.get('items'),
-        "doctype": "Sales Order"
-    }
+        "items": json_data.get('items'),
+        "doctype": "Sales Order"    }
 
     if json_data.get('shipping_type'):
 
