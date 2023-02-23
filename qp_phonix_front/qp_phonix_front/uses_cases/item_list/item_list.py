@@ -479,8 +479,8 @@ def get_tbl_product_list(item_group, from_base, where_base, item_code_list = Non
     exclude_item = get_condition_by_list(list_data = item_code_list, field = "prod.name", is_equal = is_equal)
         
     letter_filter_condition = "AND LEFT (prod.item_name, 1) = '{}'".format(letter_filter) if letter_filter else ""
-
-    text_filter_condition = "AND prod.name LIKE '%{}'".format(filter_text) if filter_text else ""
+    
+    text_filter_condition = "AND prod.name LIKE '{}%'".format(filter_text) if filter_text else ""
 
     select_base = """
             prod.name,
