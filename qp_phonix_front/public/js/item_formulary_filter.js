@@ -104,7 +104,7 @@ $(document).ready(function() {
 
         visible_filter_select($(this).is(":checked"))
 
-        //get_rows()
+        get_rows()
 
 
     })
