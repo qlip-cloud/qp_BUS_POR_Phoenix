@@ -95,6 +95,8 @@ $(document).ready(function() {
             class_filter="SI"
         }
         else{
+            $(`.item-row.filter.NO`).show()
+
             $(".row-inventary").hide()
         }
 

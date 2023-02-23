@@ -51,7 +51,7 @@ def callback_get_inventary(item_group = None, item_Categoria= None, item_SubCate
     
     setup = get_table_and_condition(item_group, item_Categoria, item_SubCategoria, filter_text = filter_text, item_code_list = item_code_list, idlevel = idlevel)
     
-    result =  __get_product_list(setup.get("tbl_product_list"), setup.get("cond_c"), setup.get("cond_t"))
+    result =  __get_product_list(setup.get("tbl_product_list"), setup.get("cond_c"), setup.get("cond_t"), has_limit=True)
 
     response = get_item_inventary(result)
     
@@ -146,6 +146,7 @@ def __get_product_class(idlevel):
         where level.idlevel = '{}'
         group by levelGroup.name, levelGroup.title
     """.format(idlevel)
+    
 
     return frappe.db.sql(sql, as_dict=1)
 
@@ -163,6 +164,7 @@ def __get_product_sku(idlevel):
         where level.idlevel = '{}'
         group by sku
     """.format(idlevel)
+    
 
     return frappe.db.sql(sql, as_dict=1)
 
@@ -196,6 +198,7 @@ def get_filter_option(option, price_list):
             fGroup.idx = 1
     ORDER BY prod.item_group, att.value
     """.format(option = option, price_list = price_list)
+    
 
     return frappe.db.sql(sql, as_dict=1)
 
@@ -308,6 +311,7 @@ def get_filter_SubCategoria_option(price_list):
         tbl_SubCategoria.code = tbl_SubCategoria_class.SubCategoria_id
     ORDER BY tbl_SubCategoria.title, tbl_SubCategoria_class.code
     """.format(sql_tlb_SubCategoria = sql_tlb_SubCategoria, sql_tlb_SubCategoria_class = sql_tlb_SubCategoria_class)
+    
 
     SubCategoria_dict = frappe.db.sql(sql_SubCategoria, as_dict=1)
 
@@ -326,7 +330,7 @@ def get_table_and_condition(item_group = None, item_Categoria = None, item_SubCa
     
     tbl_product_list = get_tbl_product_list(item_group, from_base, where_base, item_code_list, letter_filter, is_equal, filter_text = filter_text)
 
-    print(tbl_product_list)
+    
     #tlb_product_attr_select, tlb_product_attr_body, list_attr = __get_product_attr(from_base, where_base)
 
     attr_dict = get_attr_group(item_group)
@@ -404,6 +408,7 @@ def get_attr_group(item_group):
         WHERE iGroup.enabled = '1' and iGroup.item_group = '{item_group}'
         order by fGroup.idx
     """.format(item_group = item_group)
+    
 
     filter_list = frappe.db.sql(sql_filter, as_dict=1)
 
@@ -515,6 +520,7 @@ def get_tbl_product_list(item_group, from_base, where_base, item_code_list = Non
         """ % (text_filter_condition)
 
     return """
+        
         Select distinct %s from %s
         where %s
         order by prod.item_name
@@ -573,11 +579,9 @@ def __get_product_list(tbl_product_list, cond_c, cond_t, has_limit = True ):
                 %s
         ) AS drb_tbl_prod_filter
 
-    """ % (select_attr_base, tbl_product_list, cond_c, cond_t, limit)
-    #print(sql_product_list)
-    #frappe.throw("rompete bobo")
+    """ % (select_attr_base, tbl_product_list, cond_c, cond_t, limit)  
+    
     product_list = frappe.db.sql(sql_product_list, as_dict=1)
-
     for item in product_list:
         
         uom_list = __get_uom_list(item.name)
@@ -604,6 +608,7 @@ def __get_select_attr_base():
         WHERE iGroup.enabled = '1'
         order by fGroup.idx, iGroup.position, iGroup.item_group
     """
+    
 
     filter_list = frappe.db.sql(sql_filter, as_dict=1)
 
@@ -703,6 +708,7 @@ def __get_attr_list(tbl_product_list, list_attr):
                     {2}
                 order by attr_{3}.value
             """.format(select_attr, tbl_product_list, join_attr, key)
+            
 
             Categoria_list = frappe.db.sql(sql_Categoria_list, as_dict=1)
 
@@ -749,6 +755,7 @@ def __get_product_attr(from_base, where_base):
         from tabItem as prod
         inner join tabqp_ItemAttribute as attr on attr.parent = prod.name and attr.parentfield = 'item_attributes'
         """
+    
 
     item_attr = frappe.db.sql(sql_item_attr, as_dict=1)
 
