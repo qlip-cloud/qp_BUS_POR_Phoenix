@@ -28,7 +28,7 @@
         <td class="{{'item_select' if item.cantidad else ''}}">
             <div class="margin-left" id = "inventory_quantity-{{item.name | replace(':','-')}}">
                 {% if is_internal%}
-                    {{item.quantity|int}}
+                    {{item.quantity|int}} ({{item.quantity_dis|int}})
                 {%else%}
                     {{'Si' if item.quantity > 0 else 'No'}}
                 {%endif%}

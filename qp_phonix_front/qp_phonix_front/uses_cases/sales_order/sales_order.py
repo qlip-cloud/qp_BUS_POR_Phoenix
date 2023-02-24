@@ -225,7 +225,7 @@ def create_sales_order(order_json):
         #url = "{0}/api/resource/Sales Order".format(url_base)
         #print(order_json);
 
-
+        print(order_json)
         string_obj = __get_body(order_json)
 
         sale_order =  frappe.get_doc(string_obj)
@@ -518,6 +518,7 @@ def __get_body(json_data):
 
     obj_data = {
         "customer": customer.name,
+        
         "delivery_date": today(),
         "items": json_data.get('items'),
         "items": json_data.get('items'),

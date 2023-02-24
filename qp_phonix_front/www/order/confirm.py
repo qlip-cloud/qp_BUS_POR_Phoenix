@@ -24,7 +24,9 @@ def get_context(context):
         if count_item:
             
             set_order_data(context, order_id)       
-    
+
+        set_has_sync(context)
+        
     try_catch(callback, context)
 
 def get_count_update(context, order_id):
@@ -38,3 +40,23 @@ def get_count_update(context, order_id):
     context.count_change_item_list = True if count_initial_item != count_item else False
 
     return count_item
+
+def set_has_sync(context):
+
+    email = frappe.session.user
+
+    sql = """SELECT 
+                customer.qp_phonix_has_sync
+            FROM
+                tabContact as contact
+            inner join
+                `tabDynamic Link` as link
+                on (contact.name = link.parent)
+            inner join
+                `tabCustomer` as customer
+                on(link.link_name = customer.name)
+            where contact.email_id = '{}';""".format(email)
+    
+    result =  frappe.db.sql(sql, as_dict=1)
+
+    context.has_sync = result[0]["qp_phonix_has_sync"]

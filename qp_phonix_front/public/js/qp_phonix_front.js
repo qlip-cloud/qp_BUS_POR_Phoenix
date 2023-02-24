@@ -79,7 +79,7 @@ $(document).ready(function() {
 
         $("#btn_confirm_order").on("click", ()=>{
 
-                update_modal(2, 1)
+                //update_modal(2, 1)
 
         })
 
@@ -340,6 +340,7 @@ function save_order(url, redirect_link, action = null, valid_empty = true, order
                 obj = {
                     qty: $(this).find("#quantity").val(),
                     item_code: $(this).find("#item_id").val(),
+                    description: $(this).find("#item_id").val(),
                     rate: $(this).find("#item_price").val(),
                     discount_percentage: $(this).find("#item_discount").val()
 
