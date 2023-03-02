@@ -3,6 +3,9 @@ import json
 from qp_phonix_front.qp_phonix_front.validations.utils import is_guest
 from qp_phonix_front.qp_phonix_front.uses_cases.front.service import set_shipping_data, set_items_data, set_order_data, get_order_item_list
 from qp_phonix_front.qp_phonix_front.services.try_catch import handler as try_catch
+from qp_phonix_front.qp_phonix_front.services.manager_permission import handler as get_permission
+from qp_phonix_front.qp_phonix_front.uses_cases.item_group.item_group_list import vf_item_group_list
+
 from gp_phonix_integration.gp_phonix_integration.use_case.get_item_inventary import handler as get_item_inventary
 import frappe
 
@@ -19,7 +22,7 @@ def get_context(context):
 
         order_id = query_params.get("order_id")
 
-        get_is_internal(context)
+        context.permission = get_permission()
 
         get_idlevel(context)
 
@@ -50,6 +53,7 @@ def get_is_internal(context):
         frappe.throw("Este usuario no esta configurado")
 
     context.is_internal =  True if is_internal[0]["role_profile_name"]  == "Phonix internal" else False
+
     context.rol =  is_internal[0]["role_profile_name"]
 
 def get_idlevel(context):
@@ -76,7 +80,11 @@ def setup_new(context):
 
     query_params = frappe.request.args
 
-    item_group_select = query_params.get("item_group")
+    #item_group_select = query_params.get("item_group")
+
+    item_group_select = get_item_group_select()
+
+    print(item_group_select)
 
     shipping_method_select = query_params.get("shipping_type")
     
@@ -87,6 +95,12 @@ def setup_new(context):
     set_items_data(context, item_group_select, idlevel = context.idlevel)
 
     context.item_list = get_item_inventary(context.item_list)
+    
+def get_item_group_select():
+    
+    item_types = vf_item_group_list()
+
+    return item_types[0].title
 
 
 def setup_edit(context, order_id):

@@ -28,10 +28,10 @@ def export_xlsx(order_id):
 
     xlsx_data = [
         [           
-            "nombre de item",
+            "Referencia",
             "Código de item",
             "Cantidad",
-            "Múltiplo",
+            "Pedir por paquetes de",
             "Precio",
             "Total",
             "Disponibilidad"

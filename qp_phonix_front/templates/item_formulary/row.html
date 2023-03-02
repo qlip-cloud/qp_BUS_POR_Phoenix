@@ -8,18 +8,20 @@
         
         <td class="{{'item_select' if item.cantidad else ''}} item-name" ><div class="margin-left">{{item.item_name}}</div></td>
         <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">{{item.name}}</div></td>
-
-
         
 
-        {% if rol != "Phonix external technical"%}
+        {% if permission.price_format %}
 
             <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">{{item.price_format}} COP</div></td>
         {%endif%}
 
-        {% if rol == "Phonix external" %}
+        {% if permission.discountpercentage %}
 
             <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">{{item.discountpercentage}} %</div></td>
+        {%endif%}
+
+        {% if permission.price_discount_format %}
+
             <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">{{item.price_discount_format}} COP</div></td>
 
         {%endif%}
@@ -27,25 +29,25 @@
         
         <td class="{{'item_select' if item.cantidad else ''}}">
             <div class="margin-left" id = "inventory_quantity-{{item.name | replace(':','-')}}">
-                {% if is_internal%}
+                {% if permission.quantity_format %}
                     {{item.quantity|int}} ({{item.quantity_dis|int}})
                 {%else%}
                     {{'Si' if item.quantity > 0 else 'No'}}
                 {%endif%}
             </div>
         </td>
-        {% if rol != "Phonix internal"%}
+        {% if permission.quantity %}
             <td class="padding_list {{'item_select' if item.cantidad else ''}}"><input type="number" class="form-control quantity " id="quantity" value={{item.cantidad}} data-is_internal = "{{is_internal}}" data-quantity = "{{item.quantity}}" data-value = {{item.cantidad}} data-factor = "{{item.inqt}}" data-select= "{{item.name | replace(':','-')}}" min = 0 max = {{item.quantity}} ></td>
         {%endif%}
         
         <td class="lateralright {{'item_select' if item.cantidad else ''}}"><div class="margin-left ">Unidad <br> x {{item.inqt}}</div></td>
         
-        {% if rol != "Phonix external technical"%}
+        {% if permission.stock_uom %}
 
             <td class="lateralright {{'item_select' if item.cantidad else ''}}"><div class="margin-left">{{item.stock_uom}}</div></td>
         {%endif%}
         
-        {% if rol != "Phonix external"%}
+        {% if permission.sku %}
             <td class="lateralright {{'item_select' if item.cantidad else ''}}"><div class="margin-left">{{item.sku}}</div></td>
         {%endif%}
     </tr>

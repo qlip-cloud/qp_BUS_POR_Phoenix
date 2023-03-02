@@ -2,13 +2,21 @@
 
 {% block section_title %}
     {%if is_valid%}                
-        Orden #{{order.so_name}}
+        Orden 
     {%endif%}
 {% endblock %}
 
 {% block button_title %}
-    <a id="btn_back_orders" class="btn button-master button-back">
-        {{ _("VOLVER A ORDENES") }}
+
+    {%if has_sync %}
+
+        <a href="/order/index" class="btn button-master button-back">
+            {{ _("VOLVER A ORDENES") }}
+    {% else %}
+        <a href="/order/item_formulary" class="btn button-master button-back">
+            {{ _("VOLVER A CONSULTAR ARTÍCULOS") }}
+    {%endif%}
+                
     </a>
     <a id="btn_edit_export" href="/api/method/qp_phonix_front.qp_phonix_front.uses_cases.export.order_xlsx.export_xlsx?order_id={{order.so_name}}" target="_blank"class="btn button-master button-default">
         {{ _("EXPORTAR") }}
