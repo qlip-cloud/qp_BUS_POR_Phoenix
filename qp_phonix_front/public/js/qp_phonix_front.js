@@ -44,13 +44,15 @@ $(document).ready(function() {
                         
                 }
                 $inventory_quantity = $(`#table_content #inventory_quantity-${item_name}`);
-
-                if (is_internal == "False" && (max_value == 0 || value > max_value) ){
                 
-                        $inventory_quantity.html("No");
-                }
-                else{
-                        $inventory_quantity.html("Si");
+                if (max_value > 0) {
+                        if ( value > max_value ){
+                        
+                                $inventory_quantity.html("No");
+                        }
+                        else{
+                                $inventory_quantity.html("Si");
+                        }
                 }
 
                 $line = $(this).parents(".line")

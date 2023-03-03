@@ -84,8 +84,6 @@ def setup_new(context):
 
     item_group_select = get_item_group_select()
 
-    print(item_group_select)
-
     shipping_method_select = query_params.get("shipping_type")
     
     shipping_date_select = query_params.get("shipping_date")
@@ -95,7 +93,7 @@ def setup_new(context):
     set_items_data(context, item_group_select, idlevel = context.idlevel)
 
     context.item_list = get_item_inventary(context.item_list)
-    
+
 def get_item_group_select():
     
     item_types = vf_item_group_list()

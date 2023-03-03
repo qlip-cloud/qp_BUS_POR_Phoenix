@@ -88,7 +88,9 @@ def vf_item_list(item_group=None, item_Categoria=None, item_SubCategoria=None, i
 
         #product_list = __get_product_list(setup.get("tbl_product_list"), setup.get("tlb_product_attr_select"), setup.get("tlb_product_attr_body"),
 
-        product_list = __get_product_list(setup.get("tbl_product_list"), setup.get("cond_c"), setup.get("cond_t"))
+        result = __get_product_list(setup.get("tbl_product_list"), setup.get("cond_c"), setup.get("cond_t"))
+        
+        product_list = get_item_inventary(result)
 
         price_list = frappe.db.get_single_value("Selling Settings", "selling_price_list")
 
