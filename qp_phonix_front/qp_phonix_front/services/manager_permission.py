@@ -36,44 +36,43 @@ def get_role():
 
 def set_permission(role):
 
-    match role:
 
-        case "Phonix external":
+    if role == "Phonix external":
 
-            permission.update({
-                "price_format": True,
-                "discountpercentage": True,
-                "price_discount_format": True,
-                "quantity": True,
-                "stock_uom": True
-            })
-            
-        case "Phonix external technical":
+        permission.update({
+            "price_format": True,
+            "discountpercentage": True,
+            "price_discount_format": True,
+            "quantity": True,
+            "stock_uom": True
+        })
+        
+    elif role == "Phonix external technical":
 
-            permission.update({
-                "quantity": True,
-                "sku": True
+        permission.update({
+            "quantity": True,
+            "sku": True
 
-            })
+        })
 
-        case "Phonix external Dos":
+    elif role == "Phonix external Dos":
 
-            permission.update({
-                "quantity": True,
-                "price_format": True
+        permission.update({
+            "quantity": True,
+            "price_format": True
 
-            })
+        })
 
-        case "Phonix internal":
-            
-            permission.update({
-                "price_discount_format": True,
-                "quantity_format": True,
-                "quantity": True,
-                "stock_uom": True,
-                "sku": True
-            })
-        case _:
-            frappe.throw("Este usuario no tiene un rol valido")
+    elif role == "Phonix internal":
+        
+        permission.update({
+            "price_discount_format": True,
+            "quantity_format": True,
+            "quantity": True,
+            "stock_uom": True,
+            "sku": True
+        })
+    else:
+        frappe.throw("Este usuario no tiene un rol valido")
 
     return permission

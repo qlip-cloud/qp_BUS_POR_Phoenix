@@ -209,7 +209,7 @@ function setup_filter_text(){
     let value = $("#filter_text").val()
     
     $items = $('.item-row.filter').filter( function(index){
-        console.log()
+        //console.log()
         //if ($(this).data("item-name").toUpperCase().indexOf(value, 0) != -1) 
         if ($(this).data("id").toString().indexOf(value, 0) != -1) 
             return true;
