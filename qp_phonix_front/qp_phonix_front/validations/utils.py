@@ -5,6 +5,7 @@ from frappe import _
 def is_guest():
 
     frappe.clear_cache()
+    frappe.website.render.clear_cache()
 
     is_guest = (frappe.session.user == 'Guest')
 
