@@ -37,7 +37,16 @@
             </div>
         </td>
         {% if permission.quantity %}
-            <td class="padding_list {{'item_select' if item.cantidad else ''}}"><input type="number" class="form-control quantity " id="quantity" value={{item.cantidad}} data-quantity = "{{item.quantity}}" data-value = {{item.cantidad}} data-factor = "{{item.inqt}}" data-select= "{{item.name | replace(':','-')}}" min = 0 max = {{item.quantity}} ></td>
+            <td class="padding_list {{'item_select' if item.cantidad else ''}}">
+                <input type="number" class="form-control quantity "  id="quantity" value={{item.cantidad}} min = 0 max = {{item.quantity}}
+                    data-quantity = "{{item.quantity}}" 
+                    data-value = {{item.cantidad}} 
+                    data-factor = "{{item.inqt}}" 
+                    data-select= "{{item.name | replace(':','-')}}" 
+                    data-sku= "{{item.sku}}"
+                    data-quantity_format = {{permission.quantity_format}}
+                     >
+            </td>
         {%endif%}
         
         <td class="lateralright {{'item_select' if item.cantidad else ''}}"><div class="margin-left ">Unidad <br> x {{item.inqt}}</div></td>

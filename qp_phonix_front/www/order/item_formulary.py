@@ -12,8 +12,9 @@ import frappe
 def get_context(context):
 
     is_guest()
+        
+    frappe.website.render.clear_cache()
 
-    
     def callback():
 
         query_params = frappe.request.args

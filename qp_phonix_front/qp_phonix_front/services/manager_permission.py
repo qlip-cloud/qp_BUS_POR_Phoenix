@@ -74,5 +74,5 @@ def set_permission(role):
         })
     else:
         frappe.throw("Este usuario no tiene un rol valido")
-
+    
     return permission

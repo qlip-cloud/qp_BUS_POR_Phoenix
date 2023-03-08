@@ -22,12 +22,13 @@ $(document).ready(function() {
         $("#table_content").on('blur mouseup', ".quantity",function () {
 
                 let value = $(this).val()   
-                let is_internal = $(this).data("is_internal")
+                let quantity_format = $(this).data("quantity_format")
                 let max_value = $(this).data("quantity")
                 let item_name = $(this).data("select")
+                let sku = $(this).data("sku")
 
 
-                if (value > 0){
+                if (sku != "SI" && value > 0){
                
                     factor = parseInt($(this).data("factor"))
                             
@@ -45,7 +46,7 @@ $(document).ready(function() {
                 }
                 $inventory_quantity = $(`#table_content #inventory_quantity-${item_name}`);
                 
-                if (max_value > 0) {
+                if (quantity_format == "False" && max_value > 0) {
                         if ( value > max_value ){
                         
                                 $inventory_quantity.html("No");
