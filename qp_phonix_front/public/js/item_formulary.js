@@ -11,26 +11,27 @@ $(document).ready(function() {
 
     $("#with_inventary").on("change", function(){
 
+        group_filter = get_group_filter();
+
         if ($("#with_inventary").is(':checked')){
             
             $('.item-row.filter').not(`.inventary-SI.SI`).hide()
 
-            $(`.item-row.filter.inventary-SI.SI`).show()
+            $(`.item-row.filter.inventary-SI.SI`).filter(group_filter).show()
 
             get_rows()
 
 
         }else{
-            
-            visible_filter_select($("#sku_true").is(':checked'))
+            if (!group_filter){
+                visible_filter_select($("#sku_true").is(':checked'))
+            }
 
-            $(`.item-row.filter.SI`).show()
+            $(`.item-row.filter.SI`).filter(group_filter).show()
 
             $("#pagination_control").val(0)
 
         }
-
-      
 
     })
 
