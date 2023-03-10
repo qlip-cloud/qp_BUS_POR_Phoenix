@@ -12,6 +12,8 @@ import frappe
 def get_context(context):
 
     is_guest()
+    
+    frappe.clear_cache()
         
     frappe.website.render.clear_cache()
 
