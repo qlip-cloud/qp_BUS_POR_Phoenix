@@ -79,7 +79,7 @@ $(document).ready(function() {
         $("#with_inventary").prop("checked", false);
 
         group_filter = get_group_filter();       
-        console.log(group_filter)
+
         if ($(this).is(':checked')){
             
             $(`.item-row.filter`).not(`.SI`).hide()
@@ -193,17 +193,19 @@ function get_group_filter(){
     let group_filter = ""
 
     let count = 0
-
-    select_value.forEach(element => {
-        if (count > 0){
-            group_filter += ","
-        }
-        
-        group_filter += ` .${element}`
-
-        count ++;
-
-    });
+    if (select_value){
+        select_value.forEach(element => {
+            if (count > 0){
+                group_filter += ","
+            }
+            
+            group_filter += ` .${element}`
+    
+            count ++;
+    
+        });
+    }
+    
 
     return group_filter
 }
