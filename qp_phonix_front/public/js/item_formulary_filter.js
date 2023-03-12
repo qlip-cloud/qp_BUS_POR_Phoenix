@@ -78,19 +78,21 @@ $(document).ready(function() {
 
         $("#with_inventary").prop("checked", false);
 
-        group_filter = get_group_filter();       
+        group_filter = get_group_filter();
+
+        $item = group_filter ? $(`.item-row.filter`).filter(group_filter) : $(`.item-row.filter`);
 
         if ($(this).is(':checked')){
             
-            $(`.item-row.filter`).not(`.SI`).hide()
+            $(`.item-row.filter`).hide()
 
-            $(`.item-row.filter.SI`).filter(group_filter).show()
+            $item.filter(".SI").show()
 
             $(".row-inventary").show()
 
         }
         else{
-            $(`.item-row.filter`).filter(group_filter).show()
+            $item.show()
 
             $(".row-inventary").hide()
         }
