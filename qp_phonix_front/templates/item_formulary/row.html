@@ -12,7 +12,7 @@
 
         {% if permission.price_format %}
 
-            <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">{{item.price_format}} COP</div></td>
+            <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">$ {{item.price_format | replace(",",".")}} COP</div></td>
         {%endif%}
 
         {% if permission.discountpercentage %}
@@ -22,7 +22,7 @@
 
         {% if permission.price_discount_format %}
 
-            <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">{{item.price_discount_format}} COP</div></td>
+            <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">$ {{item.price_discount_format | replace(",",".")}} COP</div></td>
 
         {%endif%}
 
@@ -44,6 +44,7 @@
                     data-factor = "{{item.inqt}}" 
                     data-select= "{{item.name | replace(':','-')}}" 
                     data-sku= "{{item.sku}}"
+                    data-quantity_dis= "{{item.quantity_dis}}"
                     data-quantity_format = {{permission.quantity_format}}
                      >
             </td>

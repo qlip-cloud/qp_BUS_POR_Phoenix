@@ -19,11 +19,12 @@ $(document).ready(function() {
     
         get_shipping_calendar(shipping_method)
 
-        $("#table_content").on('blur mouseup', ".quantity",function () {
-
-                let value = $(this).val()   
+        $("#table_content").on('keyup blur mouseup', ".quantity",function () {
+                
+                let value = parseInt($(this).val())
                 let quantity_format = $(this).data("quantity_format")
-                let max_value = $(this).data("quantity")
+                let max_value = parseInt($(this).data("quantity"))
+                let transit_value = parseInt($(this).data("quantity_dis"))
                 let item_name = $(this).data("select")
                 let sku = $(this).data("sku")
 
@@ -47,9 +48,14 @@ $(document).ready(function() {
                 $inventory_quantity = $(`#table_content #inventory_quantity-${item_name}`);
                 
                 if (quantity_format == "False" && max_value > 0) {
-                        if ( value > max_value ){
                         
-                                $inventory_quantity.html("No");
+                        if ( parseInt(value) > parseInt(max_value) ){
+                                if ((transit_value + max_value) >= value)
+                                        
+                                        $inventory_quantity.html("En tránsito");
+                                else
+                                        
+                                        $inventory_quantity.html("No");
                         }
                         else{
                                 $inventory_quantity.html("Si");
@@ -270,7 +276,7 @@ function total_update(){
                 total += subtotal;
         })
 
-        $("#price_total").html(formato.format(total))
+        $("#price_total").html(String(formato.format(total)).replace(",","."))
 }
 function update_modal(type, data_no = 0){
 
@@ -354,8 +360,7 @@ function save_order(url, redirect_link, action = null, valid_empty = true, order
             }
             
         });
-        console.log(items)
-
+        
         args = {
                 'order_json': {
                         items
@@ -403,11 +408,9 @@ function save_order(url, redirect_link, action = null, valid_empty = true, order
                                 if (url == URL_CREATE_SALES_ORDER){
 
                                         if (!sessionStorage.getItem("order_id")){
-                                                console.log("session")
-                                                console.log(sessionStorage.getItem("order_id"))
+                                                
+                                                
                                                 sessionStorage.setItem('order_id', response.name)
-                                                console.log(sessionStorage.getItem("order_id"))
-                                                console.log("finn")
 
                                         }
 
@@ -551,7 +554,6 @@ function active_block(){
         $("#blockscreen").addClass("modal-backdrop" )
         $("#blockscreen").addClass("fade" )
         $("#blockscreen").addClass("show" )
-        console.log("akiii")
         $("#loader").show()
 }
 function disabled_block(){

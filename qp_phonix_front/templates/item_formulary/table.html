@@ -22,7 +22,12 @@
             <th ><div class="margin-left " style="font-size: 13px;">Precio x unidad</div></th> 
         {%endif%}
 
-        <th ><div class="margin-left ">Inventario</div></th>
+        <th ><div class="margin-left ">Inventario
+            {% if permission.quantity_format %}
+            <br>(En tránsito disponible)
+            {%endif%}
+
+        </div></th>
         
         {% if permission.quantity %}
             <th width = 10%><div class="margin-left ">Cantidad</div></th>
