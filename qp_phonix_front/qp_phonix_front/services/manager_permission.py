@@ -38,11 +38,10 @@ def get_role():
     return  role[0]["role_profile_name"]
 
 def set_permission(role):
+    
     permission = get_permission()
-    print("------------------------------------------")
-    print(role)
+
     if role == "Phonix external":
-        print("Phonix external")
 
         permission.update({
             "price_format": True,
@@ -53,8 +52,7 @@ def set_permission(role):
         })
         
     elif role == "Phonix external technical":
-        print("Phonix external")
-
+        
         permission.update({
             "quantity": True,
             "sku": True
@@ -62,8 +60,7 @@ def set_permission(role):
         })
 
     elif role == "Phonix external Dos":
-        print("Phonix external")
-
+        
         permission.update({
             "quantity": True,
             "price_format": True
@@ -71,7 +68,6 @@ def set_permission(role):
         })
 
     elif role == "Phonix internal":
-        print("Phonix external")
         
         permission.update({
             "price_discount_format": True,

@@ -219,26 +219,31 @@ function get_filter_text(){
 
     get_rows()
 
-    $items = setup_filter_text()
+    setup_filter_text()
 
-    $items.show()
-        
     get_class($('.item-row.filter:visible'))
 }
 function setup_filter_text(){
-
-    //let value = $("#filter_text").val().replace(":","-")
+    
     let value = $("#filter_text").val()
-    
-    $items = $('.item-row.filter').filter( function(index){
-        //console.log()
-        //if ($(this).data("item-name").toUpperCase().indexOf(value, 0) != -1) 
-        if ($(this).data("id").toString().indexOf(value, 0) != -1) 
-            return true;
-    });
 
-    return $items
+    if (value){
+        
+        value = value.split(" ")
+
+        value.forEach(element => {
+            element = element.replace(":","-")
+
+            $('.item-row.filter').filter(`.${element}`).show()
+        })
+    }
+    else{
+        group_filter = get_group_filter();
+
+        $item = group_filter ? $(`.item-row.filter`).filter(group_filter) : $(`.item-row.filter`);
     
+        $item.show()
+    } 
 }
 
 function visible_filter_select(select_sku = false){

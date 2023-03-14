@@ -482,7 +482,7 @@ def get_tbl_product_list(item_group, from_base, where_base, item_code_list = Non
         
     letter_filter_condition = "AND LEFT (prod.item_name, 1) = '{}'".format(letter_filter) if letter_filter else ""
     
-    text_filter_condition = "AND prod.name LIKE '{}%'".format(filter_text) if filter_text else ""
+    text_filter_condition = __get_text_filter_condition(filter_text)
 
     select_base = """
             prod.name,
@@ -527,6 +527,20 @@ def get_tbl_product_list(item_group, from_base, where_base, item_code_list = Non
         where %s
         order by prod.item_name
         """ % (select_base, from_base, where_base)
+
+def __get_text_filter_condition(filter_text):
+
+    if filter_text:
+
+        filter_array = filter_text.split(" ")
+        
+        if len(filter_array) > 1:
+        
+            return "AND prod.name IN {}".format(tuple(filter_array))
+        
+        return "AND prod.name LIKE '{}%'".format(filter_array[0])
+    
+    return ""
 
 def __get_cond(attribute, item_value):
 
