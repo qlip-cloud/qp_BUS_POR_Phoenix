@@ -447,7 +447,7 @@ def get_from_base(idlevel):
     return """
         tabItem as prod 
         inner join `tabItem Price` as price on prod.name = price.item_code
-        inner join `tabqp_GP_Level` as gp_level on (prod.qp_phonix_class = gp_level.group_type and gp_level.idlevel = '{}')
+        left join `tabqp_GP_Level` as gp_level on (prod.qp_phonix_class = gp_level.group_type and gp_level.idlevel = '{}')
     """.format(idlevel)
 
 def get_where_base():
@@ -494,7 +494,7 @@ def get_tbl_product_list(item_group, from_base, where_base, item_code_list = Non
             prod.item_group,
             prod.sku,
             qp_phonix_class,
-            gp_level.discountpercentage
+            IFNULL( gp_level.discountpercentage ,0) as discountpercentage
             """ % (URL_IMG_EMPTY) 
     
     if item_group:
