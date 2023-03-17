@@ -497,7 +497,8 @@ def get_tbl_product_list(item_group, from_base, where_base, item_code_list = Non
             IFNULL( gp_level.discountpercentage ,0) as discountpercentage
             """ % (URL_IMG_EMPTY) 
     
-    if item_group:
+    #if item_group:
+    if False:
 
         where_base += """
                 and prod.item_group = '%s' 
@@ -596,7 +597,7 @@ def __get_product_list(tbl_product_list, cond_c, cond_t, has_limit = True ):
         ) AS drb_tbl_prod_filter
 
     """ % (select_attr_base, tbl_product_list, cond_c, cond_t, limit)  
-    
+    #print(sql_product_list)
     product_list = frappe.db.sql(sql_product_list, as_dict=1)
     for item in product_list:
         
