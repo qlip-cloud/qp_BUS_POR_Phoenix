@@ -6,7 +6,6 @@ $(document).mousemove( function(e) {
 });  
 
 $(document).ready(function() {
-
     $("#with_inventary").prop("checked", false);
 
     $("#sku_true").prop("checked", false);
@@ -517,6 +516,8 @@ function get_rows(is_valid = false, is_letter = false, is_class = false){
 
             $petition_control.val(1)
 
+            $('#blockscreen-modal').modal("show")
+
             $("#loading").show()
 
             $item_group_active = $(".item_group").not(".inactive")
@@ -569,6 +570,8 @@ function get_rows(is_valid = false, is_letter = false, is_class = false){
                 }
 
                 $("#table_item_list tbody").append(response.data); 
+
+                $('#blockscreen-modal').modal("hide")
 
                 $("#loading").hide()
 
