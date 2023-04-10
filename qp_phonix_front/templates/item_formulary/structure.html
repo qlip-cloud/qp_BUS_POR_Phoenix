@@ -246,7 +246,11 @@ button {
             <!--button class="button-master button-default" disabled id= "save_draft" style="width: 100%;" >GUARDAR</button-->
         </div>
         <div class="col-md-2 button-new">
+        {% if permission.button_confirm %}
+         
             <button id="confirm_draft"  class="button-master button-default" style="width: 100%; " >CONFIRMAR</button>
+        {%endif%}
+
         </div>
     </div>
     

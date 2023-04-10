@@ -11,6 +11,8 @@ def get_permission():
         "quantity": False,
         "stock_uom": False,
         "sku": False,
+        "inqt": False,
+        "button_confirm": False
     } 
 
 def handler():
@@ -48,14 +50,18 @@ def set_permission(role):
             "discountpercentage": True,
             "price_discount_format": True,
             "quantity": True,
-            "stock_uom": True
+            "stock_uom": True,
+            "inqt": True,
+            "button_confirm": True
         })
         
     elif role == "Phonix external technical":
         
         permission.update({
             "quantity": True,
-            "sku": True
+            "sku": True,
+            "inqt": True,
+            "button_confirm": True
 
         })
 
@@ -63,7 +69,9 @@ def set_permission(role):
         
         permission.update({
             "quantity": True,
-            "price_format": True
+            "price_format": True,
+            "inqt": True,
+            "button_confirm": True
 
         })
 
@@ -74,7 +82,20 @@ def set_permission(role):
             "quantity_format": True,
             "quantity": True,
             "stock_uom": True,
-            "sku": True
+            "sku": True,
+            "inqt": True,
+            "button_confirm": True
+        })
+    elif role == "Phonix external vista":
+        
+        permission.update({
+            "price_format": True,
+            "discountpercentage": True,
+            "price_discount_format": True,
+            "quantity": False,
+            "stock_uom": True,
+            "inqt": False,
+            "button_confirm": False
         })
     else:
         frappe.throw("Este usuario no tiene un rol valido")

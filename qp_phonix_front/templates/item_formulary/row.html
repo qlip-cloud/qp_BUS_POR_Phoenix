@@ -50,8 +50,10 @@
                      >
             </td>
         {%endif%}
+        {% if permission.inqt %}
         
-        <td class="lateralright {{'item_select' if item.cantidad else ''}}"><div class="margin-left ">Unidad <br> x {{item.inqt}}</div></td>
+            <td class="lateralright {{'item_select' if item.cantidad else ''}}"><div class="margin-left ">Unidad <br> x {{item.inqt}}</div></td>
+        {%endif%}
         
         {% if permission.stock_uom %}
 

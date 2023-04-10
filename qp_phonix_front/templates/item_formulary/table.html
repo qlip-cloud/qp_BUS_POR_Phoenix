@@ -33,8 +33,10 @@
         {% if permission.quantity %}
             <th width = 10%><div class="margin-left ">Cantidad</div></th>
         {%endif%}
+        {% if permission.quantity %}
 
-        <th  ><div class="margin-left ">Pedir por paquetes de</div></th>
+            <th  ><div class="margin-left ">Pedir por paquetes de</div></th>
+        {%endif%}
 
         {% if permission.stock_uom %}
         
