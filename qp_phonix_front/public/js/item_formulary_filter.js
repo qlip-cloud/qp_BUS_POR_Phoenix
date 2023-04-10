@@ -205,8 +205,10 @@ function get_group_filter(){
             count ++;
     
         });
+        group_filter += ","
     }
     
+    group_filter += $("#sku_true").is(":checked") ? " .SI" : ".SI, .NO";
 
     return group_filter
 }
