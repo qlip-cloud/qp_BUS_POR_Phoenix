@@ -516,7 +516,13 @@ function get_rows(is_valid = false, is_letter = false, is_class = false){
 
             $petition_control.val(1)
 
-            $('#blockscreen-modal').modal("show")
+            filter_text = $("#filter_text").val()
+            is_filter_text = filter_text ? true : false;
+
+            if (!is_filter_text){
+                
+                $('#blockscreen-modal').modal("show")
+            }
 
             $("#loading").show()
 
@@ -532,7 +538,6 @@ function get_rows(is_valid = false, is_letter = false, is_class = false){
 
             letter_filter = $(".link_abc.selected").data("value")
 
-            filter_text = $("#filter_text").val()
             
             idlevel = $("#idlevel").val()
 
@@ -571,7 +576,9 @@ function get_rows(is_valid = false, is_letter = false, is_class = false){
 
                 $("#table_item_list tbody").append(response.data); 
 
-                $('#blockscreen-modal').modal("hide")
+                if (!is_filter_text){
+                    $('#blockscreen-modal').modal("hide")
+                }
 
                 $("#loading").hide()
 
