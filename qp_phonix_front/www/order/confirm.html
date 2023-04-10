@@ -8,6 +8,9 @@
 
 {% block button_title %}
 
+    <a id="btn_edit_export" href="/api/method/qp_phonix_front.qp_phonix_front.uses_cases.export.order_xlsx.export_xlsx?order_id={{order.so_name}}" target="_blank"class="btn button-master button-default">
+        {{ _("EXPORTAR") }}
+    </a> 
     {%if has_sync %}
 
         <a href="/order/index" class="btn button-master button-back">
@@ -18,9 +21,6 @@
     {%endif%}
                 
     </a>
-    <a id="btn_edit_export" href="/api/method/qp_phonix_front.qp_phonix_front.uses_cases.export.order_xlsx.export_xlsx?order_id={{order.so_name}}" target="_blank"class="btn button-master button-default">
-        {{ _("EXPORTAR") }}
-    </a> 
     {#if is_valid and order.status_code == 0#}
     {%if 0 %}
 
@@ -31,7 +31,7 @@
     {%if has_sync %}
     
         <a id = "btn_confirm_order"  class="btn button-master button-default">
-            {{ _("CONFIRM ORDER") }}
+            {{ _("CONFIRMAR ORDER") }}
         </a>
     {%endif%}
             

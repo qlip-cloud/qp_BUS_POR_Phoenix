@@ -38,7 +38,8 @@
         </td>
         {% if permission.quantity %}
             <td class="padding_list {{'item_select' if item.cantidad else ''}}">
-                <input type="number" class="form-control quantity "  id="quantity" value={{item.cantidad}} min = 0 max = {{item.quantity}}
+                <input type="number" class="form-control quantity "  id="quantity" value={{item.cantidad}} 
+                    min = 0 
                     data-quantity = "{{item.quantity}}" 
                     data-value = {{item.cantidad}} 
                     data-factor = "{{item.inqt}}" 
