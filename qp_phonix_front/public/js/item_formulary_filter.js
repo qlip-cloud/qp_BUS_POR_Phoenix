@@ -521,7 +521,7 @@ function get_rows(is_valid = false, is_letter = false, is_class = false){
             filter_text = $("#filter_text").val()
             is_filter_text = filter_text ? true : false;
 
-            if (!is_filter_text){
+            if (!is_filter_text && !is_valid){
                 
                 $('#blockscreen-modal').modal("show")
             }
@@ -578,7 +578,7 @@ function get_rows(is_valid = false, is_letter = false, is_class = false){
 
                 $("#table_item_list tbody").append(response.data); 
 
-                if (!is_filter_text){
+                if (!is_filter_text && !is_valid){
                     $('#blockscreen-modal').modal("hide")
                 }
 
