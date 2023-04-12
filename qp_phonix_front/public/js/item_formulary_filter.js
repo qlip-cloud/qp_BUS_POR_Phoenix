@@ -6,6 +6,7 @@ $(document).mousemove( function(e) {
 });  
 
 $(document).ready(function() {
+    
     $("#with_inventary").prop("checked", false);
 
     $("#sku_true").prop("checked", false);
@@ -37,10 +38,9 @@ $(document).ready(function() {
 
     })
 
-
     $("#filter_text").on("keyup", function(){
-        
-        get_filter_text()
+           
+            get_filter_text()
     })
 
     
@@ -88,6 +88,8 @@ $(document).ready(function() {
             $item.filter(".SI").show()
 
             $(".row-inventary").show()
+            
+            get_rows()
 
         }
         else{
@@ -104,7 +106,6 @@ $(document).ready(function() {
         }
             
 
-        get_rows()
 
 
     })
@@ -180,7 +181,9 @@ $(document).ready(function() {
 
         active_item()
         
-        get_rows(false, false, true)
+        if (isSelected)
+        
+            get_rows(false, false, true)
         
     })
     $("#filter_text").val("")
@@ -218,7 +221,9 @@ function get_filter_text(){
 
     $(".link_abc").removeClass("selected")
 
-    get_rows()
+    if ($("#filter_text").val())
+
+        get_rows()
 
     setup_filter_text()
 
@@ -408,7 +413,6 @@ function format_class(list_id){
 
 function active_filter_abc(item_group = null){
 
-
     if (!(item_group)){
 
         item_group = $("#item_group_active").val()
@@ -429,7 +433,6 @@ function active_filter_abc(item_group = null){
 }
 
 function item_group_filter_toggle(item_group_default){
-    
     
     active_filter_abc(item_group_default)
 
