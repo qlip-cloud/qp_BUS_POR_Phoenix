@@ -3,6 +3,7 @@ from qp_phonix_front.qp_phonix_front.uses_cases.item_group.item_group_list impor
 from qp_phonix_front.qp_phonix_front.uses_cases.shipping_method.shipping_method_list import vf_shipping_method_list
 from qp_phonix_front.qp_phonix_front.uses_cases.item_list.item_list import vf_item_list, get_item_list
 from qp_phonix_front.qp_phonix_front.uses_cases.sales_order.sales_order import get_sales_order
+from frappe.utils import now
 
 def set_items_data(context, item_group_select, item_code_list = None, items_select = [], idlevel = None):
 
@@ -26,7 +27,7 @@ def __setup_item_group(context):
 
     context.item_groups = vf_item_group_list()
 
-    context.select_filter = list(map(lambda x: {"group": x.title, "select_setup": x.ig_filter}, context.item_groups))
+    #context.select_filter = list(map(lambda x: {"group": x.title, "select_setup": x.ig_filter}, context.item_groups))
 
 def __setup_class_list(context, class_list):
 
@@ -68,7 +69,8 @@ def __setup_abc_filter(context):
     
     abc_list = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"]
 
-    context.filter_abc = abc_list
+    #context.filter_abc = abc_list
+    context.filter_abc = []
 
 def set_shipping_data(context, item_group_select, shipping_method_select, shipping_date_select):
 

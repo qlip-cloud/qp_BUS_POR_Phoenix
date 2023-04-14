@@ -1,6 +1,7 @@
 import frappe
 import json
 from gp_phonix_integration.gp_phonix_integration.use_case.get_item_inventary import handler as get_item_inventary
+from frappe.utils import now
 
 URL_IMG_EMPTY = "/assets/qlip_bussines_theme/images/company_default_logo.jpg"
 
@@ -83,24 +84,29 @@ def get_item_list(item_code_list, idlevel = None):
 def vf_item_list(item_group=None, item_Categoria=None, item_SubCategoria=None, item_code_list = None, idlevel = None):
 
     try:
+        print("2", now())
         
         setup = get_table_and_condition(item_group, item_Categoria, item_SubCategoria, item_code_list = item_code_list, idlevel = idlevel)
 
         #product_list = __get_product_list(setup.get("tbl_product_list"), setup.get("tlb_product_attr_select"), setup.get("tlb_product_attr_body"),
+        print("3", now())
 
         result = __get_product_list(setup.get("tbl_product_list"), setup.get("cond_c"), setup.get("cond_t"))
+        print("4", now())
         
         product_list = get_item_inventary(result)
 
-        price_list = frappe.db.get_single_value("Selling Settings", "selling_price_list")
+        #price_list = frappe.db.get_single_value("Selling Settings", "selling_price_list")
 
         #SubCategoria_list = get_filter_SubCategoria_option(price_list)
 
         #Categoria_list = get_filter_option("Categoria", price_list)
 
         #attribute_list = __get_attr_list(setup.get("tbl_product_list"), setup.get("list_attr"))
+        print("5", now())
 
         product_class = __get_product_class(idlevel)
+        print("6", now())
 
         product_sku = __get_product_sku(idlevel)
 
@@ -335,7 +341,7 @@ def get_table_and_condition(item_group = None, item_Categoria = None, item_SubCa
     
     #tlb_product_attr_select, tlb_product_attr_body, list_attr = __get_product_attr(from_base, where_base)
 
-    attr_dict = get_attr_group(item_group)
+    #attr_dict = get_attr_group(item_group)
     cond_c = __get_cond("sku",item_Categoria)
     cond_t = __get_cond("qp_phonix_class",item_SubCategoria)
 
@@ -485,16 +491,19 @@ def get_tbl_product_list(item_group, from_base, where_base, item_code_list = Non
     text_filter_condition = __get_text_filter_condition(filter_text)
 
     select_base = """
-            prod.name,
-            prod.item_name,
+            prod.name as name,
+            prod.item_name as item_name,
             IF(prod.image IS NULL or prod.image = '', '%s', prod.image) as image,
             price.price_list_rate as price,
+            format(price.price_list_rate,0) as price_format,
             0 as cantidad,
-            prod.stock_uom,
-            prod.item_group,
-            prod.sku,
-            qp_phonix_class,
-            IFNULL( gp_level.discountpercentage ,0) as discountpercentage
+            prod.stock_uom as stock_uom,
+            prod.item_group as item_group,
+            prod.sku as sku,
+            prod.qp_phonix_class as qp_phonix_class,
+            IFNULL( gp_level.discountpercentage ,0) as discountpercentage,
+            (price.price_list_rate - (price.price_list_rate * IFNULL( gp_level.discountpercentage ,0)) / 100) as price_discount,
+            format((price.price_list_rate - (price.price_list_rate * IFNULL( gp_level.discountpercentage ,0)) / 100),0) as price_discount_format
             """ % (URL_IMG_EMPTY) 
     
     #if item_group:
@@ -524,9 +533,9 @@ def get_tbl_product_list(item_group, from_base, where_base, item_code_list = Non
 
     return """
         
-        Select distinct %s from %s
+        Select %s from %s
         where %s
-        order by prod.item_name
+        
         """ % (select_base, from_base, where_base)
 
 def __get_text_filter_condition(filter_text):
@@ -571,32 +580,18 @@ def __get_product_list(tbl_product_list, cond_c, cond_t, has_limit = True ):
 
     limit = "LIMIT 0, 10" if has_limit else ""
 
-    select_attr_base = __get_select_attr_base()
-
+    #select_attr_base = __get_select_attr_base()
+    #print("select_attr_base:", select_attr_base,"tbl_product_list:", tbl_product_list,"cond_c: ", cond_c,"cond_t: ", cond_t,"limit", limit)  
+    #print("cond_c: ", cond_c,"cond_t: ", cond_t,"limit", limit)  
     sql_product_list = """
-            SELECT
-            %s
-            FROM (
-                Select distinct
-                    prod.name,
-                    prod.item_name,
-                    prod.image,
-                    prod.price,
-                    prod.cantidad,
-                    prod.stock_uom,
-                    prod.item_group,
-                    prod.sku,
-                    qp_phonix_class,
-                    prod.discountpercentage
-                from
-                    (%s) as prod
-                    
-                Where %s and %s
-                order by prod.item_name
-                %s
-        ) AS drb_tbl_prod_filter
+        %s
+        and %s
+        and %s
+        order by prod.item_name
+        %s
+        
 
-    """ % (select_attr_base, tbl_product_list, cond_c, cond_t, limit)  
+    """ % (tbl_product_list, cond_c, cond_t, limit)  
     #print(sql_product_list)
     product_list = frappe.db.sql(sql_product_list, as_dict=1)
     for item in product_list:
@@ -611,6 +606,24 @@ def __get_product_list(tbl_product_list, cond_c, cond_t, has_limit = True ):
 
 
 def __get_select_attr_base():
+    return """
+            name,
+            item_name,
+            image,
+            price,
+            format(price,0) as price_format,
+            cantidad,
+            stock_uom,
+            item_group,
+            sku,
+            qp_phonix_class,
+            discountpercentage,
+            (price - (price * discountpercentage) / 100) as price_discount,
+            format((price - (price * discountpercentage) / 100),0) as price_discount_format
+    """
+
+#__get_select_attr_base original
+def __get_select_attr_base_old():
 
     sql_base = ""
     sql_base_attr = ""

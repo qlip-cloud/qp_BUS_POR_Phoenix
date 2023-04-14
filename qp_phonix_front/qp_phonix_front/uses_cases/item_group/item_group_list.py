@@ -10,7 +10,8 @@ def vf_item_group_list():
         fields=['image_url as image', 'item_group as title','title as title_pretty', 'description', 'activated_filter', 'name'],
         order_by="position"
     )
-
+    #comentado para pruebas de optimizacion de tiempo
+    """
     for item in item_group_list:
 
         item['ig_filter'] = frappe.db.get_list('qp_vf_ItemGroupFilter',
@@ -21,7 +22,7 @@ def vf_item_group_list():
             },
             fields=['idx', 'item_attribute', 'label', 'filter_multiselect'],
             order_by="idx"
-        )
+        )"""
 
     return item_group_list
 
