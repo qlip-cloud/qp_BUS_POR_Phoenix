@@ -1,11 +1,7 @@
 import json
-import os
 import requests
 import json
 import uuid
-import threading
-import asyncio
-import aiohttp
 import frappe
 
 @frappe.whitelist(allow_guest=True)
