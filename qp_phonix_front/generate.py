@@ -50,11 +50,6 @@ def handler(ApiKey, ApiSecret,ProductId,ServiceId,NIT= None,Nombre= None):
         'code': code
     }
     
-async def test(code, event):
-
-    tasks = asyncio.create_task(send_petition(code, event))
-
-    asyncio.wait([tasks])
 
 def send_petition(code, payload):
     print("entre1")
@@ -66,16 +61,6 @@ def send_petition(code, payload):
     
     response = requests.request("POST", url,headers = headers, data=json.dumps(payload))
     print("entre2")
-    
-    """async with aiohttp.ClientSession() as session:
-        print("entre")
-        async with session.post(url,headers = headers, data=payload) as resp:
-            print("hola")
-
-            response = await resp.text()
-
-            update_db_petition(code, response)
-            print("chao")"""
 
     update_db_petition(code, response.text)
 
