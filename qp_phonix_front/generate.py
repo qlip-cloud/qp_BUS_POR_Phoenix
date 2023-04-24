@@ -31,11 +31,8 @@ def handler(ApiKey, ApiSecret,ProductId,ServiceId,NIT= None,Nombre= None):
 
     frappe.enqueue(
         send_petition, # python function or a module path as string
-        queue="default", # one of short, default, long
-        #timeout=None, # pass timeout manually
         is_async=True, # if this is True, method is run in worker
         job_name="generate_report", # specify a job name
-        #enqueue_after_commit=False, # enqueue the job after the database commit is done at the end of the request
         code = code, # kwargs are passed to the method as arguments
         payload = payload
     )
