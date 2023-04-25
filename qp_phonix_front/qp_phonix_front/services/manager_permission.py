@@ -78,7 +78,7 @@ def set_permission(role):
     elif role == "Phonix internal":
         
         permission.update({
-            "price_discount_format": True,
+            "price_format": True,
             "quantity_format": True,
             "quantity": True,
             "stock_uom": True,
