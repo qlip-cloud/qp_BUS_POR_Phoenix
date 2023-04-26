@@ -84,17 +84,15 @@ def get_item_list(item_code_list, idlevel = None):
 def vf_item_list(item_group=None, item_Categoria=None, item_SubCategoria=None, item_code_list = None, idlevel = None):
 
     try:
-        print("2", now())
         
         setup = get_table_and_condition(item_group, item_Categoria, item_SubCategoria, item_code_list = item_code_list, idlevel = idlevel)
 
         #product_list = __get_product_list(setup.get("tbl_product_list"), setup.get("tlb_product_attr_select"), setup.get("tlb_product_attr_body"),
-        print("3", now())
 
-        result = __get_product_list(setup.get("tbl_product_list"), setup.get("cond_c"), setup.get("cond_t"))
-        print("4", now())
+        #result = __get_product_list(setup.get("tbl_product_list"), setup.get("cond_c"), setup.get("cond_t"))
         
-        product_list = get_item_inventary(result)
+        #product_list = get_item_inventary(result)
+        product_list = []
 
         #price_list = frappe.db.get_single_value("Selling Settings", "selling_price_list")
 
@@ -103,10 +101,8 @@ def vf_item_list(item_group=None, item_Categoria=None, item_SubCategoria=None, i
         #Categoria_list = get_filter_option("Categoria", price_list)
 
         #attribute_list = __get_attr_list(setup.get("tbl_product_list"), setup.get("list_attr"))
-        print("5", now())
 
         product_class = __get_product_class(idlevel)
-        print("6", now())
 
         product_sku = __get_product_sku(idlevel)
 
