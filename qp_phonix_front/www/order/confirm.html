@@ -244,7 +244,11 @@
                         
                 {%for item in items_select%}
 
-                    <div class="row line row_select" data-price = {{item.price }} data-subtotal = "{{item.price * item.cantidad}}" id = "row-{{item.item_code}}">
+                    <div class="row line row_select" 
+                        data-price = {{item.price }} 
+                        data-subtotal = "{{item.price * item.cantidad}}" 
+                        data-item = "row-{{item.item_code}}" 
+                        id = "row-{{item.item_code | replace(':','-')}}">
                         <input type="hidden" class="subtotal" value={{item.price * item.cantidad}}>
                         <div class="col-sm-2" >
                             <img width="575px" height="575px" class="rounded" src="{{item.image}}" alt="">                       
@@ -254,9 +258,9 @@
                                 <div class="col-sm-12">
                                     <p class="order_id" style="margin-bottom: 0rem;">{{item.item_name}} &nbsp; 
                                         {%if order.status_code == 0%}
-                                        <a data-item = "row-{{item.item_code}}" class="oi oi-trash trash"></a></p> 
+                                        <a data-item = "row-{{item.item_code | replace(':','-')}}" class="oi oi-trash trash"></a></p> 
                                         {%endif%}
-                                </div>         
+                                </div>
                             </div>
                             <div class="row label">
                                 <div class="col-sm-3">
