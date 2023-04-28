@@ -3,7 +3,6 @@ from qp_phonix_front.qp_phonix_front.uses_cases.item_group.item_group_list impor
 from qp_phonix_front.qp_phonix_front.uses_cases.shipping_method.shipping_method_list import vf_shipping_method_list
 from qp_phonix_front.qp_phonix_front.uses_cases.item_list.item_list import vf_item_list, get_item_list
 from qp_phonix_front.qp_phonix_front.uses_cases.sales_order.sales_order import get_sales_order
-from frappe.utils import now
 
 def set_items_data(context, item_group_select, item_code_list = None, items_select = [], idlevel = None):
 

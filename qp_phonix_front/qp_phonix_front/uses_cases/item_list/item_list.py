@@ -1,7 +1,6 @@
 import frappe
 import json
 from gp_phonix_integration.gp_phonix_integration.use_case.get_item_inventary import handler as get_item_inventary
-from frappe.utils import now
 
 URL_IMG_EMPTY = "/assets/qlip_bussines_theme/images/company_default_logo.jpg"
 
@@ -102,9 +101,9 @@ def vf_item_list(item_group=None, item_Categoria=None, item_SubCategoria=None, i
 
         #attribute_list = __get_attr_list(setup.get("tbl_product_list"), setup.get("list_attr"))
 
-        product_class = __get_product_class(idlevel)
+        product_class = get_product_class(idlevel)
 
-        product_sku = __get_product_sku(idlevel)
+        product_sku = get_product_sku(idlevel)
 
     except Exception as error:
 
@@ -133,43 +132,46 @@ def vf_item_list(item_group=None, item_Categoria=None, item_SubCategoria=None, i
         'sku_list': product_sku,
     }
 
-def __get_product_class(idlevel):
+def get_product_class(idlevel):
     sql = """
         SELECT
             levelGroup.name as id,
             levelGroup.name as code,
             levelGroup.title as title,
             REPLACE(group_concat(distinct sku),","," ")  as class
-        FROM tabItem as item
-        inner join 
-            tabqp_GP_LevelGroup as levelGroup
-        on (levelGroup.name = item.qp_phonix_class)
-        inner join 
-            tabqp_GP_Level as level
-        on (levelGroup.name = level.group_type)
+
+        FROM tabqp_GP_Level as level
+            
+            inner join 
+                tabqp_GP_LevelGroup as levelGroup
+            on (levelGroup.name = level.group_type)
+
+            inner join 
+                tabItem as item
+            on (levelGroup.name = item.qp_phonix_class)
+            
         where level.idlevel = '{}'
+
         group by levelGroup.name, levelGroup.title
     """.format(idlevel)
     
-
     return frappe.db.sql(sql, as_dict=1)
 
-def __get_product_sku(idlevel):
+def get_product_sku(idlevel):
     sql = """
         SELECT
             sku as id,
             sku as code,
             sku as title,
             REPLACE(group_concat(distinct qp_phonix_class),","," ")  as class
-        FROM tabItem as item
-        inner join 
-            tabqp_GP_Level as level
-        on (level.group_type = item.qp_phonix_class)
+        FROM tabqp_GP_Level as level 
+            inner join 
+                tabItem as item
+            on (level.group_type = item.qp_phonix_class)
         where level.idlevel = '{}'
         group by sku
     """.format(idlevel)
     
-
     return frappe.db.sql(sql, as_dict=1)
 
 def get_filter_option(option, price_list):

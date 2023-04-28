@@ -5,21 +5,31 @@ from qp_phonix_front.qp_phonix_front.uses_cases.front.service import set_shippin
 from qp_phonix_front.qp_phonix_front.services.try_catch import handler as try_catch
 from qp_phonix_front.qp_phonix_front.services.manager_permission import handler as get_permission
 from qp_phonix_front.qp_phonix_front.uses_cases.item_group.item_group_list import vf_item_group_list
-
-from gp_phonix_integration.gp_phonix_integration.use_case.get_item_inventary import handler as get_item_inventary
+#from qp_phonix_front.qp_phonix_front.uses_cases.item_list.item_list import vf_item_list, get_item_list
+from qp_phonix_front.qp_phonix_front.uses_cases.item_list.item_list import get_product_class,get_product_sku
+#from gp_phonix_integration.gp_phonix_integration.use_case.get_item_inventary import handler as get_item_inventary
 import frappe
-from frappe.utils import now
+
 
 def get_context(context):
-    print("inicio")
+
     is_guest()
-    print("1", now())
     
     frappe.clear_cache()
         
     frappe.website.render.clear_cache()
 
     def callback():
+        
+        context.permission = get_permission()
+
+        get_idlevel(context)
+
+        setup_new(context)
+
+    try_catch(callback, context)
+
+    """def callback():
 
         query_params = frappe.request.args
 
@@ -37,30 +47,9 @@ def get_context(context):
 
         else:
 
-            setup_new(context)
         print("1", now())
 
-    try_catch(callback, context)
-
-def get_is_internal(context):
-
-    email = frappe.session.user
-
-    sql = """SELECT 
-                role_profile_name
-            FROM
-                tabUser as user
-            where user.name = '{}';""".format(email)
-
-    is_internal =  frappe.db.sql(sql, as_dict=1)
-    
-    if not is_internal:
-
-        frappe.throw("Este usuario no esta configurado")
-
-    context.is_internal =  True if is_internal[0]["role_profile_name"]  == "Phonix internal" else False
-
-    context.rol =  is_internal[0]["role_profile_name"]
+    try_catch(callback, context)"""
 
 def get_idlevel(context):
 
@@ -84,20 +73,29 @@ def get_idlevel(context):
     
 def setup_new(context):
 
-    query_params = frappe.request.args
+    context.item_groups = vf_item_group_list()
+
+    context.item_list = []
+
+    context.class_list = get_product_class(context.idlevel)
+
+    context.item_group_select = context.item_groups[0].title
+    
+
+    #context.sku_list =    get_product_sku(context.idlevel)
+    #print(context.sku_list)
+    #query_params = frappe.request.args
 
     #item_group_select = query_params.get("item_group")
     
-    item_group_select = get_item_group_select()
     
-
-    shipping_method_select = query_params.get("shipping_type")
+    #shipping_method_select = query_params.get("shipping_type")
     
-    shipping_date_select = query_params.get("shipping_date")
+    #shipping_date_select = query_params.get("shipping_date")
 
-    set_shipping_data(context, item_group_select, shipping_method_select, shipping_date_select)
+    #set_shipping_data(context, item_group_select, shipping_method_select, shipping_date_select)
 
-    set_items_data(context, item_group_select, idlevel = context.idlevel)
+    #set_items_data(context, item_group_select, idlevel = context.idlevel)
 
     #context.item_list = get_item_inventary(context.item_list)
 

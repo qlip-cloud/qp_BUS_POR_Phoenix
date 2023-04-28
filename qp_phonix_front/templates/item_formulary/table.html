@@ -1,62 +1,61 @@
+    <input type="hidden" id="pagination_control" value = 0>
+    <input type="hidden" id="petition_control" value = 0>
 
-<input type="hidden" id="pagination_control" value = 0>
-<input type="hidden" id="petition_control" value = 0>
+    <table class = "item_list" id = "table_item_list" width= 100%>
+        <thead >
+            <th width = 10% class="lateralleft margin-left" style="padding: 10px;">Imagen</th>
+            <th width = 26%><div class="margin-left ">Referencia </div></th>
 
-<table class = "item_list" id = "table_item_list" width= 100%>
-    <thead >
-        <th width = 10% class="lateralleft margin-left" style="padding: 10px;">Imagen</th>
-        <th width = 26%><div class="margin-left ">Referencia </div></th>
+            <th ><div class="margin-left ">Código de item</div></th>
+            
+            {% if permission.price_format %}
+                <th ><div class="margin-left " style="font-size: 13px;">Precio lista x unidad</div></th> 
+            {%endif%}
+            
+            {% if permission.discountpercentage %}
 
-        <th ><div class="margin-left ">Código de item</div></th>
-        
-        {% if permission.price_format %}
-            <th ><div class="margin-left " style="font-size: 13px;">Precio lista x unidad</div></th> 
-        {%endif%}
-        
-        {% if permission.discountpercentage %}
-
-            <th ><div class="margin-left ">Descuento</div></th>
-        {%endif%}
-
-        {% if permission.price_discount_format %}
-
-            <th ><div class="margin-left " style="font-size: 13px;">Precio x unidad</div></th> 
-        {%endif%}
-
-        <th ><div class="margin-left ">Inventario
-            {% if permission.quantity_format %}
-            <br>(En tránsito disponible)
+                <th ><div class="margin-left ">Descuento</div></th>
             {%endif%}
 
-        </div></th>
+            {% if permission.price_discount_format %}
+
+                <th ><div class="margin-left " style="font-size: 13px;">Precio x unidad</div></th> 
+            {%endif%}
+
+            <th ><div class="margin-left ">Inventario
+                {% if permission.quantity_format %}
+                <br>(En tránsito disponible)
+                {%endif%}
+
+            </div></th>
+            
+            {% if permission.quantity %}
+                <th width = 10%><div class="margin-left ">Cantidad</div></th>
+            {%endif%}
+            {% if permission.quantity %}
+
+                <th  ><div class="margin-left ">Pedir por paquetes de</div></th>
+            {%endif%}
+
+            {% if permission.stock_uom %}
+            
+                <th  ><div class="margin-left ">UDM</div></th>
+            {%endif%}
+            
+            {% if permission.sku %}
+
+                <th  ><div class="margin-left ">SKU</div></th>
+
+            {%endif%}
         
-        {% if permission.quantity %}
-            <th width = 10%><div class="margin-left ">Cantidad</div></th>
-        {%endif%}
-        {% if permission.quantity %}
+        </thead>
+        <tbody>
 
-            <th  ><div class="margin-left ">Pedir por paquetes de</div></th>
-        {%endif%}
+            {% include "qp_phonix_front/templates/item_formulary/row.html" %}    
 
-        {% if permission.stock_uom %}
-        
-            <th  ><div class="margin-left ">UDM</div></th>
-        {%endif%}
-        
-        {% if permission.sku %}
+        </tbody>
+    </table>
 
-            <th  ><div class="margin-left ">SKU</div></th>
-
-        {%endif%}
-    
-    </thead>
-    <tbody>
-
-        {% include "qp_phonix_front/templates/item_formulary/row.html" %}    
-
-    </tbody>
-</table>
-
-<div id = "loading" class="text-center" style="display: none;">
-    <img src="/assets/qp_phonix_front/img/loading.gif" style="height: 150px !important;" alt="">
-</div>
+    <div id = "loading" class="text-center" style="display: none;">
+        <img src="/assets/qp_phonix_front/img/loading.gif" style="height: 150px !important;" alt="">
+    </div>

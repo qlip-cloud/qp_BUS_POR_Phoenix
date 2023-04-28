@@ -23,15 +23,12 @@
 
 {% block section_title %}                 
 
-{%for item_group in item_groups%}
+{%for item_group in item_groups %}
 
     <input type="hidden" id="item_group_{{item_group.title}}" value="{{item_group.activated_filter}}">
     
-    {%if item_group.title.lower() == item_group_select.lower() %}
-        <a  data-item-group = "{{item_group.title}}" class="item_group">{{item_group.title_pretty if item_group.title_pretty else item_group.title}} </a>
-    {%else%}
-        <a  data-item-group = "{{item_group.title}}" data-shipping-type = "{{shipping_method_select}}" data-shipping-date = "{{shipping_date_select}}" class="inactive item_group">{{item_group.title}}</a>
-    {%endif%}
+    <a  data-item-group = "{{item_group.title}}" class="item_group">{{item_group.title_pretty if item_group.title_pretty else item_group.title}} </a>
+
 {%endfor%}
 <input type="hidden" id="item_group_active" value = "{{item_group_select}}">
 
@@ -263,13 +260,6 @@ button {
         <div class="col-sm-5 text-left row-abc">
             <input type="text" id = "filter_text" class="form-control" name="" id="" placeholder="Buscar por código de item">
         </div>
-        
-        <div class="col-sm-7 text-right row-abc filter-abc">
-            <span class= "filter_label">Nombre: </span> 
-            {%for abc in filter_abc%}
-                <a class="link_abc" data-value="{{abc}}">{{abc}}</a>
-            {%endfor%}      
-        </div>     
     </div>
     <!--p>hover on the button below to check the results</p>
     <button class="tool-tip">Here I am</button-->
@@ -282,6 +272,7 @@ button {
     <div id="table_content">
         <input type="hidden" data-time = "{{autosave_control}}" value = "0" id = "save_control">
         {% include "qp_phonix_front/templates/item_formulary/table.html" %}    
+            
     </div>
 
 
