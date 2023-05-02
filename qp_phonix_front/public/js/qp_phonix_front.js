@@ -276,7 +276,9 @@ function total_update(){
                 total += subtotal;
         })
 
-        $("#price_total").html(String(formato.format(total)).replace(",","."))
+        //total_str = formato.format(total)
+
+        $("#price_total").html(new Intl.NumberFormat('es-CO').format(total))
 }
 function update_modal(type, data_no = 0){
 
