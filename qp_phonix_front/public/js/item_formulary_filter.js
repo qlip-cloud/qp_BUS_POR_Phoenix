@@ -30,13 +30,13 @@ $(document).ready(function() {
     
     })
 
-    $("#filter_clear").on("click", function(){
+    /*$("#filter_clear").on("click", function(){
         reset_filter()
         $(".selectpicker").selectpicker("deselectAll")
         $(".selectpicker").selectpicker("refresh")
         active_item()
 
-    })
+    })*/
 
     $("#filter_text").on("keyup", function(){
            
