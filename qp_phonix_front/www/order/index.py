@@ -9,6 +9,9 @@ def get_context(context):
     
     def callback():
         
+        context.statues = {
+            "Draft": "‌Borrador"
+        }
         context.order_list = sales_order_list()
 
     try_catch(callback, context)

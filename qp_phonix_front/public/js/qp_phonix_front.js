@@ -444,7 +444,7 @@ function delete_line(line_id){
 
         remove_count = $(".is_removed").length
 
-        msg = `Undo ${remove_count} item deleted`
+        msg = `Deshacer ${remove_count} producto eliminado`
 
         $("#undo").text(msg)
 

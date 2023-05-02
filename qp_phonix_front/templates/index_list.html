@@ -38,20 +38,20 @@
                 <a href="/order/confirm?order_id={{order.so_name}}" class="order_id"> Order #{{order.so_name}} </a>
             </div>
             <div class="col-sm-6">
-                <li class="{{'Draft' if order.status == 'Draft' else 'Delivery' }}">{{order.status}}</li>
+                <li class="{{'Draft' if order.status == 'Draft' else 'Delivery' }}">{{statues[order.status]}}</li>
             </div>
         </div>
         <div class="row label">
             <div class="col-sm-3">
-                # Of Products
+                # De productos
                 
             </div>
             <div class="col-sm-3">
-                Shipping type
+                Tipo de envío 
                 
             </div>
             <div class="col-sm-3">
-                Shipping date
+                Fecha de envío
             </div>
         </div>
         <div class="row info">
