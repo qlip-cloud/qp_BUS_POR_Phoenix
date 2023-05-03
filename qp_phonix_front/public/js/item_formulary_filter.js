@@ -83,7 +83,7 @@ $(document).ready(function() {
 
         if ($(this).is(':checked')){
             
-            $(`.item-row.filter`).hide()
+            $(`.item-row.filter`).not(".row_select").hide()
 
             $item.filter(".SI").show()
 
@@ -216,18 +216,20 @@ function get_group_filter(){
     return group_filter
 }
 function get_filter_text(){
-    
-    $('.item-row.filter').hide()
+
+    $('.item-row.filter').not(".row_select").hide()
 
     $(".link_abc").removeClass("selected")
 
-    if ($("#filter_text").val())
-
+    if ($("#filter_text").val()){
+        
+        
         get_rows()
 
-    setup_filter_text()
+        setup_filter_text()
 
-    get_class($('.item-row.filter:visible'))
+        get_class($('.item-row.filter:visible'))
+    }
 }
 function setup_filter_text(){
     
@@ -522,6 +524,7 @@ function get_rows(is_valid = false, is_letter = false, is_class = false){
             $petition_control.val(1)
 
             filter_text = $("#filter_text").val()
+
             is_filter_text = filter_text ? true : false;
 
             if (!is_filter_text && !is_valid){

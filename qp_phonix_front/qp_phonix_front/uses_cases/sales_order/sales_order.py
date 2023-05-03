@@ -330,9 +330,10 @@ def sales_order_update(order_json):
 
             return rec_result
         
-        delivery_date = min([x.get("delivery_date") for x in order_item_json])
+        #delivery_date = min([x.get("delivery_date") for x in order_item_json])
 
-        delivery_date = delivery_date or qdoc.delivery_date
+        #delivery_date = delivery_date or qdoc.delivery_date
+        delivery_date = qdoc.delivery_date
 
         if not __dates_validate(delivery_date):
 
@@ -370,19 +371,19 @@ def sales_order_update(order_json):
 
                         so_item_doc.qty = item.get('qty')
 
-                    item_delivery_date = datetime.strptime(item.get('delivery_date'), DATE_DELIVERY_FORMAT_FIELD).date()
+                    #item_delivery_date = datetime.strptime(item.get('delivery_date'), DATE_DELIVERY_FORMAT_FIELD).date()
 
-                    if item_delivery_date:
+                    #if item_delivery_date:
 
-                        so_item_doc.delivery_date = item_delivery_date
+                        #so_item_doc.delivery_date = item_delivery_date
 
             if item.get('item_code') in item_insert_list:
 
                 qdoc.append('items', {
                     'item_code': item.get('item_code'),
                     'qty': item.get('qty'),
-                    'rate': item.get('rate'),
-                    'delivery_date': datetime.strptime(item.get('delivery_date'), DATE_DELIVERY_FORMAT_FIELD).date()
+                    'rate': item.get('rate')
+                    
                 })
 
         for so_item_doc in qdoc.items:

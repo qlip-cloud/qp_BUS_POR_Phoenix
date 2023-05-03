@@ -7,7 +7,7 @@ from qp_phonix_front.qp_phonix_front.services.manager_permission import handler 
 from qp_phonix_front.qp_phonix_front.uses_cases.item_group.item_group_list import vf_item_group_list
 #from qp_phonix_front.qp_phonix_front.uses_cases.item_list.item_list import vf_item_list, get_item_list
 from qp_phonix_front.qp_phonix_front.uses_cases.item_list.item_list import get_product_class,get_product_sku
-#from gp_phonix_integration.gp_phonix_integration.use_case.get_item_inventary import handler as get_item_inventary
+from gp_phonix_integration.gp_phonix_integration.use_case.get_item_inventary import handler as get_item_inventary
 import frappe
 
 
@@ -25,7 +25,17 @@ def get_context(context):
 
         get_idlevel(context)
 
-        setup_new(context)
+        query_params = frappe.request.args
+
+        order_id = query_params.get("order_id")
+        
+        if order_id:
+
+            setup_edit(context, order_id)
+
+        else:
+    
+            setup_new(context)
 
     try_catch(callback, context)
 
@@ -108,11 +118,25 @@ def get_item_group_select():
 
 def setup_edit(context, order_id):
 
+
+
     item_code_list, items_select = setup_order(context, order_id)
     
-    set_shipping_data(context, context.order.item_group, context.order.shipping_type, context.order.shipping_date)
+    context.item_groups = vf_item_group_list()
 
-    set_items_data(context, context.order.item_group, item_code_list, items_select)
+    context.item_list = get_item_inventary(items_select)
+
+    context.class_list = get_product_class(context.idlevel)
+
+    context.item_group_select = context.item_groups[0].title
+
+    """
+    print("item_code_list, items_select")
+
+    print(item_code_list, items_select)
+    #set_shipping_data(context, context.order.item_group, context.order.shipping_type, context.order.shipping_date)
+
+    set_items_data(context, context.order.item_group, item_code_list, items_select)"""
 
 def setup_order(context, order_id):
 
