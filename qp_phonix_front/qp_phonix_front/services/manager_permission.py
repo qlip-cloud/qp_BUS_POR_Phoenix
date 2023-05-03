@@ -43,7 +43,7 @@ def set_permission(role):
     
     permission = get_permission()
 
-    if role == "Phonix external":
+    if role == "Compras Externas":
 
         permission.update({
             "price_format": True,
@@ -55,7 +55,7 @@ def set_permission(role):
             "button_confirm": True
         })
         
-    elif role == "Phonix external technical":
+    elif role == "Ventas Internas":
         
         permission.update({
             "quantity": True,
@@ -66,7 +66,7 @@ def set_permission(role):
             "price_format": True
         })
 
-    elif role == "Phonix external Dos":
+    elif role == "Ventas Externas":
         
         permission.update({
             "quantity": True,
@@ -76,7 +76,7 @@ def set_permission(role):
 
         })
 
-    elif role == "Phonix internal":
+    elif role == "Admin":
         
         permission.update({
             "price_format": True,
@@ -87,7 +87,7 @@ def set_permission(role):
             "inqt": True,
             "button_confirm": True
         })
-    elif role == "Phonix external vista":
+    elif role == "Especificador Externo":
         
         permission.update({
             "price_format": True,
