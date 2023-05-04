@@ -25,7 +25,7 @@
     
 
         <a id="btn_edit_order"  class="btn button-master button-default">
-            {{ _("EDIT ORDER") }}
+            {{ _("EDITAR ORDEN") }}
         </a>
     
     {%if has_sync %}
@@ -232,11 +232,15 @@
             
                 <div class="col-sm-12 subtitle">
                     <div class="row">
-                        <div class="col-sm-3" style="margin-left: -15px; margin-bottom: 15px;">
+                        <div class="col-sm-4" style="margin-left: -15px; margin-bottom: 15px;">
                             Productos
                             <input type="hidden" id="order_id" value="{{order.so_name}}">
+                        </div>
+                        <div class="col-sm-4">
+                            <a id="selected_delete"                                     style = "display: none;"
+                            >Eliminar Selección</a>
                         </div> 
-                        <div class="col-sm-8">
+                        <div class="col-sm-4">
                             <a id="undo"></a>
                         </div> 
                     </div>
@@ -256,14 +260,20 @@
                         <div class="col-sm-10">
                             <div class="row">
                                 <div class="col-sm-12">
-                                    <p class="order_id" style="margin-bottom: 0rem;">{{item.item_name}} &nbsp; 
-                                        {%if order.status_code == 0%}
-                                        <a data-item = "row-{{item.item_code | replace(':','-')}}" class="oi oi-trash trash"></a></p> 
-                                        {%endif%}
+                            
+                            <p class="order_id" style="margin-bottom: 0rem;">
+                                <input type="checkbox"
+                                    class="delecte_group"
+                                    name = "delecte_group" 
+                                    id = "ch_deleted_{{item.item_code | replace(':','-')}}"
+                                    data-id = "{{item.item_code | replace(':','-')}}"
+                                    > {{item.item_name}} &nbsp; 
+
                                 </div>
                             </div>
                             <div class="row label">
                                 <div class="col-sm-3">
+                            <!-- input type="checkbox"-->
                                     Código de item
                                     {#item.SubCategoria_title#}
                                 </div>

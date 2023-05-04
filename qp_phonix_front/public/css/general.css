@@ -1,6 +1,6 @@
     
 
-    #undo, #filter_clear{
+    #undo, #filter_clear, #selected_delete{
         text-decoration: underline;
         font-size: 0.75rem;
         cursor: pointer;

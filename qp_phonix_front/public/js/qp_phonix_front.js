@@ -133,9 +133,8 @@ $(document).ready(function() {
 
                 if (data_type == 0){
 
-                        line_id = $("#warn-modal #line").val()
 
-                        delete_line(line_id)
+                        deleted_rows()
 
                 }
                 if (data_type == 1){
