@@ -182,14 +182,17 @@ $(document).ready(function() {
         active_item()
         
         if (isSelected)
-        
+            
             get_rows(false, false, true)
-        
     })
     $("#filter_text").val("")
 });
 
-
+function validate_has_filter(){
+    if ($('#select-SubCategoria').val() || $('#sku_true').prop("checked") || $('#filter_text').val())
+        return true
+    return false
+}
 function get_group_filter(){
 
     select_value = $('#select-SubCategoria').selectpicker('val')
@@ -497,11 +500,13 @@ function filter_show(){
 
 
 $(window).scroll(function() {
+    console.log(validate_has_filter())
+    if (validate_has_filter()){
+        if((($(window).scrollTop() * 2) + $(window).height()) >= $(document).height()){
 
-	if((($(window).scrollTop() * 2) + $(window).height()) >= $(document).height()){
-
-        get_rows(true)
-    }    
+            get_rows(true)
+        }
+    }
 });	
 
 
