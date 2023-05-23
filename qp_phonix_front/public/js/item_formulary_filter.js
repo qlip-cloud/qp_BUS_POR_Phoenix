@@ -500,7 +500,7 @@ function filter_show(){
 
 
 $(window).scroll(function() {
-    console.log(validate_has_filter())
+
     if (validate_has_filter()){
         if((($(window).scrollTop() * 2) + $(window).height()) >= $(document).height()){
 

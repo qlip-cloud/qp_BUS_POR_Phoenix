@@ -25,7 +25,8 @@
 
 {%for item_group in item_groups %}
 
-    <input type="hidden" id="item_group_{{item_group.title}}" value="{{item_group.activated_filter}}">
+    <input type="hidden" id="qp_box_no_sku" value="{{qp_box_no_sku}}">
+    <input type="hidden" id="qp_box_sku" value="{{qp_box_sku}}">
     
     <a  data-item-group = "{{item_group.title}}" class="item_group">{{item_group.title_pretty if item_group.title_pretty else item_group.title}} </a>
 
@@ -246,7 +247,7 @@ button {
         <div class="col-md-2 button-new">
         {% if permission.button_confirm %}
          
-            <button id="confirm_draft"  class="button-master button-default" style="width: 100%; " >CONFIRMAR</button>
+            <button id="confirm_draft"  class="button-master button-default" style="width: 100%; " >Ir al Carrito</button>
         {%endif%}
 
         </div>

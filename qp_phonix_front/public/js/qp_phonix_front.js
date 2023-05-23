@@ -26,10 +26,18 @@ $(document).ready(function() {
                 let max_value = parseInt($(this).data("quantity"))
                 let transit_value = parseInt($(this).data("quantity_dis"))
                 let item_name = $(this).data("select")
+                let qp_box_no_sku = parseInt($("#qp_box_no_sku").val())
+                let qp_box_sku = parseInt($("#qp_box_sku").val())
                 let sku = $(this).data("sku")
 
+                if (sku == "SI" ){
 
-                if (sku != "SI" && value > 0){
+                        is_factor = qp_box_sku
+                }else{
+                        is_factor = qp_box_no_sku
+                }
+
+                if (is_factor && value > 0){
                
                     factor = parseInt($(this).data("factor"))
                             
