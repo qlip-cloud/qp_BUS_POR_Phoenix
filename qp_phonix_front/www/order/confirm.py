@@ -6,6 +6,7 @@ from qp_phonix_front.qp_phonix_front.uses_cases.shipping_method.shipping_method_
 from qp_phonix_front.qp_phonix_front.uses_cases.front.service import set_order_data
 from qp_phonix_front.qp_phonix_front.services.update_price_by_price_list import handler as update_price_by_price_list
 from qp_phonix_front.qp_phonix_front.services.try_catch import handler as try_catch
+from qp_phonix_front.qp_phonix_front.services.manager_permission import handler as get_permission
 
 def get_context(context):
 
@@ -14,6 +15,8 @@ def get_context(context):
     def callback():
 
         query_params = frappe.request.args
+        
+        context.permission = get_permission()
 
         order_id = query_params.get("order_id")
         

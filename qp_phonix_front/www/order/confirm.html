@@ -27,11 +27,11 @@
         <a id="btn_edit_order"  class="btn button-master button-default">
             {{ _("EDITAR ORDEN") }}
         </a>
-    
-    {%if has_sync %}
+
+    {%if has_sync and permission.confirm %}
     
         <a id = "btn_confirm_order"  class="btn button-master button-default">
-            {{ _("CONFIRMAR ORDER") }}
+            {{ _("CONFIRMAR ORDEN") }}
         </a>
     {%endif%}
             
