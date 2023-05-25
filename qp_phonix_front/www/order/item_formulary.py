@@ -39,33 +39,10 @@ def get_context(context):
 
     try_catch(callback, context)
 
-    """def callback():
-
-        query_params = frappe.request.args
-
-        context.autosave_control =  get_autosave_control()
-
-        order_id = query_params.get("order_id")
-
-        context.permission = get_permission()
-
-        get_idlevel(context)
-
-        if order_id:
-
-            setup_edit(context, order_id)
-
-        else:
-
-        print("1", now())
-
-    try_catch(callback, context)"""
 
 def get_product_class(idlevel):
 
-    result = frappe.db.get_list("qp_GP_ClassSync", fields = ["id", "code", "title", "class"])
-    print(result)
-    return result
+    return frappe.db.get_list("qp_GP_ClassSync", fields = ["id", "code", "title", "class"])
 
 def get_idlevel(context):
 

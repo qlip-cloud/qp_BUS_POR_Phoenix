@@ -19,7 +19,7 @@ $(document).ready(function() {
     
         get_shipping_calendar(shipping_method)
 
-        $("#table_content").on('keyup blur mouseup', ".quantity",function () {
+        $("#table_content").on('blur', ".quantity",function () {
                 
                 let value = parseInt($(this).val())
                 let quantity_format = $(this).data("quantity_format")

@@ -67,7 +67,7 @@ $(document).ready(function() {
         }
     })
 
-    $("#table_content").on('keyup mouseup', ".quantity",function () {
+    $("#table_content").on('blur', ".quantity",function () {
         
         value = $(this).val()
         
