@@ -6,7 +6,7 @@ from qp_phonix_front.qp_phonix_front.services.try_catch import handler as try_ca
 from qp_phonix_front.qp_phonix_front.services.manager_permission import handler as get_permission
 from qp_phonix_front.qp_phonix_front.uses_cases.item_group.item_group_list import vf_item_group_list
 #from qp_phonix_front.qp_phonix_front.uses_cases.item_list.item_list import vf_item_list, get_item_list
-from qp_phonix_front.qp_phonix_front.uses_cases.item_list.item_list import get_product_class,get_product_sku
+#from qp_phonix_front.qp_phonix_front.uses_cases.item_list.item_list import get_product_class,get_product_sku
 from gp_phonix_integration.gp_phonix_integration.use_case.get_item_inventary import handler as get_item_inventary
 import frappe
 
@@ -60,6 +60,12 @@ def get_context(context):
         print("1", now())
 
     try_catch(callback, context)"""
+
+def get_product_class(idlevel):
+
+    result = frappe.db.get_list("qp_GP_ClassSync", fields = ["id", "code", "title", "class"])
+    print(result)
+    return result
 
 def get_idlevel(context):
 
