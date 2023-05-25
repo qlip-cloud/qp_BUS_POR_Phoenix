@@ -12,7 +12,8 @@ def get_permission():
         "stock_uom": False,
         "sku": False,
         "inqt": False,
-        "button_confirm": False
+        "button_confirm": False,
+        "confirm": True
     } 
 
 def handler():
@@ -63,7 +64,8 @@ def set_permission(role):
             "inqt": True,
             "button_confirm": True,
             "button_confirm": True,
-            "price_format": True
+            "price_format": True,
+            "confirm": False
         })
 
     elif role == "Ventas Externas":
