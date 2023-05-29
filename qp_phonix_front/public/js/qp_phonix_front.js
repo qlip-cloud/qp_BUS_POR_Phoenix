@@ -19,7 +19,7 @@ $(document).ready(function() {
     
         get_shipping_calendar(shipping_method)
 
-        $("#table_content").on('blur', ".quantity",function () {
+        $("#table_content").on('blur mouseup', ".quantity",function () {
                 
                 let value = parseInt($(this).val())
                 let quantity_format = $(this).data("quantity_format")
@@ -29,13 +29,9 @@ $(document).ready(function() {
                 let qp_box_no_sku = parseInt($("#qp_box_no_sku").val())
                 let qp_box_sku = parseInt($("#qp_box_sku").val())
                 let sku = $(this).data("sku")
-
-                if (sku == "SI" ){
-
-                        is_factor = qp_box_sku
-                }else{
-                        is_factor = qp_box_no_sku
-                }
+                
+                
+                is_factor = !(sku == "SI" ? qp_box_sku : qp_box_no_sku)
 
                 if (is_factor && value > 0){
                
