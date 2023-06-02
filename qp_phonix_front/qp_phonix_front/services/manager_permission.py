@@ -65,7 +65,8 @@ def set_permission(role):
             "button_confirm": True,
             "button_confirm": True,
             "price_format": True,
-            "confirm": False
+            "confirm": False,
+            "quantity_format": True
         })
 
     elif role == "Ventas Externas":
