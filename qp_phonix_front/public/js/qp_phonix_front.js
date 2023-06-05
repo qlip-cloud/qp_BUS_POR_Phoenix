@@ -18,69 +18,24 @@ $(document).ready(function() {
         }
     
         get_shipping_calendar(shipping_method)
+        $("#table_content").on('keypress', ".quantity",function (event) {
+                var keycode = (event.keyCode ? event.keyCode : event.which);
+                if(keycode == '13'){
+                    
+                    und_factor($(this))
+        
+               
+                }
+            })
+
 
         $("#table_content").on('blur mouseup', ".quantity",function () {
                 
-                let value = parseInt($(this).val())
-                let quantity_format = $(this).data("quantity_format")
-                let max_value = parseInt($(this).data("quantity"))
-                let transit_value = parseInt($(this).data("quantity_dis"))
-                let item_name = $(this).data("select")
-                let qp_box_no_sku = parseInt($("#qp_box_no_sku").val())
-                let qp_box_sku = parseInt($("#qp_box_sku").val())
-                let sku = $(this).data("sku")
                 
-                
-                is_factor = !(sku == "SI" ? qp_box_sku : qp_box_no_sku)
 
-                if (is_factor && value > 0){
-               
-                    factor = parseInt($(this).data("factor"))
-                            
-                    if (value % factor != 0){
-        
-                        result = parseInt(value / factor) + 1;
-            
-                        value = result * factor;
-                        
-                        $(this).val(value)
-                        
-                    }
-                    
-                        
-                }
-                $inventory_quantity = $(`#table_content #inventory_quantity-${item_name}`);
-                
-                if (quantity_format == "False" && max_value > 0) {
-                        
-                        if ( parseInt(value) > parseInt(max_value) ){
-                                if ((transit_value + max_value) >= value)
-                                        
-                                        $inventory_quantity.html("En tránsito");
-                                else
-                                        
-                                        $inventory_quantity.html("No");
-                        }
-                        else{
-                                $inventory_quantity.html("Si");
-                        }
-                }
+                und_factor($(this))
+        })
 
-                $line = $(this).parents(".line")
-
-                price = parseFloat($line.data("price"))
-                
-                sub = value * price;
-                
-                $subtotal = $line.find(".subtotal")
-                
-                $subtotal.val(sub)
-
-                total_update()
-
-                //delay_save_or_update()
-
-            })
 
         
         $("#select_shipping_method").change(function(){
@@ -165,6 +120,74 @@ $(document).ready(function() {
 
 })
 
+function und_factor($quantity){
+        
+        let row = $quantity.data("select")        
+        let value = parseInt($quantity.val())
+        let quantity_format = $quantity.data("quantity_format")
+        let max_value = parseInt($quantity.data("quantity"))
+        let transit_value = parseInt($quantity.data("quantity_dis"))
+        let item_name = $quantity.data("select")
+        let qp_box_no_sku = parseInt($("#qp_box_no_sku").val())
+        let qp_box_sku = parseInt($("#qp_box_sku").val())
+        let sku = $quantity.data("sku")
+
+        if (value && value > 0){
+                $(`tr.${row} td`).addClass("item_select")
+                $(`tr.${row}`).addClass("row_select")
+        }else{
+                $(`tr.${row} td`).removeClass("item_select")
+                $(`tr.${row}`).removeClass("row_select")
+
+        }
+
+        is_factor = !(sku == "SI" ? qp_box_sku : qp_box_no_sku)
+
+        if (is_factor && value > 0){
+
+        factor = parseInt($quantity.data("factor"))
+                
+        if (value % factor != 0){
+
+                result = parseInt(value / factor) + 1;
+
+                value = result * factor;
+                
+                $quantity.val(value)
+                
+        }
+        
+                
+        }
+        $inventory_quantity = $(`#table_content #inventory_quantity-${item_name}`);
+
+        if (quantity_format == "False" && max_value > 0) {
+                
+                if ( parseInt(value) > parseInt(max_value) ){
+                        if ((transit_value + max_value) >= value)
+                                
+                                $inventory_quantity.html("En tránsito");
+                        else
+                                
+                                $inventory_quantity.html("No");
+                }
+                else{
+                        $inventory_quantity.html("Si");
+                }
+        }
+
+        $line = $quantity.parents(".line")
+
+        price = parseFloat($line.data("price"))
+
+        sub = value * price;
+
+        $subtotal = $line.find(".subtotal")
+
+        $subtotal.val(sub)
+
+        total_update()
+}
 
 function updateIndicator() {
 
