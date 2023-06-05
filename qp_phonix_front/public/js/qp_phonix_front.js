@@ -2,6 +2,8 @@ URL_CREATE_SALES_ORDER = "create_sales_order";
 
 $(document).ready(function() {
 
+        $(".dropdown-menu.dropdown-menu-right").children().first().remove()
+
         const REDIRECT_INDEX = `/order/index`;
 
         const REDIRECT_CONFIRM = `/order/confirm`;
@@ -22,8 +24,8 @@ $(document).ready(function() {
                 var keycode = (event.keyCode ? event.keyCode : event.which);
                 if(keycode == '13'){
                     
-                    und_factor($(this))
-        
+                        und_factor($(this))
+                        $("#select-SubCategoria").focus()
                
                 }
             })
@@ -115,8 +117,6 @@ $(document).ready(function() {
         })
 
         total_update()
-
-
 
 })
 
