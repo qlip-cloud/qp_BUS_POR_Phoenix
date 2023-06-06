@@ -518,6 +518,7 @@ $("#undo").click(()=>{
         $("#undo").text("")
 
         total_update()
+        show_deleted_button()
 
     })
 

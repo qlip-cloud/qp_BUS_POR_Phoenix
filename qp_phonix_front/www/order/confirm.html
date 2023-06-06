@@ -232,16 +232,20 @@
             
                 <div class="col-sm-12 subtitle">
                     <div class="row">
-                        <div class="col-sm-4" style="margin-left: -15px; margin-bottom: 15px;">
+                        <div class="col-sm-3" style="margin-left: -15px; margin-bottom: 15px;">
                             Productos
                             <input type="hidden" id="order_id" value="{{order.so_name}}">
                         </div>
-                        <div class="col-sm-4">
-                            <a id="selected_delete"                                     style = "display: none;"
-                            >Eliminar Selección</a>
+                        <div class="col-sm-3">
+                            <a id="select_all" class = "confirm_link select_all" data-action = "1"> Seleccionar Todos</a>
+                            <a id="deselect_all" style ="display: none" class = "confirm_link select_all" data-action = "0"> Deseleccionar Todos</a>
                         </div> 
-                        <div class="col-sm-4">
-                            <a id="undo"></a>
+                        <div class="col-sm-3">
+                            <a id="selected_delete" class = "confirm_link" style = "display: none;">
+                                Eliminar Selección</a>
+                        </div> 
+                        <div class="col-sm-3">
+                            <a id="undo" class = "confirm_link" ></a>
                         </div> 
                     </div>
                 </div>
