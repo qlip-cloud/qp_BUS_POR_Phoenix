@@ -87,6 +87,33 @@
         margin-top: 50px;
     }
 
+    .description-label{
+        display: none;
+    }
+    @media (max-width: 576px){
+        .button-master{
+            width: 100%;
+            margin-top: 0.25em;
+        }
+
+        .information-container{
+            padding-right: 0em;
+        }
+
+        .details-container{
+            display: none;
+        }
+
+        .description-column{
+            display: none;
+
+        }
+        .description-label{
+            display:block;
+        }
+    }
+
+
 </style>
 
 
@@ -94,9 +121,9 @@
 <div class="row"  style="margin-top: 30px;">
     {%if is_valid%}
 
-        <div class="col-sm-3" style="margin-right: 1em; max-width: 23%;">
+        <div class="col-sm-12 col-lg-3 information-container" style="max-width: 100%; padding-right: 2em">
             <div class="row shadow p-3 mb-5 bg-white rounded">
-                <div class="col-md-12 subtitle">
+                <div class=" col-sm-12 col-md-12 subtitle">
                     Información
                 </div>
                 <div class="col-md-12 label">
@@ -132,9 +159,9 @@
             </div>
         </div>
     
-        <div class="col-sm-9">
+        <div class="col-sm-9 ">
             <div class="row">
-            <div class="col-sm-9 shadow p-3 mb-5 bg-white rounded" style="max-width: 72%; margin-right: 0.75em;">
+            <div class="col-sm-9 shadow p-3 mb-5 bg-white rounded details-container" style="max-width: 72%; margin-right: 0.75em;">
                 <!--div class="col">
                     <div class="row">
                         <div class=" col-md-12 subtitle">
@@ -275,8 +302,8 @@
 
                                 </div>
                             </div>
-                            <div class="row label">
-                                <div class="col-sm-3">
+                            <div class="row label description-column">
+                                <div class="col-lg-3">
                             <!-- input type="checkbox"-->
                                     Código de item
                                     {#item.SubCategoria_title#}
@@ -297,12 +324,14 @@
                     
                             <div class="row info">
                                 <div class="col-sm-3">
+                                    <div class="description-label">Código de item</div>
                                     <div class="background-info information_label {#'' if item.SubCategoria_value else cell_empty#}">
                                         {{item.item_code}}
                                     </div>
                                 </div>
         
                                 <div class="col-sm-2 ">
+                                    <div class="description-label">Cantidad</div>
                                     <div class="background-info information_label">
 
                                         <input type="hidden" name="" id="item_id" value="{{item.item_code}}">
@@ -315,16 +344,19 @@
                                     </div>
                                 </div>
                                 <div class="col-sm-3">
+                                    <div class="description-label">Pedir por paquetes de</div>
                                     <div class="background-info information_label">
                                         Unidad x {{item.inqt}}
                                     </div>
                                 </div>
                                 <div class="col-sm-2">
+                                    <div class="description-label">Precio</div>
                                     <div class="background-info information_label">
                                         $ {{item.price_format | replace(",", ".")}}
                                     </div>
                                 </div>
                                 <div class="col-sm-2">
+                                    <div class="description-label">Total</div>
                                     <div class="background-info information_label">
                                         $ {{item.total_format | replace(",", ".")}}
                                     </div>
