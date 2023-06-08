@@ -92,6 +92,10 @@
         margin-bottom: 0.25em;
 
     }
+
+    .total-responsive{
+        display: none;
+    }
     @media (max-width: 576px){
         .button-master{
             width: 100%;
@@ -119,6 +123,13 @@
             margin-bottom: 0.25em;
 
             display:block;
+        }
+        .total-content{
+            display: none;
+        }
+
+        .total-responsive{
+            display: block;
         }
     }
 
@@ -230,17 +241,17 @@
                     </div>
                 </div-->
             </div>
-            <div class="col-sm-3 shadow p-3 mb-5 bg-white rounded">
+            <div class="col-sm-3 shadow p-3 mb-5 bg-white rounded total-content">
                 <div class=" col-md-12 subtitle">
                     Costo Total Antes de IVA
                 </div>
                 <div class=" col-md-12 title" style="line-height: 48px;">
-                    $ <span id="price_total">{{order.total_format | replace(",", ".")}}</span>
+                    $ <span id="" class="price_total ">{{order.total_format | replace(",", ".")}}</span>
                 </div>
                 <div class=" col-md-12 subtitle">
                     COP
                 </div>
-            </div>
+                </div>
         </div>
             <div class="row">
                 {%if count_change_item_list%}
@@ -273,7 +284,7 @@
                             <input type="hidden" id="order_id" value="{{order.so_name}}">
                         </div>
                         <div class="col-sm-3">
-                            <a id="select_all" class = "confirm_link select_all" data-action = "1"> Seleccionar Todos</a>
+                            <a id="select_all" class = "confirm_link select_all" style="color: #1aa2aa !important"data-action = "1"> Seleccionar Todos</a>
                             <a id="deselect_all" style ="display: none" class = "confirm_link select_all" data-action = "0"> Deseleccionar Todos</a>
                         </div> 
                         <div class="col-sm-3">
@@ -379,6 +390,23 @@
 
 
             </div> 
+            <div class="total-responsive">
+
+            <div class="row">
+                <div class="col-sm-3 shadow p-3 mb-5 bg-white rounded">
+                    <div class=" col-md-12 subtitle">
+                        Costo Total Antes de IVA
+                    </div>
+                    <div class=" col-md-12 title" style="line-height: 48px;">
+                        $ <span id="" class="price_total">{{order.total_format | replace(",", ".")}}</span>
+                    </div>
+                    <div class=" col-md-12 subtitle">
+                        COP
+                    </div>
+                </div>
+            </div>
+        </div>
+
         </div> 
     {%else%}
     <div class="col-sm-12">    

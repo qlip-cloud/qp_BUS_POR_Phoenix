@@ -25,7 +25,8 @@ $(document).ready(function() {
                 if(keycode == '13'){
                     
                         und_factor($(this))
-                        $("#select-SubCategoria").focus()
+
+                        document.activeElement.blur()
                
                 }
             })
@@ -34,7 +35,6 @@ $(document).ready(function() {
         $("#table_content").on('blur mouseup', ".quantity",function () {
                 
                 
-
                 und_factor($(this))
         })
 
@@ -304,7 +304,7 @@ function total_update(){
 
         //total_str = formato.format(total)
 
-        $("#price_total").html(new Intl.NumberFormat('es-CO').format(total))
+        $(".price_total").html(new Intl.NumberFormat('es-CO').format(total))
 }
 function update_modal(type, data_no = 0){
 

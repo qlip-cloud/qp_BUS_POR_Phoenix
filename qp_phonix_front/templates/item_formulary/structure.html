@@ -27,9 +27,9 @@
 
     <input type="hidden" id="qp_box_no_sku" value="{{qp_box_no_sku}}">
     <input type="hidden" id="qp_box_sku" value="{{qp_box_sku}}">
-    
-    <a  data-item-group = "{{item_group.title}}" class="item_group">{{item_group.title_pretty if item_group.title_pretty else item_group.title}} </a>
-
+    <div class="">
+        <a  data-item-group = "{{item_group.title}}" class="item_group">{{item_group.title_pretty if item_group.title_pretty else item_group.title}} </a>
+    </div>
 {%endfor%}
 <input type="hidden" id="item_group_active" value = "{{item_group_select}}">
 
@@ -49,6 +49,10 @@
         }
         .clear-responsive{
             display: block !important;
+        }
+        .item_group{
+            font-size: 0.70em  !important;
+            
         }
     }
     table{
