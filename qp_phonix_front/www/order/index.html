@@ -16,6 +16,43 @@
 
 
     <style>
+        .description-label{
+            display: none;
+
+        }
+
+        @media (max-width: 576px){
+        .button-master{
+            width: 100%;
+            margin-top: 0.25em;
+            text-align: center;
+        }
+        .order_id{
+            font-size: 16px;
+        }
+
+        .information-container{
+            padding-right: 0em;
+        }
+
+        .details-container, .description-column{
+            display: none;
+        }
+
+
+        .background-info{
+            margin-top: 0.25em;
+
+        }
+        .description-label{
+            margin-bottom: 0.25em;
+
+            display:block;
+        }
+        .tab-container{
+            margin-top: 2em;
+        }
+    }
     
         .Delivery{
             color: #4D6444;
@@ -62,7 +99,7 @@
         {% if(order_list)%}
             <div class="container">
 
-                <div class="row text-center">
+                <div class="row text-center tab-container">
                     <div class="tab-items active margin-left" >
                         ‌Borrador
                     </div>

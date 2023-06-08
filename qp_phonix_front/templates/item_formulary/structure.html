@@ -37,6 +37,20 @@
 {% block button_title %}
 
 <style>
+
+
+    @media (max-width: 576px){
+        th {
+            width: 1%;
+            white-space: nowrap;
+        }
+        .clear-container{
+            display: none;
+        }
+        .clear-responsive{
+            display: block !important;
+        }
+    }
     table{
         width: 100%;
         border: 0 !important;
@@ -193,6 +207,11 @@ button {
     input[type=checkbox]{
         margin-left: 0px;
     }
+    .clear-responsive{
+        display: none;
+    }
+    
+
 </style>
     <input type="hidden" id="order_id" value="{{order.so_name if order else ''}}">
     <div class="row " style="padding-top: 20px;">
@@ -233,7 +252,7 @@ button {
 
         </div>
 
-        <div class="col-md-2 text-left ">
+        <div class="col-md-2 text-left clear-container">
             <div class="row" style="position: absolute; top:0px">
                 <!--a id="filter_clear">LIMPIAR FILTRO</a-->
                 <a id="filter_clear" onclick=location.reload()>LIMPIAR</a>
@@ -259,9 +278,21 @@ button {
     <input type="hidden" id="is_filter_abc" value="{{is_filter_abc}}">
     <input type="hidden" id="idlevel" value="{{idlevel}}">
     <div class="row " >
-        <div class="col-sm-5 text-left row-abc">
+        <div class="col-sm-12 col-md-5 text-left row-abc">
             <input type="text" id = "filter_text" class="form-control" name="" id="" placeholder="Buscar por Código de ítems">
         </div>
+    </div>
+    <div class="row ">
+        <div class="clear-responsive">
+
+            <div class="col text-left ">
+                <!--a id="filter_clear">LIMPIAR FILTRO</a-->
+                <a id="filter_clear" onclick=location.reload()>LIMPIAR</a>
+
+                
+            </div>
+        </div>
+
     </div>
     <!--p>hover on the button below to check the results</p>
     <button class="tool-tip">Here I am</button-->
@@ -271,11 +302,14 @@ button {
         Fallo conexion a internet
     </div>
 
-    <div id="table_content">
+    <div id="table_content" style="overflow:hidden">
         <input type="hidden" data-time = "{{autosave_control}}" value = "0" id = "save_control">
+        <div id="" style="overflow:auto">
+
         {% include "qp_phonix_front/templates/item_formulary/table.html" %}    
             
     </div>
+</div>
 
 
 <!-- The Modal -->
