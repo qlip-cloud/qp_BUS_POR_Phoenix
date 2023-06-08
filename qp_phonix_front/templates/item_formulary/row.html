@@ -30,7 +30,7 @@
         <td class="{{'item_select' if item.cantidad else ''}}">
             <div class="margin-left" id = "inventory_quantity-{{item.name | replace(':','-')}}">
                 {% if permission.quantity_format %}
-                    {{item.quantity|int}} ({{item.quantity_dis|int}})
+                    {{item.quantity|int}} [{{item.quantity_dis|int}}]
                 {%else%}
                     {{'Si' if item.quantity > 0 else 'No'}}
                 {%endif%}
