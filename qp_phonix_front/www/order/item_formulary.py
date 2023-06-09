@@ -42,7 +42,8 @@ def get_context(context):
 
 def get_product_class(idlevel):
 
-    return frappe.db.get_list("qp_GP_ClassSync", fields = ["id", "code", "title", "class"])
+    #return frappe.db.get_list("qp_GP_ClassSync", fields = ["id", "code", "title", "class"])
+    return frappe.db.get_list("qp_GP_ClassSync", fields = ["id", "code", "title", "class"], order_by = "title asc", group_by = "title")
 
 def get_idlevel(context):
 
@@ -64,7 +65,6 @@ def get_idlevel(context):
             where contact.email_id = '{}';""".format(email)
     
     result =  frappe.db.sql(sql, as_dict=1)
-    print(result)
     context.idlevel = result[0]["customer_group"]
     context.qp_box_no_sku = int(result[0]["qp_box_no_sku"])
     context.qp_box_sku = int(result[0]["qp_box_sku"])
@@ -76,7 +76,6 @@ def setup_new(context):
     context.item_list = []
 
     context.class_list = get_product_class(context.idlevel)
-
     context.item_group_select = context.item_groups[0].title
     
 

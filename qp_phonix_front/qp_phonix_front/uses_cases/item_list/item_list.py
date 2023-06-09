@@ -336,12 +336,15 @@ def get_table_and_condition(item_group = None, item_Categoria = None, item_SubCa
     
     tbl_product_list = get_tbl_product_list(item_group, from_base, where_base, item_code_list, letter_filter, is_equal, filter_text = filter_text)
 
-    
+    #print(tbl_product_list)
     #tlb_product_attr_select, tlb_product_attr_body, list_attr = __get_product_attr(from_base, where_base)
 
     #attr_dict = get_attr_group(item_group)
     cond_c = __get_cond("sku",item_Categoria)
-    cond_t = __get_cond("qp_phonix_class",item_SubCategoria)
+
+
+    
+    cond_t = __get_cond("class_sync.title",list(map(lambda x: x.replace("--", " ") , item_SubCategoria)))
 
     """
     filter01, filter02 = __get_attr_filter_options(attr_dict.get('field'))
@@ -451,6 +454,8 @@ def get_from_base(idlevel):
     return """
         tabItem as prod 
         inner join `tabItem Price` as price on prod.name = price.item_code
+        left join `tabqp_GP_ClassSync` as class_sync on(prod.qp_phonix_class = class_sync.id)
+
         left join `tabqp_GP_Level` as gp_level on (prod.qp_phonix_class = gp_level.group_type and gp_level.idlevel = '{}')
     """.format(idlevel)
 
@@ -499,6 +504,7 @@ def get_tbl_product_list(item_group, from_base, where_base, item_code_list = Non
             prod.item_group as item_group,
             prod.sku as sku,
             prod.qp_phonix_class as qp_phonix_class,
+            REPLACE( class_sync.title , ' ', '--' ) as class_title,
             IFNULL( gp_level.discountpercentage ,0) as discountpercentage,
             (price.price_list_rate - (price.price_list_rate * IFNULL( gp_level.discountpercentage ,0)) / 100) as price_discount,
             format((price.price_list_rate - (price.price_list_rate * IFNULL( gp_level.discountpercentage ,0)) / 100),0) as price_discount_format
