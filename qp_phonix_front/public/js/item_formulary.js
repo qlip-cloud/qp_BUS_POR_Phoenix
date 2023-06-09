@@ -67,24 +67,40 @@ $(document).ready(function() {
         }
     })
 
-    $("#table_content").on('blur', ".quantity",function () {
-        
-        value = $(this).val()
-        
-        row = $(this).data("select")
+    /*$("#table_content").on('keypress', ".quantity",function (event) {
+        var keycode = (event.keyCode ? event.keyCode : event.which);
+        if(keycode == '13'){
+            console.log("aqui")
+            und_factor($(this))
 
-        if (value && value > 0){
-            $(`tr.${row} td`).addClass("item_select")
-            $(`tr.${row}`).addClass("row_select")
-        }else{
-            $(`tr.${row} td`).removeClass("item_select")
-            $(`tr.${row}`).removeClass("row_select")
-
+       
         }
+    })*/
+
+    /*$("#table_content").on('blur', ".quantity",function () {
+
+        und_factor($(this))
+       
         
-    })
+    })*/
 
 });
+/*
+function und_factor($quantity){
+    
+    value = $quantity.val()
+        
+    row = $quantity.data("select")
+    
+    if (value && value > 0){
+        $(`tr.${row} td`).addClass("item_select")
+        $(`tr.${row}`).addClass("row_select")
+    }else{
+        $(`tr.${row} td`).removeClass("item_select")
+        $(`tr.${row}`).removeClass("row_select")
+
+    }
+}*/
 
 function setup_filter(link_abc){
 

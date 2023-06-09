@@ -1,10 +1,10 @@
-{%for item in item_list %}
+{%for  item in item_list %}
 
     <tr data-item-name = "{{item.item_name}}" class="inventary-{{'SI' if item.quantity > 0 else 'NO'}} {{item.sku}} {{item.qp_phonix_class}} item-row {{item.name | replace(':','-')}} {{item.item_group}} {{item.initial}} {{'row_select' if item.cantidad else ''}} {{'filter' if disabled_off else ''}}" style="{{'display: none;' if not disabled_off else ''}}" data-id = "{{item.name}}">
         <input type="hidden" id = "item_id" value= "{{item.name}}" >
         <input type="hidden" id = "item_discount" value= "{{item.discountpercentage}}" >
         
-        <td class="lateralleft padding_list {{'row_select' if item.cantidad else ''}}"><img src="{{item.image}}" class="rounded float-left item_img" onerror="this.src='/assets/qlip_bussines_theme/images/company_default_logo.jpg'" /> 
+        <td class="lateralleft padding_list {{'row_select' if item.cantidad else ''}}"><img src="{{item.image}}" class="rounded float-left item_img " onerror="this.src='/assets/qlip_bussines_theme/images/company_default_logo.jpg'" /> 
         
         <td class="{{'item_select' if item.cantidad else ''}} item-name" ><div class="margin-left">{{item.item_name}}</div></td>
         <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">{{item.name}}</div></td>
@@ -30,7 +30,7 @@
         <td class="{{'item_select' if item.cantidad else ''}}">
             <div class="margin-left" id = "inventory_quantity-{{item.name | replace(':','-')}}">
                 {% if permission.quantity_format %}
-                    {{item.quantity|int}} ({{item.quantity_dis|int}})
+                    {{item.quantity|int}} [{{item.quantity_dis|int}}]
                 {%else%}
                     {{'Si' if item.quantity > 0 else 'No'}}
                 {%endif%}
@@ -47,6 +47,7 @@
                     data-sku= "{{item.sku}}"
                     data-quantity_dis= "{{item.quantity_dis}}"
                     data-quantity_format = {{permission.quantity_format}}
+                    data-next = {{key}}
                      >
             </td>
         {%endif%}

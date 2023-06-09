@@ -41,7 +41,7 @@
                 <li class="{{'Draft' if order.status == 'Draft' else 'Delivery' }}">{{statues[order.status]}}</li>
             </div>
         </div>
-        <div class="row label">
+        <div class="row label details-container">
             <div class="col-sm-3">
                 # De productos
                 
@@ -56,17 +56,27 @@
         </div>
         <div class="row info">
             <div class="col-sm-3">
+                <div class="description-label">
+                    # De productos
+                </div>
+
                 <div class="background-info information_label">
                 
                 {{order.of_products}}
             </div>
         </div>
             <div class="col-sm-3" >
+                <div class="description-label">
+                    Tipo de envío 
+                </div>
                 <div class="background-info information_label">
                     {{order.shipping_description}}
             </div>
         </div>
             <div class="col-sm-3">
+                <div class="description-label">
+                    Fecha de envío
+                </div>
                 <div class="background-info information_label">
                     {{order.shipping_date}}
             </div>

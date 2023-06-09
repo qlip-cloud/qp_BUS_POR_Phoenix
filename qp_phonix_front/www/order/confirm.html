@@ -87,6 +87,53 @@
         margin-top: 50px;
     }
 
+    .description-label{
+        display: none;
+        margin-bottom: 0.25em;
+
+    }
+
+    .total-responsive{
+        display: none;
+    }
+    @media (max-width: 576px){
+        .button-master{
+            width: 100%;
+            margin-top: 0.25em;
+        }
+
+        .information-container{
+            padding-right: 0em;
+        }
+
+        .details-container{
+            display: none;
+        }
+
+        .description-column{
+            display: none;
+
+        }
+
+        .background-info{
+            margin-top: 0.25em;
+
+        }
+        .description-label{
+            margin-bottom: 0.25em;
+
+            display:block;
+        }
+        .total-content{
+            display: none;
+        }
+
+        .total-responsive{
+            display: block;
+        }
+    }
+
+
 </style>
 
 
@@ -94,9 +141,9 @@
 <div class="row"  style="margin-top: 30px;">
     {%if is_valid%}
 
-        <div class="col-sm-3" style="margin-right: 1em; max-width: 23%;">
+        <div class="col-sm-12 col-lg-3 information-container" style="max-width: 100%; padding-right: 2em">
             <div class="row shadow p-3 mb-5 bg-white rounded">
-                <div class="col-md-12 subtitle">
+                <div class=" col-sm-12 col-md-12 subtitle">
                     Información
                 </div>
                 <div class="col-md-12 label">
@@ -132,9 +179,9 @@
             </div>
         </div>
     
-        <div class="col-sm-9">
+        <div class="col-sm-9 ">
             <div class="row">
-            <div class="col-sm-9 shadow p-3 mb-5 bg-white rounded" style="max-width: 72%; margin-right: 0.75em;">
+            <div class="col-sm-9 shadow p-3 mb-5 bg-white rounded details-container" style="max-width: 72%; margin-right: 0.75em;">
                 <!--div class="col">
                     <div class="row">
                         <div class=" col-md-12 subtitle">
@@ -194,17 +241,17 @@
                     </div>
                 </div-->
             </div>
-            <div class="col-sm-3 shadow p-3 mb-5 bg-white rounded">
+            <div class="col-sm-3 shadow p-3 mb-5 bg-white rounded total-content">
                 <div class=" col-md-12 subtitle">
                     Costo Total Antes de IVA
                 </div>
                 <div class=" col-md-12 title" style="line-height: 48px;">
-                    $ <span id="price_total">{{order.total_format | replace(",", ".")}}</span>
+                    $ <span id="" class="price_total ">{{order.total_format | replace(",", ".")}}</span>
                 </div>
                 <div class=" col-md-12 subtitle">
                     COP
                 </div>
-            </div>
+                </div>
         </div>
             <div class="row">
                 {%if count_change_item_list%}
@@ -232,16 +279,20 @@
             
                 <div class="col-sm-12 subtitle">
                     <div class="row">
-                        <div class="col-sm-4" style="margin-left: -15px; margin-bottom: 15px;">
+                        <div class="col-sm-3" style="margin-left: -15px; margin-bottom: 15px;">
                             Productos
                             <input type="hidden" id="order_id" value="{{order.so_name}}">
                         </div>
-                        <div class="col-sm-4">
-                            <a id="selected_delete"                                     style = "display: none;"
-                            >Eliminar Selección</a>
+                        <div class="col-sm-3">
+                            <a id="select_all" class = "confirm_link select_all" style="color: #1aa2aa !important"data-action = "1"> Seleccionar Todos</a>
+                            <a id="deselect_all" style ="display: none" class = "confirm_link select_all" data-action = "0"> Deseleccionar Todos</a>
                         </div> 
-                        <div class="col-sm-4">
-                            <a id="undo"></a>
+                        <div class="col-sm-3">
+                            <a id="selected_delete" class = "confirm_link" style = "display: none;">
+                                Eliminar Selección</a>
+                        </div> 
+                        <div class="col-sm-3">
+                            <a id="undo" class = "confirm_link" ></a>
                         </div> 
                     </div>
                 </div>
@@ -271,8 +322,8 @@
 
                                 </div>
                             </div>
-                            <div class="row label">
-                                <div class="col-sm-3">
+                            <div class="row label description-column">
+                                <div class="col-lg-3">
                             <!-- input type="checkbox"-->
                                     Código de item
                                     {#item.SubCategoria_title#}
@@ -293,12 +344,14 @@
                     
                             <div class="row info">
                                 <div class="col-sm-3">
+                                    <div class="description-label">Código de item</div>
                                     <div class="background-info information_label {#'' if item.SubCategoria_value else cell_empty#}">
                                         {{item.item_code}}
                                     </div>
                                 </div>
         
                                 <div class="col-sm-2 ">
+                                    <div class="description-label">Cantidad</div>
                                     <div class="background-info information_label">
 
                                         <input type="hidden" name="" id="item_id" value="{{item.item_code}}">
@@ -311,16 +364,19 @@
                                     </div>
                                 </div>
                                 <div class="col-sm-3">
+                                    <div class="description-label">Pedir por paquetes de</div>
                                     <div class="background-info information_label">
                                         Unidad x {{item.inqt}}
                                     </div>
                                 </div>
                                 <div class="col-sm-2">
+                                    <div class="description-label">Precio</div>
                                     <div class="background-info information_label">
                                         $ {{item.price_format | replace(",", ".")}}
                                     </div>
                                 </div>
                                 <div class="col-sm-2">
+                                    <div class="description-label">Total</div>
                                     <div class="background-info information_label">
                                         $ {{item.total_format | replace(",", ".")}}
                                     </div>
@@ -334,6 +390,23 @@
 
 
             </div> 
+            <div class="total-responsive">
+
+            <div class="row">
+                <div class="col-sm-3 shadow p-3 mb-5 bg-white rounded">
+                    <div class=" col-md-12 subtitle">
+                        Costo Total Antes de IVA
+                    </div>
+                    <div class=" col-md-12 title" style="line-height: 48px;">
+                        $ <span id="" class="price_total">{{order.total_format | replace(",", ".")}}</span>
+                    </div>
+                    <div class=" col-md-12 subtitle">
+                        COP
+                    </div>
+                </div>
+            </div>
+        </div>
+
         </div> 
     {%else%}
     <div class="col-sm-12">    

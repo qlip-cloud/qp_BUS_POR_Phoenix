@@ -2,12 +2,12 @@
     <input type="hidden" id="petition_control" value = 0>
     <!--p style="color: #c0c0c0;">Precios antes de iva </p-->
     <p >Precios antes de IVA </p>
-    <table class = "item_list" id = "table_item_list" width= 100%>
+    <table class = "item_list"  id = "table_item_list" width= 100%>
         <thead >
             <th width = 10% class="lateralleft margin-left" style="padding: 10px;">Imagen</th>
-            <th width = 26%><div class="margin-left ">Referencia </div></th>
+            <th width = auto><div class="margin-left ">Referencia </div></th>
 
-            <th ><div class="margin-left ">Código de item</div></th>
+            <th width = auto><div class="margin-left">Código de item</div></th>
             
             {% if permission.price_format %}
                 <th ><div class="margin-left " style="font-size: 13px;">Precio lista x unidad</div></th> 
@@ -25,7 +25,7 @@
 
             <th ><div class="margin-left ">Inventario
                 {% if permission.quantity_format %}
-                <br>(En tránsito disponible)
+                [En tránsito]
                 {%endif%}
 
             </div></th>
