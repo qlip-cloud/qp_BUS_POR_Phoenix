@@ -47,6 +47,7 @@ def paginator_item_list(item_group = None, item_Categoria = None, item_SubCatego
     return response"""
 
 def callback_get_inventary(item_group = None, item_Categoria= None, item_SubCategoria= None, letter_filter= None, filter_text= None, 
+    
     idlevel = None, has_inventary = False,item_code_list = [], item_with_inventary = []):
     
     setup = get_table_and_condition(item_group, item_Categoria, item_SubCategoria, filter_text = filter_text, item_code_list = item_code_list, idlevel = idlevel)
@@ -332,19 +333,21 @@ def get_table_and_condition(item_group = None, item_Categoria = None, item_SubCa
 
     where_base = get_where_base()
 
-    from_base = get_from_base(idlevel)
+
+    cond_c = __get_cond("sku",item_Categoria)
+
+
+    cond_t = __get_cond("class_sync.title",list(map(lambda x: x.replace("--", " ") , item_SubCategoria)) if item_SubCategoria else None)
     
-    tbl_product_list = get_tbl_product_list(item_group, from_base, where_base, item_code_list, letter_filter, is_equal, filter_text = filter_text)
+    from_base = get_from_base(idlevel, cond_t)
+    
+    tbl_product_list = get_tbl_product_list(item_group, from_base, where_base, item_code_list, letter_filter, is_equal, filter_text = filter_text, cond_t = cond_t)
 
     #print(tbl_product_list)
     #tlb_product_attr_select, tlb_product_attr_body, list_attr = __get_product_attr(from_base, where_base)
 
     #attr_dict = get_attr_group(item_group)
-    cond_c = __get_cond("sku",item_Categoria)
 
-
-    
-    cond_t = __get_cond("class_sync.title",list(map(lambda x: x.replace("--", " ") , item_SubCategoria)))
 
     """
     filter01, filter02 = __get_attr_filter_options(attr_dict.get('field'))
@@ -449,15 +452,16 @@ def get_attrs_filters_item_group(item_group):
     return res
 
 
-def get_from_base(idlevel):
-
+def get_from_base(idlevel, cond_t = None):
+    
+    class_condition = "" if cond_t == "1=1" else "left join `tabqp_GP_ClassSync` as class_sync on(prod.qp_phonix_class = class_sync.id)"
+    
     return """
         tabItem as prod 
         inner join `tabItem Price` as price on prod.name = price.item_code
-        left join `tabqp_GP_ClassSync` as class_sync on(prod.qp_phonix_class = class_sync.id)
-
+        {}
         left join `tabqp_GP_Level` as gp_level on (prod.qp_phonix_class = gp_level.group_type and gp_level.idlevel = '{}')
-    """.format(idlevel)
+    """.format(class_condition, idlevel)
 
 def get_where_base():
 
@@ -485,13 +489,15 @@ def get_condition_by_list(list_data, field, is_equal = False, operator = "AND"):
 
     return ""
 
-def get_tbl_product_list(item_group, from_base, where_base, item_code_list = None, letter_filter = None, is_equal = False, filter_text = None):
+def get_tbl_product_list(item_group, from_base, where_base, item_code_list = None, letter_filter = None, is_equal = False, filter_text = None, cond_t = None):
     
     exclude_item = get_condition_by_list(list_data = item_code_list, field = "prod.name", is_equal = is_equal)
         
     letter_filter_condition = "AND LEFT (prod.item_name, 1) = '{}'".format(letter_filter) if letter_filter else ""
     
     text_filter_condition = __get_text_filter_condition(filter_text)
+
+    class_condition = "" if cond_t == "1=1" else "REPLACE( class_sync.title , ' ', '--' ) as class_title,"
 
     select_base = """
             prod.name as name,
@@ -504,11 +510,11 @@ def get_tbl_product_list(item_group, from_base, where_base, item_code_list = Non
             prod.item_group as item_group,
             prod.sku as sku,
             prod.qp_phonix_class as qp_phonix_class,
-            REPLACE( class_sync.title , ' ', '--' ) as class_title,
+            %s
             IFNULL( gp_level.discountpercentage ,0) as discountpercentage,
             (price.price_list_rate - (price.price_list_rate * IFNULL( gp_level.discountpercentage ,0)) / 100) as price_discount,
             format((price.price_list_rate - (price.price_list_rate * IFNULL( gp_level.discountpercentage ,0)) / 100),0) as price_discount_format
-            """ % (URL_IMG_EMPTY) 
+            """ % (URL_IMG_EMPTY, class_condition) 
     
     #if item_group:
     if False:
