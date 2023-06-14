@@ -65,6 +65,8 @@ def get_idlevel(context):
             where contact.email_id = '{}';""".format(email)
     
     result =  frappe.db.sql(sql, as_dict=1)
+
+    print(result)
     context.idlevel = result[0]["customer_group"]
     context.qp_box_no_sku = int(result[0]["qp_box_no_sku"])
     context.qp_box_sku = int(result[0]["qp_box_sku"])
