@@ -1,26 +1,28 @@
 {%for  item in item_list %}
-
+    {% set count = 4 %}
     <tr data-item-name = "{{item.item_name}}" class="inventary-{{'SI' if item.quantity > 0 else 'NO'}} {{item.sku}} {{item.class_title}} item-row {{item.name | replace(':','-')}} {{item.item_group}} {{item.initial}} {{'row_select' if item.cantidad else ''}} {{'filter' if disabled_off else ''}}" style="{{'display: none;' if not disabled_off else ''}}" data-id = "{{item.name}}">
         <input type="hidden" id = "item_id" value= "{{item.name}}" >
         <input type="hidden" id = "item_discount" value= "{{item.discountpercentage}}" >
         
-        <td class="lateralleft padding_list {{'row_select' if item.cantidad else ''}}"><img src="{{item.image}}" class="rounded float-left item_img " onerror="this.src='/assets/qlip_bussines_theme/images/company_default_logo.jpg'" /> 
+        <td rowspan="{{ 2 if item.description_full else 1}}" class="lateralleft padding_list {{'row_select' if item.cantidad else ''}}"><img src="{{item.image}}" class="rounded float-left item_img " onerror="this.src='/assets/qlip_bussines_theme/images/company_default_logo.jpg'" /> 
         
         <td class="{{'item_select' if item.cantidad else ''}} item-name" ><div class="margin-left">{{item.item_name}}</div></td>
         <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">{{item.name}}</div></td>
         
 
         {% if permission.price_format %}
-
+            {% set count = count + 1 %}
             <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">$ {{item.price_format | replace(",",".")}} COP</div></td>
         {%endif%}
 
         {% if permission.discountpercentage %}
+            {% set count = count + 1 %}
 
             <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">{{item.discountpercentage}} %</div></td>
         {%endif%}
 
         {% if permission.price_discount_format %}
+            {% set count = count + 1 %}
 
             <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">$ {{item.price_discount_format | replace(",",".")}} COP</div></td>
 
@@ -37,6 +39,8 @@
             </div>
         </td>
         {% if permission.quantity %}
+            {% set count = count + 1 %}
+
             <td class="padding_list {{'item_select' if item.cantidad else ''}}">
                 <input type="number" class="form-control quantity "  id="quantity" value={{item.cantidad}} 
                     min = 0 
@@ -52,18 +56,27 @@
             </td>
         {%endif%}
         {% if permission.inqt %}
+            {% set count = count + 1 %}
         
             <td class="lateralright {{'item_select' if item.cantidad else ''}}"><div class="margin-left ">Unidad <br> x {{item.inqt}}</div></td>
         {%endif%}
         
         {% if permission.stock_uom %}
+        {% set count = count + 1 %}
 
-            <td class="lateralright {{'item_select' if item.cantidad else ''}}"><div class="margin-left">{{item.stock_uom}}</div></td>
+            <td class="lateralright {{'item_select' if item.cantidad else ''}}"><div class="margin-left">{{item.stock_uom}} {{count}}</div></td>
         {%endif%}
         
         {% if permission.sku %}
+            {% set count = count + 1 %}
+
             <td class="lateralright {{'item_select' if item.cantidad else ''}}"><div class="margin-left">{{item.sku}}</div></td>
         {%endif%}
     </tr>
-
+    {% if item.description_full %}
+    <tr data-item-name = "{{item.item_name}}" class="inventary-{{'SI' if item.quantity > 0 else 'NO'}} {{item.sku}} {{item.class_title}} item-row {{item.name | replace(':','-')}} {{item.item_group}} {{item.initial}} {{'row_select' if item.cantidad else ''}} {{'filter' if disabled_off else ''}}" style="{{'display: none;' if not disabled_off else ''}}" data-id = "{{item.name}}">
+        <td colspan="{{count}}" class="lateralright {{'item_select' if item.cantidad else ''}}"><div class="margin-left">{{item.description_full}}</div></td>
+        
+    </tr>
+    {% endif %}
 {%endfor%}
