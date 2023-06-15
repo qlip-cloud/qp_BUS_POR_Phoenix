@@ -64,7 +64,7 @@
         {% if permission.stock_uom %}
         {% set count = count + 1 %}
 
-            <td class="lateralright {{'item_select' if item.cantidad else ''}}"><div class="margin-left">{{item.stock_uom}} {{count}}</div></td>
+            <td class="lateralright {{'item_select' if item.cantidad else ''}}"><div class="margin-left">{{item.stock_uom}}</div></td>
         {%endif%}
         
         {% if permission.sku %}
