@@ -501,6 +501,7 @@ def get_tbl_product_list(item_group, from_base, where_base, item_code_list = Non
 
     select_base = """
             prod.name as name,
+            prod.qp_description_full as description_full ,
             prod.item_name as item_name,
             IF(prod.image IS NULL or prod.image = '', '%s', prod.image) as image,
             price.price_list_rate as price,
