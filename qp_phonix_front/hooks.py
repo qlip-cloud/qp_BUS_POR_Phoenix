@@ -97,6 +97,10 @@ web_include_js = "/assets/qp_phonix_front/js/qp_phonix_front.js"
 #	}
 # }
 
+website_context = {
+	"favicon": 	"/assets/qp_phonix_front/img/favicon.png"
+}
+
 get_website_user_home_page = "qp_phonix_front.qp_phonix_front.services.redirect_after_login.handler"
 
 doc_events = {
