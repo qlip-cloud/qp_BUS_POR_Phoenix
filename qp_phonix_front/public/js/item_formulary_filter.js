@@ -75,7 +75,8 @@ $(document).ready(function() {
 
     $("#sku_true").on("change", function(){
 
-        $("#with_inventary").prop("checked", false);
+        //edicion with_inventary
+        //$("#with_inventary").prop("checked", false);
 
         group_filter = get_group_filter();
 
@@ -104,10 +105,6 @@ $(document).ready(function() {
 
             visible_filter_select($(this).is(":checked"))
         }
-            
-
-
-
     })
 
     /*$('#select-Categoria').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
@@ -189,7 +186,8 @@ $(document).ready(function() {
 });
 
 function validate_has_filter(){
-    if ($('#select-SubCategoria').val() || $('#sku_true').prop("checked") || $('#filter_text').val())
+    //if ($('#select-SubCategoria').val() || $('#sku_true').prop("checked") || $('#filter_text').val())
+    if ($('#select-SubCategoria').val() || $('#sku_true').prop("checked") || $('#filter_text').val() || $('#with_inventary').prop("checked"))
         return true
     return false
 }
