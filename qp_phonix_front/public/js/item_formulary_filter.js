@@ -88,7 +88,7 @@ $(document).ready(function() {
 
             $item.filter(".SI").show()
 
-            $(".row-inventary").show()
+            //$(".row-inventary").show()
             
             get_rows()
 
@@ -96,7 +96,7 @@ $(document).ready(function() {
         else{
             $item.show()
 
-            $(".row-inventary").hide()
+            //$(".row-inventary").hide()
         }
 
         //setup_filter(class_filter)
