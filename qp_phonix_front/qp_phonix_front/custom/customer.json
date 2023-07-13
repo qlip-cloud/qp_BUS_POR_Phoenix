@@ -393,7 +393,7 @@
    "in_preview": 0,
    "in_standard_filter": 0,
    "insert_after": "qp_box_sku",
-   "label": "qp_phoenix_buy_no_sku",
+   "label": "Activar compra de saldos No SKU",
    "length": 0,
    "mandatory_depends_on": null,
    "modified": "2023-07-11 16:59:12.450830",
