@@ -460,7 +460,7 @@ def get_from_base(idlevel, cond_t = None):
         tabItem as prod 
         inner join `tabItem Price` as price on prod.name = price.item_code
         {}
-        left join `tabqp_GP_Level` as gp_level on (prod.qp_phonix_class = gp_level.group_type and gp_level.idlevel = '{}')
+        left join `tabqp_GP_Level` as gp_level on (prod.qp_price_group = gp_level.group_type and gp_level.idlevel = '{}')
     """.format(class_condition, idlevel)
 
 def get_where_base():
@@ -511,6 +511,7 @@ def get_tbl_product_list(item_group, from_base, where_base, item_code_list = Non
             prod.item_group as item_group,
             prod.sku as sku,
             prod.qp_phonix_class as qp_phonix_class,
+            prod.qp_price_group as qp_price_group,
             %s
             IFNULL( gp_level.discountpercentage ,0) as discountpercentage,
             (price.price_list_rate - (price.price_list_rate * IFNULL( gp_level.discountpercentage ,0)) / 100) as price_discount,
@@ -628,6 +629,7 @@ def __get_select_attr_base():
             item_group,
             sku,
             qp_phonix_class,
+            qp_price_group,
             discountpercentage,
             (price - (price * discountpercentage) / 100) as price_discount,
             format((price - (price * discountpercentage) / 100),0) as price_discount_format
@@ -703,6 +705,7 @@ def __get_select_attr_base_old():
             item_group,
             sku,
             qp_phonix_class,
+            qp_price_group,
             discountpercentage,
             (price - (price * discountpercentage) / 100) as price_discount,
             format((price - (price * discountpercentage) / 100),0) as price_discount_format
