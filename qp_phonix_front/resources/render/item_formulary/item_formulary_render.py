@@ -11,7 +11,6 @@ import json
 @frappe.whitelist()
 def paginator(order_id = None, item_group = None, item_Categoria = None, item_SubCategoria = None, item_code_list = None, letter_filter = None, filter_text = None, idlevel = None, has_inventary = False):
     
-    print("--------------------------------------------")
     origin = "render item formulary paginator"
 
     error_msg = "Error render item formulary paginator"

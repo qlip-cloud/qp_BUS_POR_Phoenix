@@ -53,7 +53,8 @@ def get_idlevel(context):
                 customer.name,
                 customer.customer_group,
                 customer.qp_box_no_sku,
-                customer.qp_box_sku
+                customer.qp_box_sku,
+                customer.qp_phoenix_buy_no_sku
             FROM
                 tabContact as contact
             inner join
@@ -66,10 +67,11 @@ def get_idlevel(context):
     
     result =  frappe.db.sql(sql, as_dict=1)
 
-    print(result)
+    #print(result)
     context.idlevel = result[0]["customer_group"]
     context.qp_box_no_sku = int(result[0]["qp_box_no_sku"])
     context.qp_box_sku = int(result[0]["qp_box_sku"])
+    context.qp_buy_no_sku = int(result[0]["qp_phoenix_buy_no_sku"])
     
 def setup_new(context):
 

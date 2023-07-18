@@ -130,6 +130,7 @@ function und_factor($quantity){
         let item_name = $quantity.data("select")
         let qp_box_no_sku = parseInt($("#qp_box_no_sku").val())
         let qp_box_sku = parseInt($("#qp_box_sku").val())
+        let qp_buy_no_sku = parseInt($("#qp_buy_no_sku").val())
         let sku = $quantity.data("sku")
 
         if (value && value > 0){
@@ -145,15 +146,34 @@ function und_factor($quantity){
 
         if (is_factor && value > 0){
 
-        factor = parseInt($quantity.data("factor"))
-                
-        if (value % factor != 0){
+                factor = parseInt($quantity.data("factor"))
 
-                result = parseInt(value / factor) + 1;
-
-                value = result * factor;
+                let buy_no_sku = false;
                 
-                $quantity.val(value)
+                if (qp_buy_no_sku && sku == "NO"){
+
+                        base_result = Number((max_value / factor).toFixed(2));
+                        base_decimal =Number(( base_result - parseInt(base_result)).toFixed(2));
+                        base_mult_ue = Number((base_decimal * factor).toFixed(2));
+
+                        result = Number((value / factor).toFixed(2));
+                        decimal_value = Number((result - parseInt(result)).toFixed(2));
+                        mult_ue = Number((decimal_value * factor).toFixed(2));
+
+                        down_value = Number((parseInt(result) * factor).toFixed(2));
+                        up_value = Number((down_value + base_mult_ue).toFixed(2));
+
+                        buy_no_sku = (up_value - down_value) >= mult_ue ? true : false;
+
+                }
+
+                if ((value % factor != 0) && !(buy_no_sku)){
+
+                        result = parseInt(value / factor) + 1;
+
+                        value = result * factor;
+                        
+                        $quantity.val(value)
                 
         }
         
