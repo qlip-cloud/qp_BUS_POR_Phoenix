@@ -96,8 +96,9 @@ def set_permission(role):
             "price_format": True,
             "discountpercentage": True,
             "price_discount_format": True,
-            "quantity": False,
+            "quantity": True,
             "stock_uom": True,
+            "sku": True,
             "inqt": False,
             "button_confirm": False
         })
