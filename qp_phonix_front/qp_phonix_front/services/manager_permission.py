@@ -99,7 +99,7 @@ def set_permission(role):
             "quantity": True,
             "stock_uom": True,
             "sku": True,
-            "inqt": False,
+            "inqt": True,
             "button_confirm": False
         })
     else:
