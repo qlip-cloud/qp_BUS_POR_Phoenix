@@ -22,7 +22,8 @@ def get_context(context):
         
         count_item = get_count_update(context, order_id)
 
-        context.shipping_method_list = vf_shipping_method_list()
+        #context.shipping_method_list = vf_shipping_method_list()
+        context.shipping_method_list = []
             
         if count_item:
             

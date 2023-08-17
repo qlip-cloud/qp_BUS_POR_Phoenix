@@ -334,21 +334,25 @@ def sales_order_update(order_json):
 
         #delivery_date = delivery_date or qdoc.delivery_date
         delivery_date = qdoc.delivery_date
+        ########eliminado para phoenix############
 
-        if not __dates_validate(delivery_date):
+        #if not __dates_validate(delivery_date):
 
-            rec_result['msg'] = _('Shipping date is not current')
+            #rec_result['msg'] = _('Shipping date is not current')
 
-            return rec_result
+            #return rec_result
 
-        so_shipping_type = order_json.get('shipping_type')
+        #so_shipping_type = order_json.get('shipping_type')
+        ##########################################
 
         # update qp_shipping_type
 
-        if so_shipping_type:
 
-            qdoc.qp_shipping_type = so_shipping_type
+        ########eliminado para phoenix############
+        #if so_shipping_type:
 
+            #qdoc.qp_shipping_type = so_shipping_type
+        ##########################################
         # update items (qty and delivery_date)
 
         items_so = [x.get('item_code') for x in qdoc.items]
@@ -412,9 +416,6 @@ def sales_order_update(order_json):
 
                     raise vf_SaleOrderCheckOutError()
 
-
-            qdoc.submit()
-            
             res = send_sales_order(sales_order)
 
             if not res.get("result") or res.get("result") != 200:
@@ -424,7 +425,11 @@ def sales_order_update(order_json):
             frappe.log_error(message=res.get("body_data"), title="GP Send Confirm")
 
             rec_log(doc_ref=sales_order, msg_body=res.get("body_data"), msg_res=res.get("response"), valid=1)
-        
+
+            qdoc.qp_phonix_reference = res.get("reference")
+
+            qdoc.submit()
+
         frappe.db.commit()
 
         rec_result['result'] = 200

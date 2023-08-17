@@ -49,7 +49,7 @@ $(document).ready(function() {
 
         $("#btn_confirm_order").on("click", ()=>{
 
-                //update_modal(2, 1)
+                update_modal(2, 1)
 
         })
 
