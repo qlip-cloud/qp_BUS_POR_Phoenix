@@ -7,9 +7,10 @@ from datetime import datetime
 from gp_phonix_integration.gp_phonix_integration.service.connection import execute_send
 from gp_phonix_integration.gp_phonix_integration.service.utils import get_master_setup
 from gp_phonix_integration.gp_phonix_integration.constant.api_setup import INTGVENT
+from qp_phonix_front.qp_phonix_front.uses_cases.item_group.item_group_list import vf_item_group_list
 
 
-MSG_ERROR = _("There was an error in the process to connect to GP, contact the administrator")
+MSG_ERROR = _("Existe un error en el proceso al conectar con GP, por favor contacte al administrador")
 
 
 def send_sales_order(sales_order):
@@ -112,7 +113,7 @@ def __prepare_petition(master_name, sales_order):
                 "Price": item.base_price_list_rate,
                 "DiscountPercentage": item.discount_percentage, #valida
                 "DiscountPrice": item.discount_amount, #valida
-                "Warehouse": store_main,
+                "Warehouse": item.item_group,
                 "ShippingMethod": None,
                 "ShippingDate": None # valida
             }
@@ -146,11 +147,14 @@ def __prepare_petition(master_name, sales_order):
     so_json['Ciudad_Entrega'] = customer_addr.city
     so_json['Pais_entrega'] = customer_addr.country"""
 
+
+    item_types = vf_item_group_list()
+
     so_json['IdDoc'] = order_id
     so_json['IdOrder'] = ""
     so_json['OrderType'] = "5"
     so_json['Lot'] = ""
-    so_json['Warehouse'] = store_main
+    so_json['Warehouse'] = item_types[0].name
     so_json['WarehousesAlter'] = bdg_alter #valida
     so_json['Lines'] = item_list
     so_json['IdCustomer'] = so_obj.customer

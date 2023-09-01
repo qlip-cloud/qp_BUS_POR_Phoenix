@@ -15,7 +15,7 @@ from frappe.utils import today
 SHIPPING_DEFAULT = 'N/S'
 DATE_DELIVERY_FORMAT_FIELD = "%Y-%m-%d"
 DATE_DELIVERY_FORMAT = "%W %Y-%m-%d"
-MSG_ERROR = _("There was an error in the process, contact the administrator")
+MSG_ERROR = _("Existe un error en el proceso, por favor contacte al administrador")
 STATUS_SO = {
 
     "Draft": 0,

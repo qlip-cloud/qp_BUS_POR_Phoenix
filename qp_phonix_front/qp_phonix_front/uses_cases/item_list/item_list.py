@@ -1,6 +1,8 @@
 import frappe
 import json
 from gp_phonix_integration.gp_phonix_integration.use_case.get_item_inventary import handler as get_item_inventary
+from gp_phonix_integration.gp_phonix_integration.constant.api_setup import QUANTITY_ITEM
+from gp_phonix_integration.gp_phonix_integration.service.connection import execute_send
 
 URL_IMG_EMPTY = "/assets/qlip_bussines_theme/images/company_default_logo.jpg"
 
@@ -47,32 +49,67 @@ def paginator_item_list(item_group = None, item_Categoria = None, item_SubCatego
     return response"""
 
 def callback_get_inventary(item_group = None, item_Categoria= None, item_SubCategoria= None, letter_filter= None, filter_text= None, 
-    
     idlevel = None, has_inventary = False,item_code_list = [], item_with_inventary = []):
+
+    if has_inventary:
+        
+        sync_item_quantity()
     
-    setup = get_table_and_condition(item_group, item_Categoria, item_SubCategoria, filter_text = filter_text, item_code_list = item_code_list, idlevel = idlevel)
+    setup = get_table_and_condition(item_group, item_Categoria, item_SubCategoria, filter_text = filter_text, item_code_list = item_code_list, idlevel = idlevel, has_inventary = has_inventary)
     
     result =  __get_product_list(setup.get("tbl_product_list"), setup.get("cond_c"), setup.get("cond_t"), has_limit=True)
 
-    response = get_item_inventary(result)
+    if not has_inventary:
+
+        return get_item_inventary(result)
     
-    if has_inventary:
+    return result
+    
+    #if has_inventary:
+    #    
+    #    if response:
+    #             
+    #        if (not len(item_with_inventary) >= 10):
+    #    
+    #            item_with_inventary += list(filter(lambda x: x.quantity > 0,response))
+    #
+    #            item_code_list += list(map(lambda x: x.name, response))
+    #
+    #            return callback_get_inventary(item_group , item_Categoria, item_SubCategoria , letter_filter, 
+    #            filter_text , idlevel , has_inventary, item_code_list, item_with_inventary)
+    #
+    #    return item_with_inventary
+
+    #return response
+
+def sync_item_quantity():
+
+    company = frappe.defaults.get_user_default("company")
+
+    json_data = json.dumps({
+        "PriceLevel": "Base",
+        "Warehouses": [
+            {
+                "Id": "PHOENIX"
+            }
+        ]
+    })
+
+    response =  execute_send(company_name = company, endpoint_code = QUANTITY_ITEM, json_data = json_data)
+
+    frappe.db.sql("truncate table `tabqp_GP_ItemQuantity`")
+
+    for item in response['Items']:
+
+        item_quantity = frappe.new_doc("qp_GP_ItemQuantity")
+        item_quantity.iditem = item["IdItem"]
+        item_quantity.quantity = item["Quantity"]
+        item_quantity.itemtype = item["ItemType"]
+        item_quantity.quantitydis = item["QuantityDis"]
+        item_quantity.save()
+
+    frappe.db.commit()
         
-        if response:
-                 
-            if (not len(item_with_inventary) >= 10):
-        
-                item_with_inventary += list(filter(lambda x: x.quantity > 0,response))
-
-                item_code_list += list(map(lambda x: x.name, response))
-
-                return callback_get_inventary(item_group , item_Categoria, item_SubCategoria , letter_filter, 
-                filter_text , idlevel , has_inventary, item_code_list, item_with_inventary)
-
-        return item_with_inventary
-
-    return response
-
 def get_item_list(item_code_list, idlevel = None):
 
     setup = get_table_and_condition(item_code_list = item_code_list, is_equal= True, idlevel = idlevel)
@@ -329,7 +366,7 @@ def get_filter_SubCategoria_option(price_list):
 
 
 def get_table_and_condition(item_group = None, item_Categoria = None, item_SubCategoria = None, item_code_list = None, letter_filter = None, 
-                is_equal = False, filter_text = None, idlevel= None):
+                is_equal = False, filter_text = None, idlevel= None, has_inventary = False):
 
     where_base = get_where_base()
 
@@ -339,9 +376,9 @@ def get_table_and_condition(item_group = None, item_Categoria = None, item_SubCa
 
     cond_t = __get_cond("class_sync.title",list(map(lambda x: x.replace("--", " ") , item_SubCategoria)) if item_SubCategoria else None)
     
-    from_base = get_from_base(idlevel, cond_t)
+    from_base = get_from_base(idlevel, cond_t, has_inventary)
     
-    tbl_product_list = get_tbl_product_list(item_group, from_base, where_base, item_code_list, letter_filter, is_equal, filter_text = filter_text, cond_t = cond_t)
+    tbl_product_list = get_tbl_product_list(item_group, from_base, where_base, item_code_list, letter_filter, is_equal, filter_text = filter_text, cond_t = cond_t, has_inventary = has_inventary)
 
     #print(tbl_product_list)
     #tlb_product_attr_select, tlb_product_attr_body, list_attr = __get_product_attr(from_base, where_base)
@@ -452,16 +489,19 @@ def get_attrs_filters_item_group(item_group):
     return res
 
 
-def get_from_base(idlevel, cond_t = None):
+def get_from_base(idlevel, cond_t = None, has_inventary = False):
     
     class_condition = "" if cond_t == "1=1" else "left join `tabqp_GP_ClassSync` as class_sync on(prod.qp_phonix_class = class_sync.id)"
     
+    item_quantity_inner = """inner join `tabqp_GP_ItemQuantity` as item_quantity
+            on (prod.name = item_quantity.iditem)""" if has_inventary else ""
     return """
-        tabItem as prod 
+        tabItem as prod
+        {}
         inner join `tabItem Price` as price on prod.name = price.item_code
         {}
         left join `tabqp_GP_Level` as gp_level on (prod.qp_price_group = gp_level.group_type and gp_level.idlevel = '{}')
-    """.format(class_condition, idlevel)
+    """.format(item_quantity_inner,class_condition, idlevel)
 
 def get_where_base():
 
@@ -489,7 +529,12 @@ def get_condition_by_list(list_data, field, is_equal = False, operator = "AND"):
 
     return ""
 
-def get_tbl_product_list(item_group, from_base, where_base, item_code_list = None, letter_filter = None, is_equal = False, filter_text = None, cond_t = None):
+def get_tbl_product_list(item_group, from_base, where_base, item_code_list = None, letter_filter = None, is_equal = False, filter_text = None, cond_t = None, has_inventary = False):
+    
+
+    item_quantity_select = """
+        convert(item_quantity.quantity, float) as quantity,
+        convert(item_quantity.quantitydis, float) as quantity_dis,""" if has_inventary else ""
     
     exclude_item = get_condition_by_list(list_data = item_code_list, field = "prod.name", is_equal = is_equal)
         
@@ -498,6 +543,8 @@ def get_tbl_product_list(item_group, from_base, where_base, item_code_list = Non
     text_filter_condition = __get_text_filter_condition(filter_text)
 
     class_condition = "" if cond_t == "1=1" else "REPLACE( class_sync.title , ' ', '--' ) as class_title,"
+    
+    has_inventary_condition = " and (item_quantity.quantity > 0 or item_quantity.quantitydis > 0)" if has_inventary else ""
 
     select_base = """
             prod.name as name,
@@ -513,10 +560,11 @@ def get_tbl_product_list(item_group, from_base, where_base, item_code_list = Non
             prod.qp_phonix_class as qp_phonix_class,
             prod.qp_price_group as qp_price_group,
             %s
+            %s
             IFNULL( gp_level.discountpercentage ,0) as discountpercentage,
             (price.price_list_rate - (price.price_list_rate * IFNULL( gp_level.discountpercentage ,0)) / 100) as price_discount,
             format((price.price_list_rate - (price.price_list_rate * IFNULL( gp_level.discountpercentage ,0)) / 100),0) as price_discount_format
-            """ % (URL_IMG_EMPTY, class_condition) 
+            """ % (URL_IMG_EMPTY, class_condition, item_quantity_select) 
     
     #if item_group:
     if False:
@@ -542,6 +590,13 @@ def get_tbl_product_list(item_group, from_base, where_base, item_code_list = Non
         where_base += """ 
             %s
         """ % (text_filter_condition)
+
+    if has_inventary:
+
+        where_base += """ 
+            %s
+        """ % (has_inventary_condition)
+
 
     return """
         
