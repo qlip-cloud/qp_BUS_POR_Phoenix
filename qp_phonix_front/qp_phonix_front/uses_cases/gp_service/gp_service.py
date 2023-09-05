@@ -154,7 +154,7 @@ def __prepare_petition(master_name, sales_order):
     so_json['IdOrder'] = ""
     so_json['OrderType'] = "5"
     so_json['Lot'] = ""
-    so_json['Warehouse'] = item_types[0].name
+    so_json['Warehouse'] = item_types[0].title
     so_json['WarehousesAlter'] = bdg_alter #valida
     so_json['Lines'] = item_list
     so_json['IdCustomer'] = so_obj.customer
