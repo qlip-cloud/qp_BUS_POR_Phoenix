@@ -134,6 +134,7 @@ function und_factor($quantity){
         let sku = $quantity.data("sku")
         let incomplete_boxes = parseInt($("#incomplete_boxes").val())
         let calc_incomplete_boxes = true;
+        
 
         if (value && value > 0){
                 $(`tr.${row} td`).addClass("item_select")
@@ -178,7 +179,7 @@ function und_factor($quantity){
 
                 }
 
-                if (((value % factor != 0) && !(buy_no_sku)) || ((value % factor != 0) && calc_incomplete_boxes)){
+                if (((value % factor != 0) && (!(buy_no_sku) && calc_incomplete_boxes))){
 
                         result = parseInt(value / factor) + 1;
 
