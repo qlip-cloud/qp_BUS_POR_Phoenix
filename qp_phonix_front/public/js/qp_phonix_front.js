@@ -132,6 +132,9 @@ function und_factor($quantity){
         let qp_box_sku = parseInt($("#qp_box_sku").val())
         let qp_buy_no_sku = parseInt($("#qp_buy_no_sku").val())
         let sku = $quantity.data("sku")
+        let incomplete_boxes = parseInt($("#incomplete_boxes").val())
+        let calc_incomplete_boxes = true;
+        
 
         if (value && value > 0){
                 $(`tr.${row} td`).addClass("item_select")
@@ -143,6 +146,15 @@ function und_factor($quantity){
         }
 
         is_factor = !(sku == "SI" ? qp_box_sku : qp_box_no_sku)
+
+        if(incomplete_boxes){
+                $.each(["BH34","BG21","BG81"], function( index, value ) {
+                        if($(`tr.${row}`).attr("data-phonix-class") == value){
+                                is_factor = 1;
+                                calc_incomplete_boxes = false;
+                        }
+                });
+        }
 
         if (is_factor && value > 0){
 
@@ -167,7 +179,7 @@ function und_factor($quantity){
 
                 }
 
-                if ((value % factor != 0) && !(buy_no_sku)){
+                if (((value % factor != 0) && (!(buy_no_sku) && calc_incomplete_boxes))){
 
                         result = parseInt(value / factor) + 1;
 
@@ -175,7 +187,7 @@ function und_factor($quantity){
                         
                         $quantity.val(value)
                 
-        }
+                }
         
                 
         }
