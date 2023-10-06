@@ -156,12 +156,13 @@ def get_sales_order(sales_order):
                 so_items.stock_uom,
                 so_items.amount,
                 ROUND(net_amount,2) as total,
-                format(net_amount,0) as total_format
+                format(net_amount,0) as total_format,
+                so_items.description
                 from `tabSales Order` as so
                 inner join `tabSales Order Item` as so_items on so.name = so_items.parent
                 inner join tabItem as item on item.name = so_items.item_code
                 where so.customer = '%s' and so.name = '%s'
-                order by item.idx
+                order by item.idx, so_items.description
             """ % (URL_IMG_EMPTY, customer.name, sales_order)
 
             so_items_obj = frappe.db.sql(sql_so_items_obj, as_dict=1)
@@ -183,6 +184,8 @@ def get_sales_order(sales_order):
                 item['uom_convertion'] = uom_list
 
                 item['inqt'] = uom_list and int(uom_list[0]['conversion_factor']) or 1
+
+                item['description'] = item.description
                 
             so_obj = so_obj[0]
 
@@ -371,7 +374,7 @@ def sales_order_update(order_json):
 
                 for so_item_doc in qdoc.items:
 
-                    if so_item_doc.item_code == item['item_code']:
+                    if so_item_doc.item_code == item['item_code'] and so_item_doc.description == item['description']:
 
                         so_item_doc.qty = item.get('qty')
 
