@@ -7,9 +7,10 @@ from datetime import datetime
 from gp_phonix_integration.gp_phonix_integration.service.connection import execute_send
 from gp_phonix_integration.gp_phonix_integration.service.utils import get_master_setup
 from gp_phonix_integration.gp_phonix_integration.constant.api_setup import INTGVENT
+from qp_phonix_front.qp_phonix_front.uses_cases.item_group.item_group_list import vf_item_group_list
 
 
-MSG_ERROR = _("There was an error in the process to connect to GP, contact the administrator")
+MSG_ERROR = _("Existe un error en el proceso al conectar con GP, por favor contacte al administrador")
 
 
 def send_sales_order(sales_order):
@@ -42,13 +43,15 @@ def send_sales_order(sales_order):
 
         res['response'] = so_respose
 
-        if so_respose.get("Estado") == "Exitoso":
+        if so_respose.get("Status") == "Success":
 
             res['name'] = sales_order
 
             res['msg'] = 'Success'
 
             res['result'] = 200
+            
+            res['reference'] = so_respose.get("Detail")
 
             return res
 
@@ -88,23 +91,35 @@ def __prepare_petition(master_name, sales_order):
 
     customer_addr = frappe.get_doc('Address', so_obj.customer_address)
 
+    store_main = __get_value_master(master_name, 'store_main')
+
     item_list = []
 
     for item in so_obj.items:
-
-        item_list.append(
-            {
-                "Id": item.item_code,
+        """
+        "Id": item.item_code,
                 "Cant": item.qty,
                 "Precio": item.base_price_list_rate,
                 "Bdga_linea": item.item_group,
                 "shipping_method": so_obj.qp_shipping_type,
                 "shipping_date": so_obj.delivery_date.strftime("%Y-%m-%d")
+        """
+        item_list.append(
+            {
+                
+
+                "Id": item.item_code,
+                "Quantity": item.qty,
+                "Price": item.base_price_list_rate,
+                "DiscountPercentage": item.discount_percentage, #valida
+                "DiscountPrice": item.discount_amount, #valida
+                "Warehouse": item.item_group,
+                "ShippingMethod": None,
+                "ShippingDate": None # valida
             }
         )
 
 
-    # store_main = __get_value_master(master_name, 'store_main')
 
     order_id = __get_value_master(master_name, 'order_id')
 
@@ -112,7 +127,7 @@ def __prepare_petition(master_name, sales_order):
 
     bdg_alter = [{"Id": ""}]
 
-    so_json['Id_Pedido'] = order_id
+    """so_json['Id_Pedido'] = order_id
     so_json['Id_Pedido_Esp'] = ""
     so_json['Tipo_Pedido'] = "2"
     so_json['Lote_Cab'] = so_obj.qp_shipping_type
@@ -130,12 +145,43 @@ def __prepare_petition(master_name, sales_order):
     so_json['Correo_Cliente'] = customer_email
     so_json['Direc_Entrega'] = customer_addr.address_line1
     so_json['Ciudad_Entrega'] = customer_addr.city
-    so_json['Pais_entrega'] = customer_addr.country
+    so_json['Pais_entrega'] = customer_addr.country"""
+
+
+    item_types = vf_item_group_list()
+
+    so_json['IdDoc'] = order_id
+    so_json['IdOrder'] = ""
+    so_json['OrderType'] = "5"
+    so_json['Lot'] = ""
+    so_json['Warehouse'] = item_types[0].title
+    so_json['WarehousesAlter'] = bdg_alter #valida
+    so_json['Lines'] = item_list
+    so_json['IdCustomer'] = so_obj.customer
+    so_json['NameCustomer'] = so_obj.customer_name
+    so_json['SurnameCustomer'] = ''
+    so_json['ClassId'] = id_clase
+    so_json['AddressCustomer'] = customer_addr.address_line1
+    so_json['CityCustomer'] = customer_addr.city
+    so_json['CountryCustomer'] = customer_addr.country
+    so_json['PhoneCustomer'] = customer_addr.phone
+    so_json['MailCustomer'] = customer_email
+    so_json['AdressShipping'] = customer_addr.address_line1
+    so_json['CityShipping'] = customer_addr.city
+    so_json['CountryShipping'] = customer_addr.country
+    so_json['Reference1'] = customer_addr.city #define
+    so_json['Reference2'] = None
+    so_json['Reference3'] = None
 
     return json.dumps(so_json)
 
 def __get_value_master(master_name, field_conf):
 
-    res = master_name.get(field_conf).split('-')
+    #res = master_name.get(field_conf).split('-')
+    res = master_name.get(field_conf,None)
+    
+    if res:
+        
+        return res.split('|')[0]
 
-    return res and res[0] or ''
+    return ''

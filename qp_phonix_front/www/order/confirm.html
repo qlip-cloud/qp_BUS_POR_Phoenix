@@ -303,6 +303,7 @@
                         data-price = {{item.price }} 
                         data-subtotal = "{{item.price * item.cantidad}}" 
                         data-item = "row-{{item.item_code}}" 
+                        data-description = "{{item.description}}"
                         id = "row-{{item.item_code | replace(':','-')}}">
                         <input type="hidden" class="subtotal" value={{item.price * item.cantidad}}>
                         <div class="col-sm-2" >
@@ -430,7 +431,7 @@
                 <div class="col-sm-7">
                     <div class="row">
                         <div class="col-sm-12 modal-title">
-                            <p>Thanks for your order</p>
+                            <p>Gracias Por su orden</p>
                         </div>
                     </div>
                     <div class="row">

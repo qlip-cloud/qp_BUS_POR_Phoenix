@@ -54,7 +54,8 @@ def get_idlevel(context):
                 customer.customer_group,
                 customer.qp_box_no_sku,
                 customer.qp_box_sku,
-                customer.qp_phoenix_buy_no_sku
+                customer.qp_phoenix_buy_no_sku,
+                customer.incomplete_boxes
             FROM
                 tabContact as contact
             inner join
@@ -72,6 +73,7 @@ def get_idlevel(context):
     context.qp_box_no_sku = int(result[0]["qp_box_no_sku"])
     context.qp_box_sku = int(result[0]["qp_box_sku"])
     context.qp_buy_no_sku = int(result[0]["qp_phoenix_buy_no_sku"])
+    context.incomplete_boxes = int(result[0]["incomplete_boxes"])
     
 def setup_new(context):
 

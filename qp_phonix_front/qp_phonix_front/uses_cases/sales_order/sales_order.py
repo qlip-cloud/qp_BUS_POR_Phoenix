@@ -15,7 +15,7 @@ from frappe.utils import today
 SHIPPING_DEFAULT = 'N/S'
 DATE_DELIVERY_FORMAT_FIELD = "%Y-%m-%d"
 DATE_DELIVERY_FORMAT = "%W %Y-%m-%d"
-MSG_ERROR = _("There was an error in the process, contact the administrator")
+MSG_ERROR = _("Existe un error en el proceso, por favor contacte al administrador")
 STATUS_SO = {
 
     "Draft": 0,
@@ -156,12 +156,13 @@ def get_sales_order(sales_order):
                 so_items.stock_uom,
                 so_items.amount,
                 ROUND(net_amount,2) as total,
-                format(net_amount,0) as total_format
+                format(net_amount,0) as total_format,
+                so_items.description
                 from `tabSales Order` as so
                 inner join `tabSales Order Item` as so_items on so.name = so_items.parent
                 inner join tabItem as item on item.name = so_items.item_code
                 where so.customer = '%s' and so.name = '%s'
-                order by item.idx
+                order by item.idx, so_items.description
             """ % (URL_IMG_EMPTY, customer.name, sales_order)
 
             so_items_obj = frappe.db.sql(sql_so_items_obj, as_dict=1)
@@ -183,6 +184,8 @@ def get_sales_order(sales_order):
                 item['uom_convertion'] = uom_list
 
                 item['inqt'] = uom_list and int(uom_list[0]['conversion_factor']) or 1
+
+                item['description'] = item.description
                 
             so_obj = so_obj[0]
 
@@ -334,21 +337,25 @@ def sales_order_update(order_json):
 
         #delivery_date = delivery_date or qdoc.delivery_date
         delivery_date = qdoc.delivery_date
+        ########eliminado para phoenix############
 
-        if not __dates_validate(delivery_date):
+        #if not __dates_validate(delivery_date):
 
-            rec_result['msg'] = _('Shipping date is not current')
+            #rec_result['msg'] = _('Shipping date is not current')
 
-            return rec_result
+            #return rec_result
 
-        so_shipping_type = order_json.get('shipping_type')
+        #so_shipping_type = order_json.get('shipping_type')
+        ##########################################
 
         # update qp_shipping_type
 
-        if so_shipping_type:
 
-            qdoc.qp_shipping_type = so_shipping_type
+        ########eliminado para phoenix############
+        #if so_shipping_type:
 
+            #qdoc.qp_shipping_type = so_shipping_type
+        ##########################################
         # update items (qty and delivery_date)
 
         items_so = [x.get('item_code') for x in qdoc.items]
@@ -367,7 +374,7 @@ def sales_order_update(order_json):
 
                 for so_item_doc in qdoc.items:
 
-                    if so_item_doc.item_code == item['item_code']:
+                    if so_item_doc.item_code == item['item_code'] and so_item_doc.description == item['description']:
 
                         so_item_doc.qty = item.get('qty')
 
@@ -412,9 +419,6 @@ def sales_order_update(order_json):
 
                     raise vf_SaleOrderCheckOutError()
 
-
-            qdoc.submit()
-            
             res = send_sales_order(sales_order)
 
             if not res.get("result") or res.get("result") != 200:
@@ -424,7 +428,11 @@ def sales_order_update(order_json):
             frappe.log_error(message=res.get("body_data"), title="GP Send Confirm")
 
             rec_log(doc_ref=sales_order, msg_body=res.get("body_data"), msg_res=res.get("response"), valid=1)
-        
+
+            qdoc.qp_phonix_reference = res.get("reference")
+
+            qdoc.submit()
+
         frappe.db.commit()
 
         rec_result['result'] = 200

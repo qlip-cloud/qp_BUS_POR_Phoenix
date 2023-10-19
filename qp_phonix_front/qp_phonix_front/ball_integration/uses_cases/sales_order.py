@@ -313,7 +313,7 @@ def send_to_gp_sales_order(sales_order):
 
         res_det = res.get("response") or {}
 
-        qdoc.qp_gp_sales_order = res_det.get("Detalle")
+        qdoc.qp_gp_sales_order = res_det.get("Detail")
 
         qdoc.save()
 

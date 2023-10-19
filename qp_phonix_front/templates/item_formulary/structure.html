@@ -28,6 +28,7 @@
     <input type="hidden" id="qp_box_no_sku" value="{{qp_box_no_sku}}">
     <input type="hidden" id="qp_box_sku" value="{{qp_box_sku}}">
     <input type="hidden" id="qp_buy_no_sku" value="{{qp_buy_no_sku}}">
+    <input type="hidden" id="incomplete_boxes" value="{{incomplete_boxes}}">
     <div class="">
         <a  data-item-group = "{{item_group.title}}" class="item_group">{{item_group.title_pretty if item_group.title_pretty else item_group.title}} </a>
     </div>
@@ -244,16 +245,16 @@ button {
         <div class="col-md-3">
             <div class="text-left" >
                 <input class="form-check-input" type="checkbox" id="sku_true">
-                <label class="form-check-label" for="with_inventary">
+                <label class="form-check-label" for="with_inventary" style="font-size: 14px;">
                     Mostrar sólo referencias SKU
                 </label>
             </div>
-            <!--div class="text-left row-inventary" >
+            <div class="text-left row-inventary" >
                 <input class="form-check-input" type="checkbox" id="with_inventary">
                 <label class="form-check-label" for="with_inventary" style="font-size: 14px;">
                     Mostrar sólo referencias con stock
                 </label>
-            </div-->
+            </div>
 
         </div>
 

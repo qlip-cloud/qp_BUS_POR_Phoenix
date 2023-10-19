@@ -49,7 +49,7 @@ $(document).ready(function() {
 
         $("#btn_confirm_order").on("click", ()=>{
 
-                //update_modal(2, 1)
+                update_modal(2, 1)
 
         })
 
@@ -132,6 +132,9 @@ function und_factor($quantity){
         let qp_box_sku = parseInt($("#qp_box_sku").val())
         let qp_buy_no_sku = parseInt($("#qp_buy_no_sku").val())
         let sku = $quantity.data("sku")
+        let incomplete_boxes = parseInt($("#incomplete_boxes").val())
+        let calc_incomplete_boxes = true;
+        
 
         if (value && value > 0){
                 $(`tr.${row} td`).addClass("item_select")
@@ -143,6 +146,15 @@ function und_factor($quantity){
         }
 
         is_factor = !(sku == "SI" ? qp_box_sku : qp_box_no_sku)
+
+        if(incomplete_boxes){
+                $.each(["BH34","BG21","BG81"], function( index, value ) {
+                        if($(`tr.${row}`).attr("data-phonix-class") == value){
+                                is_factor = 1;
+                                calc_incomplete_boxes = false;
+                        }
+                });
+        }
 
         if (is_factor && value > 0){
 
@@ -167,7 +179,7 @@ function und_factor($quantity){
 
                 }
 
-                if ((value % factor != 0) && !(buy_no_sku)){
+                if (((value % factor != 0) && (!(buy_no_sku) && calc_incomplete_boxes))){
 
                         result = parseInt(value / factor) + 1;
 
@@ -175,7 +187,7 @@ function und_factor($quantity){
                         
                         $quantity.val(value)
                 
-        }
+                }
         
                 
         }
@@ -385,26 +397,61 @@ function save_order(url, redirect_link, action = null, valid_empty = true, order
 
         let items = []
 
-        let len = 0
-
-        
+        let len = 0;
 
         $(".row_select").each(function() {
 
-            let qty = $(this).find("#quantity").val()
+            let qty = parseInt($(this).find("#quantity").val())
+            let quantity = parseInt($(this).find("#quantity").attr("data-quantity"))
+            let quantity_dis = parseInt($(this).find("#quantity").attr("data-quantity_dis"))
+            
 
             if (qty > 0){
+
+                if(action != "confirm"){
+                        if(qty > quantity_dis && quantity_dis > 0){
+
+                                qty -= quantity_dis;
+        
+                                items.push({
+                                        qty: quantity_dis,
+                                        item_code: $(this).find("#item_id").val(),
+                                        description: $(this).find("#item_id").val() + "_" + len,
+                                        rate: $(this).find("#item_price").val(),
+                                        discount_percentage: $(this).find("#item_discount").val()
+                                });
+                                    
+                                len ++;
+                        }
+        
+                        if(qty > quantity && quantity > 0){
+        
+                                qty -= quantity;
+        
+                                items.push({
+                                        qty: quantity,
+                                        item_code: $(this).find("#item_id").val(),
+                                        description: $(this).find("#item_id").val() + "_" + len,
+                                        rate: $(this).find("#item_price").val(),
+                                        discount_percentage: $(this).find("#item_discount").val()
+                                });
+                                    
+                                len ++;
+                        }
+                }
+
                 obj = {
-                    qty: $(this).find("#quantity").val(),
+                    qty: qty,
                     item_code: $(this).find("#item_id").val(),
-                    description: $(this).find("#item_id").val(),
+                    description: action == "confirm" ? $(this).data("description") : $(this).find("#item_id").val() + "_" + len,
                     rate: $(this).find("#item_price").val(),
                     discount_percentage: $(this).find("#item_discount").val()
 
                     //,delivery_date
                 }
-                items.push(obj)
-                len ++
+                items.push(obj);
+
+                len ++;
             }
             
         });
