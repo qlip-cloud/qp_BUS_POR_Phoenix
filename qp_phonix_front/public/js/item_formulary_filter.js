@@ -81,7 +81,8 @@ $(document).ready(function() {
         group_filter = get_group_filter();
 
         $item = group_filter ? $(`.item-row.filter`).filter(group_filter) : $(`.item-row.filter`);
-        console.log($item)
+
+        //console.log($item)
         if ($(this).is(':checked')){
             
             $(`.item-row.filter`).not(".row_select").hide()
@@ -210,17 +211,11 @@ function get_group_filter(){
             count ++;
     
         });
-        group_filter += ","
+        //group_filter += ","
     }
-    
-    group_filter += $("#sku_true").is(":checked") ? " .SI" : ".SI, .NO";
-
-    group_filter += $("#with_inventary").is(':checked') ? ".inventary-SI" : ""
-    
     let value = $("#filter_text").val()
 
     if (value){
-        
         value = value.split(" ")
 
         value.forEach(element => {
@@ -228,8 +223,16 @@ function get_group_filter(){
 
             group_filter += `.${element}`
         })
-    }
+        //group_filter += ","
 
+    }
+    
+    group_filter += $("#sku_true").is(":checked") ? ".SI" : "";
+
+    group_filter += $("#with_inventary").is(':checked') ? ".inventary-SI" : ""
+    
+    
+    console.log(group_filter)
     return group_filter
 }
 function get_filter_text(){
@@ -662,7 +665,8 @@ async function send_petition(payload, module_root, method, callresponse = null){
 
                     if (callresponse) {
 
-                        callresponse(response.data)
+                        console.log(response)
+                        callresponse(response)
 
                     }
                     frappe.msgprint(__(`error: ${response.msg}`))
