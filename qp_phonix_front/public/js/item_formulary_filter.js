@@ -82,6 +82,7 @@ $(document).ready(function() {
 
         $item = group_filter ? $(`.item-row.filter`).filter(group_filter) : $(`.item-row.filter`);
 
+        //console.log($item)
         if ($(this).is(':checked')){
             
             $(`.item-row.filter`).not(".row_select").hide()
@@ -198,6 +199,7 @@ function get_group_filter(){
     let group_filter = ""
 
     let count = 0
+
     if (select_value){
         select_value.forEach(element => {
             if (count > 0){
@@ -209,11 +211,28 @@ function get_group_filter(){
             count ++;
     
         });
-        group_filter += ","
+        //group_filter += ","
+    }
+    let value = $("#filter_text").val()
+
+    if (value){
+        value = value.split(" ")
+
+        value.forEach(element => {
+            element = element.replace(":","-")
+
+            group_filter += `.${element}`
+        })
+        //group_filter += ","
+
     }
     
-    group_filter += $("#sku_true").is(":checked") ? " .SI" : ".SI, .NO";
+    group_filter += $("#sku_true").is(":checked") ? ".SI" : "";
 
+    group_filter += $("#with_inventary").is(':checked') ? ".inventary-SI" : ""
+    
+    
+    console.log(group_filter)
     return group_filter
 }
 function get_filter_text(){
@@ -223,7 +242,6 @@ function get_filter_text(){
     $(".link_abc").removeClass("selected")
 
     if ($("#filter_text").val()){
-        
         
         get_rows()
 
@@ -647,7 +665,8 @@ async function send_petition(payload, module_root, method, callresponse = null){
 
                     if (callresponse) {
 
-                        callresponse(response.data)
+                        console.log(response)
+                        callresponse(response)
 
                     }
                     frappe.msgprint(__(`error: ${response.msg}`))

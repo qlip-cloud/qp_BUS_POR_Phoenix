@@ -10,7 +10,7 @@ def get_permission():
         "quantity_format": False,
         "quantity": False,
         "stock_uom": False,
-        "sku": False,
+        "sku": True,
         "inqt": False,
         "button_confirm": False,
         "confirm": True
@@ -60,7 +60,6 @@ def set_permission(role):
         
         permission.update({
             "quantity": True,
-            "sku": True,
             "inqt": True,
             "button_confirm": True,
             "price_format": True,
@@ -85,7 +84,6 @@ def set_permission(role):
             "quantity_format": True,
             "quantity": True,
             "stock_uom": True,
-            "sku": True,
             "inqt": True,
             "button_confirm": True
         })
@@ -97,9 +95,8 @@ def set_permission(role):
             "price_discount_format": True,
             "quantity": True,
             "stock_uom": True,
-            "sku": True,
             "inqt": True,
-            "button_confirm": False
+            "button_confirm": True
         })
     else:
         frappe.throw("Este usuario no tiene un rol valido")
