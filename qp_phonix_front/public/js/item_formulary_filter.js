@@ -229,7 +229,7 @@ function get_group_filter(){
     
     group_filter += $("#sku_true").is(":checked") ? ".SI" : "";
 
-    group_filter += $("#with_inventary").is(':checked') ? ".inventary-SI" : ""
+    group_filter += $("#q").is(':checked') ? ".inventary-SI" : ""
     
     
     console.log(group_filter)

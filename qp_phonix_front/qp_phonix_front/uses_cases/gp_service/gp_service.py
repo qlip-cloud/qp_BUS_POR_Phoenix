@@ -43,7 +43,7 @@ def send_sales_order(sales_order):
 
         res['response'] = so_respose
 
-        if so_respose.get("Status") == "Success":
+        if so_respose.get("ReturnCode") == "SUCCESS":
 
             res['name'] = sales_order
 
@@ -51,7 +51,7 @@ def send_sales_order(sales_order):
 
             res['result'] = 200
             
-            res['reference'] = so_respose.get("Detail")
+            res['reference'] = so_respose.get("ReturnDesc")
 
             return res
 
@@ -127,32 +127,12 @@ def __prepare_petition(master_name, sales_order):
 
     bdg_alter = [{"Id": ""}]
 
-    """so_json['Id_Pedido'] = order_id
-    so_json['Id_Pedido_Esp'] = ""
-    so_json['Tipo_Pedido'] = "2"
-    so_json['Lote_Cab'] = so_obj.qp_shipping_type
-    so_json['Bdga_Default'] = "" # store_main
-    so_json['Bdg_Alter'] = bdg_alter
-    so_json['Articulo'] = item_list
-    so_json['Id_Cliente'] = so_obj.customer
-    so_json['Nom_Cliente'] = so_obj.customer_name
-    so_json['Apell_Cliente'] = ''
-    so_json['Id_Clase'] = id_clase
-    so_json['Direc_Cliente'] = customer_addr.address_line1
-    so_json['Ciudad_Cliente'] = customer_addr.city
-    so_json['Pais_Cliente'] = customer_addr.country
-    so_json['Telefono_Cliente'] = customer_addr.phone
-    so_json['Correo_Cliente'] = customer_email
-    so_json['Direc_Entrega'] = customer_addr.address_line1
-    so_json['Ciudad_Entrega'] = customer_addr.city
-    so_json['Pais_entrega'] = customer_addr.country"""
-
-
     item_types = vf_item_group_list()
 
     so_json['IdDoc'] = order_id
     so_json['IdOrder'] = ""
-    so_json['OrderType'] = "5"
+    so_json['OrderType'] = "2"
+    so_json['IdOrderCustomer'] = so_obj.qp_phoenix_order_customer or ""
     so_json['Lot'] = ""
     so_json['Warehouse'] = item_types[0].title
     so_json['WarehousesAlter'] = bdg_alter #valida

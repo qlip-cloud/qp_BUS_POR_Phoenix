@@ -177,6 +177,13 @@
                     {{order.phone}}
                 </div>
             </div>
+            <div class="row shadow p-3 mb-5 bg-white rounded">
+                <div class="col-md-12 label">
+                    Orden del cliente
+                </div>
+                <input type="text" class="form-control "  id="qp_phoenix_order_customer" value={{order.qp_phoenix_order_customer if order.qp_phoenix_order_customer else "" }}>
+            </div>
+
         </div>
     
         <div class="col-sm-9 ">
@@ -319,7 +326,7 @@
                                     name = "delecte_group" 
                                     id = "ch_deleted_{{item.item_code | replace(':','-')}}"
                                     data-id = "{{item.item_code | replace(':','-')}}"
-                                    > {{item.item_name}} &nbsp; 
+                                    > {{item.item_name}} &nbsp; <span style="font-size: 15px; color:{{item.qp_phoenix_status_color}}">{{item.qp_phoenix_status_title}} / Entrega: {{item.delivery_date}} </span>
 
                                 </div>
                             </div>

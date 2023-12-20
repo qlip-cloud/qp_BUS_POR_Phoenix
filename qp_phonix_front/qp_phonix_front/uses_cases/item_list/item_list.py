@@ -97,16 +97,19 @@ def sync_item_quantity():
 
     response =  execute_send(company_name = company, endpoint_code = QUANTITY_ITEM, json_data = json_data)
 
-    frappe.db.sql("truncate table `tabqp_GP_ItemQuantity`")
+    
+    if 'Items' in response:
+        
+        frappe.db.sql("truncate table `tabqp_GP_ItemQuantity`")
 
-    for item in response['Items']:
+        for item in response['Items']:
 
-        item_quantity = frappe.new_doc("qp_GP_ItemQuantity")
-        item_quantity.iditem = item["IdItem"]
-        item_quantity.quantity = item["Quantity"]
-        item_quantity.itemtype = item["ItemType"]
-        item_quantity.quantitydis = item["QuantityDis"]
-        item_quantity.save()
+            item_quantity = frappe.new_doc("qp_GP_ItemQuantity")
+            item_quantity.iditem = item["IdItem"]
+            item_quantity.quantity = item["Quantity"]
+            item_quantity.itemtype = item["ItemType"]
+            item_quantity.quantitydis = item["QuantityDis"]
+            item_quantity.save()
 
     frappe.db.commit()
         
