@@ -464,8 +464,8 @@ function save_order(url, redirect_link, action = null, valid_empty = true, order
                         , action
                 }
         }
-        alert("aqui estoy")
-        console.log(args)
+        
+        
         if(len){
             if (!is_async)
                 

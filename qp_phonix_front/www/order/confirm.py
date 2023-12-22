@@ -7,6 +7,9 @@ from qp_phonix_front.qp_phonix_front.uses_cases.front.service import set_order_d
 from qp_phonix_front.qp_phonix_front.services.update_price_by_price_list import handler as update_price_by_price_list
 from qp_phonix_front.qp_phonix_front.services.try_catch import handler as try_catch
 from qp_phonix_front.qp_phonix_front.services.manager_permission import handler as get_permission
+from gp_phonix_integration.gp_phonix_integration.service.connection import execute_send
+from gp_phonix_integration.gp_phonix_integration.constant.api_setup import ORDER
+from frappe.utils import get_url, getdate,today
 
 def get_context(context):
 
@@ -20,6 +23,8 @@ def get_context(context):
 
         order_id = query_params.get("order_id")
         
+        get_delivery_update(order_id)
+
         count_item = get_count_update(context, order_id)
 
         #context.shipping_method_list = vf_shipping_method_list()
@@ -32,6 +37,28 @@ def get_context(context):
         set_has_sync(context)
         
     try_catch(callback, context)
+
+def get_delivery_update(order_id):
+
+    sale_order = frappe.get_doc("Sales Order", order_id)
+
+    if sale_order.status != "Draft":
+
+        payload = json.dumps({"IdOrder": sale_order.qp_phonix_reference})
+
+        company = frappe.defaults.get_user_default("company")
+
+        so_respose = execute_send(company_name=company, endpoint_code=ORDER, json_data=payload)
+
+        for item in sale_order.items:
+            
+            for line in so_respose.get("ReturnJson").get("Lines"):
+                
+                if line.get("Id") == item.item_code and line.get("Status") == item.qp_phoenix_status and item.delivery_date != getdate(line.get("RequestDate")):
+
+                    item.delivery_date = getdate(line.get("RequestDate")) if line.get("RequestDate") != '1900-01-01' else today()
+
+                    item.save()
 
 def get_count_update(context, order_id):
 

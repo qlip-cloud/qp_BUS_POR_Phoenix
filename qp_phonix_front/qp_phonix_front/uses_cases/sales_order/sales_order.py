@@ -158,6 +158,7 @@ def get_sales_order(sales_order):
                 so_items.amount,
                 so_items.delivery_date,
                 so_items.qp_phoenix_status_title,
+                so_items.qp_phoenix_status,
                 so_items.qp_phoenix_status_color,
                 ROUND(net_amount,2) as total,
                 format(net_amount,0) as total_format,
@@ -166,7 +167,7 @@ def get_sales_order(sales_order):
                 inner join `tabSales Order Item` as so_items on so.name = so_items.parent
                 inner join tabItem as item on item.name = so_items.item_code
                 where so.customer = '%s' and so.name = '%s'
-                order by item.idx, so_items.description, so_items.qp_phoenix_status
+                order by so_items.qp_phoenix_status asc, item.idx, so_items.description
             """ % (URL_IMG_EMPTY, customer.name, sales_order)
 
             so_items_obj = frappe.db.sql(sql_so_items_obj, as_dict=1)
@@ -191,7 +192,7 @@ def get_sales_order(sales_order):
 
                 item['description'] = item.description
 
-                item['delivery_date'] = item.delivery_date.strftime('%d-%m-%y') if item.delivery_date != getdate('1900-01-01') else 'Pendiente'
+                item['delivery_date'] = item.delivery_date.strftime('%d-%m-%y') if item.qp_phoenix_status != '3' else 'Pendiente'
 
                 item['qp_phoenix_status_title'] = item.qp_phoenix_status_title
 
@@ -415,16 +416,12 @@ def sales_order_update(order_json):
         # confirm
 
         if order_json.get('action') == "confirm":
+
             qdoc.qp_phoenix_order_customer = order_json.get("qp_phoenix_order_customer")
+
             if __validate_product_inventory():
 
-                # checkout
-
-                #habilita para prod!!!!
-
                 res_checkout = send_check_out_so(sales_order)
-
-                #######################
 
                 if not res_checkout.get("result") or res_checkout.get("result") != 200:
 
@@ -434,38 +431,8 @@ def sales_order_update(order_json):
 
                     raise vf_SaleOrderCheckOutError()
             
-            #habilita para prod!!!!
 
             res = send_sales_order(sales_order)
-
-            #######################
-
-            """res = {
-                "result" : 200,
-                "response": {
-                    "ReturnCode": "SUCCESS",
-                    "ReturnDesc": "ORDST2234",
-                    "ReturnJson": {
-                        "IdOrder": "ORDST2234",
-                        "IdCustomer": "AARONFIT0001",
-                        "lines": [
-                            {
-                                "Id": "3200014",
-                                "Quantity": "1.00000",
-                                "RequestDate": "2024-12-08",
-                                "Status": 1
-                            },
-                            {
-                                "Id": "3200014",
-                                "Quantity": "3.00000",
-                                "RequestDate": "2024-12-12",
-                                "Status": 1
-                            }
-                        ]
-                    }
-                }
-            }"""
-
 
             if not res.get("result") or res.get("result") != 200:
 
@@ -487,13 +454,13 @@ def sales_order_update(order_json):
             
             #estudiar la funcion despues de refactory
 
-            #frappe.log_error(message=res.get("body_data"), title="GP Send Confirm")
+            frappe.log_error(message=res.get("body_data"), title="GP Send Confirm")
 
-            #rec_log(doc_ref=sales_order, msg_body=res.get("body_data"), msg_res=res.get("response"), valid=1)
+            rec_log(doc_ref=sales_order, msg_body=res.get("body_data"), msg_res=res.get("response"), valid=1)
 
-            #qdoc.qp_phonix_reference = res.get("reference")
+            qdoc.qp_phonix_reference = res.get("reference")
 
-            #qdoc.submit()
+            qdoc.submit()
 
         frappe.db.commit()
 
@@ -536,7 +503,7 @@ def get_line(line, item):
     line_new = copy.copy(item)
     line_new.name = None
     line_new.qty = line.get("Quantity")
-    line_new.delivery_date = line.get("RequestDate")
+    line_new.delivery_date = line.get("RequestDate") if line.get("RequestDate") != '1900-01-01' else today()
     line_new.qp_phoenix_status = line.get("Status")
     line_new.insert()
     return line_new

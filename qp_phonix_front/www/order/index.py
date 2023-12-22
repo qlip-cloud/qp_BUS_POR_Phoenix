@@ -10,7 +10,8 @@ def get_context(context):
     def callback():
         
         context.statues = {
-            "Draft": "‌Borrador"
+            "Draft": "‌Borrador",
+            "To Deliver and Bill": "Para entregar y facturar"
         }
         context.order_list = sales_order_list()
 
