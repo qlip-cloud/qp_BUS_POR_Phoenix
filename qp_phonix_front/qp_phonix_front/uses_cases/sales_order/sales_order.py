@@ -418,10 +418,12 @@ def sales_order_update(order_json):
         if order_json.get('action') == "confirm":
 
             qdoc.qp_phoenix_order_customer = order_json.get("qp_phoenix_order_customer")
+            
+            qdoc.save()
 
             if __validate_product_inventory():
 
-                res_checkout = send_check_out_so(sales_order)
+                res_checkout = send_check_out_so(qdoc)
 
                 if not res_checkout.get("result") or res_checkout.get("result") != 200:
 
