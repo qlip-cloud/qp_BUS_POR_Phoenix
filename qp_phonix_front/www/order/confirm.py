@@ -50,13 +50,18 @@ def get_delivery_update(order_id):
 
         so_respose = execute_send(company_name=company, endpoint_code=ORDER, json_data=payload)
 
+
         for item in sale_order.items:
             
             for line in so_respose.get("ReturnJson").get("Lines"):
                 
-                if line.get("Id") == item.item_code and line.get("Status") == item.qp_phoenix_status and item.delivery_date != getdate(line.get("RequestDate")):
+                if line.get("Id") == item.item_code and line.get("LineNumber") == item.line_number and (item.delivery_date != getdate(line.get("RequestDate")) or item.qp_phoenix_status != getdate(line.get("Status"))):
 
                     item.delivery_date = getdate(line.get("RequestDate")) if line.get("RequestDate") != '1900-01-01' else today()
+
+                    item.qp_phoenix_status = line.get("Status")
+
+                    item.delivery_date_visible = True if line.get("RequestDate") != '1900-01-01' else False
 
                     item.save()
 
