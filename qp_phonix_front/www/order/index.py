@@ -6,6 +6,9 @@ from qp_phonix_front.qp_phonix_front.services.try_catch import handler as try_ca
 
 def get_context(context):
 
+    frappe.clear_cache()
+        
+    frappe.website.render.clear_cache()
     
     def callback():
         

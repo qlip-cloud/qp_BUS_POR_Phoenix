@@ -9,6 +9,10 @@ def get_context(context):
 
     is_guest()
 
+    frappe.clear_cache()
+        
+    frappe.website.render.clear_cache()
+
     def callback():
 
         #context.shipping_method_list = vf_shipping_method_list()
