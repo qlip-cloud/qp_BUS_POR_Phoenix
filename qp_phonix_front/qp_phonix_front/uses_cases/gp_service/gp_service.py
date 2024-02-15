@@ -110,9 +110,9 @@ def __prepare_petition(master_name, sales_order):
 
                 "Id": item.item_code,
                 "Quantity": item.qty,
-                "Price": item.base_price_list_rate,
+                "Price": item.base_price_list_rate - item.discount_amount,
                 "DiscountPercentage": item.discount_percentage, #valida
-                "DiscountPrice": item.discount_amount, #valida
+                "DiscountPrice": 0, #valida
                 "Warehouse": item.item_group,
                 "ShippingMethod": None,
                 "ShippingDate": None # valida

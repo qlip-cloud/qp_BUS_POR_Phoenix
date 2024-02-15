@@ -10,7 +10,7 @@ URL_IMG_EMPTY = "/assets/qlip_bussines_theme/images/company_default_logo.jpg"
 
 @frappe.whitelist()
 def paginator_item_list(item_group = None, item_Categoria = None, item_SubCategoria = None, item_code_list = None,
-                letter_filter = None, filter_text = None, idlevel = None, has_inventary = None, item_with_inventary = []):
+                letter_filter = None, filter_text = None, idlevel = None, has_inventary = None, item_with_inventary = [], with_list_price = False):
 
     item_Categoria = json.loads(item_Categoria) if item_Categoria else None
     
@@ -21,7 +21,7 @@ def paginator_item_list(item_group = None, item_Categoria = None, item_SubCatego
     #setup = get_table_and_condition(item_group, item_Categoria, item_SubCategoria, item_code_list = item_code_list, idlevel = idlevel)
     
     return callback_get_inventary(item_group, item_Categoria, item_SubCategoria, letter_filter, filter_text, 
-    idlevel, has_inventary,item_code_list, [])
+    idlevel, has_inventary,item_code_list, [], with_list_price)
     
     
     
@@ -49,13 +49,14 @@ def paginator_item_list(item_group = None, item_Categoria = None, item_SubCatego
     return response"""
 
 def callback_get_inventary(item_group = None, item_Categoria= None, item_SubCategoria= None, letter_filter= None, filter_text= None, 
-    idlevel = None, has_inventary = False,item_code_list = [], item_with_inventary = []):
+    idlevel = None, has_inventary = False,item_code_list = [], item_with_inventary = [], with_list_price = False):
 
     if has_inventary:
         
         sync_item_quantity()
     
-    setup = get_table_and_condition(item_group, item_Categoria, item_SubCategoria, filter_text = filter_text, item_code_list = item_code_list, idlevel = idlevel, has_inventary = has_inventary)
+    setup = get_table_and_condition(item_group, item_Categoria, item_SubCategoria, filter_text = filter_text, 
+                                    item_code_list = item_code_list, idlevel = idlevel, has_inventary = has_inventary, with_list_price = with_list_price)
     
     result =  __get_product_list(setup.get("tbl_product_list"), setup.get("cond_c"), setup.get("cond_t"), has_limit=True)
 
@@ -369,12 +370,16 @@ def get_filter_SubCategoria_option(price_list):
 
 
 def get_table_and_condition(item_group = None, item_Categoria = None, item_SubCategoria = None, item_code_list = None, letter_filter = None, 
-                is_equal = False, filter_text = None, idlevel= None, has_inventary = False):
+                is_equal = False, filter_text = None, idlevel= None, has_inventary = False, with_list_price = False):
 
     where_base = get_where_base()
 
 
     cond_c = __get_cond("sku",item_Categoria)
+
+    if with_list_price:
+
+        cond_c += " AND " + __get_cond("qp_phoenix_shortdescription", ['LP'])
 
 
     cond_t = __get_cond("class_sync.title",list(map(lambda x: x.replace("--", " ") , item_SubCategoria)) if item_SubCategoria else None)
@@ -560,6 +565,7 @@ def get_tbl_product_list(item_group, from_base, where_base, item_code_list = Non
             prod.stock_uom as stock_uom,
             prod.item_group as item_group,
             prod.sku as sku,
+            prod.qp_phoenix_shortdescription as qp_phoenix_shortdescription,
             prod.qp_phonix_class as qp_phonix_class,
             prod.qp_price_group as qp_price_group,
             %s
@@ -687,6 +693,7 @@ def __get_select_attr_base():
             item_group,
             sku,
             qp_phonix_class,
+            qp_phoenix_shortdescription,
             qp_price_group,
             discountpercentage,
             (price - (price * discountpercentage) / 100) as price_discount,
@@ -763,6 +770,7 @@ def __get_select_attr_base_old():
             item_group,
             sku,
             qp_phonix_class,
+            qp_phoenix_shortdescription,
             qp_price_group,
             discountpercentage,
             (price - (price * discountpercentage) / 100) as price_discount,

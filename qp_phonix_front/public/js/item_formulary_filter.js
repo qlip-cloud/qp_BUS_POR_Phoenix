@@ -9,6 +9,8 @@ $(document).ready(function() {
     
     $("#with_inventary").prop("checked", false);
 
+    $("#with_list_price").prop("checked", false);
+
     $("#sku_true").prop("checked", false);
 
     $("#tool-tip-container").on("mouseover", ".dropdown-item", function(e){
@@ -73,10 +75,13 @@ $(document).ready(function() {
 
     })
 
-    $("#sku_true").on("change", function(){
+    $("#sku_true, #with_list_price").on("change", function(){
 
         //edicion with_inventary
         //$("#with_inventary").prop("checked", false);
+        id = $(this).data("id")
+
+        class_id = id == "sku_true" ? ".SI" : ".LP"
 
         group_filter = get_group_filter();
 
@@ -87,7 +92,7 @@ $(document).ready(function() {
             
             $(`.item-row.filter`).not(".row_select").hide()
 
-            $item.filter(".SI").show()
+            $item.filter(class_id).show()
 
             //$(".row-inventary").show()
             
@@ -104,7 +109,7 @@ $(document).ready(function() {
 
         if (!group_filter){
 
-            visible_filter_select($(this).is(":checked"))
+            visible_filter_select($(this).is(":checked"), class_id)
         }
     })
 
@@ -187,8 +192,8 @@ $(document).ready(function() {
 });
 
 function validate_has_filter(){
-    //if ($('#select-SubCategoria').val() || $('#sku_true').prop("checked") || $('#filter_text').val())
-    if ($('#select-SubCategoria').val() || $('#sku_true').prop("checked") || $('#filter_text').val() || $('#with_inventary').prop("checked"))
+
+    if ($('#select-SubCategoria').val() || $('#sku_true').prop("checked")|| $('#with_list_price').prop("checked") || $('#filter_text').val() || $('#with_inventary').prop("checked"))
         return true
     return false
 }
@@ -228,6 +233,8 @@ function get_group_filter(){
     }
     
     group_filter += $("#sku_true").is(":checked") ? ".SI" : "";
+
+    group_filter += $("#with_list_price").is(":checked") ? ".LP" : "";
 
     group_filter += $("#q").is(':checked') ? ".inventary-SI" : ""
     
@@ -273,7 +280,7 @@ function setup_filter_text(){
     } 
 }
 
-function visible_filter_select(select_sku = false){
+function visible_filter_select(select_sku = false, class_id = `.SI`){
 
     $select_option = $(`.select-option.filter`)
     
@@ -283,7 +290,7 @@ function visible_filter_select(select_sku = false){
     
     if (select_sku){
 
-        $select_option.filter(`.SI`).show()
+        $select_option.filter(class_id).show()
 
     }else{
 
@@ -566,11 +573,12 @@ function get_rows(is_valid = false, is_letter = false, is_class = false){
             SubCategoria_selected = $("#select-SubCategoria").val()
 
             letter_filter = $(".link_abc.selected").data("value")
-
             
             idlevel = $("#idlevel").val()
 
             has_inventary = $("#with_inventary").is(':checked');
+
+            with_list_price = $("#with_list_price").is(':checked');
             
             let item_code_list = []
 
@@ -590,7 +598,8 @@ function get_rows(is_valid = false, is_letter = false, is_class = false){
                 letter_filter,
                 filter_text,
                 idlevel,
-                has_inventary
+                has_inventary,
+                with_list_price
             }
 
             module_root = "render.item_formulary.item_formulary_render"
