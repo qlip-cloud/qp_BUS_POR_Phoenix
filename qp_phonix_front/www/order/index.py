@@ -6,11 +6,15 @@ from qp_phonix_front.qp_phonix_front.services.try_catch import handler as try_ca
 
 def get_context(context):
 
+    frappe.clear_cache()
+        
+    frappe.website.render.clear_cache()
     
     def callback():
         
         context.statues = {
-            "Draft": "‌Borrador"
+            "Draft": "‌Borrador",
+            "To Deliver and Bill": "Para entregar y facturar"
         }
         context.order_list = sales_order_list()
 

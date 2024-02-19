@@ -25,6 +25,8 @@ def get_context(context):
 
         get_idlevel(context)
 
+        context.trm = frappe.get_last_doc('Currency Exchange')
+
         query_params = frappe.request.args
 
         order_id = query_params.get("order_id")

@@ -21,18 +21,21 @@
     {%endif%}
                 
     </a>
-    {#if is_valid and order.status_code == 0#}
+    {%if order.status == "Draft"%}
+        
+        {#if is_valid and order.status_code == 0#}
     
 
         <a id="btn_edit_order"  class="btn button-master button-default">
             {{ _("EDITAR ORDEN") }}
         </a>
 
-    {%if has_sync and permission.confirm %}
+        {%if has_sync and permission.confirm %}
     
-        <a id = "btn_confirm_order"  class="btn button-master button-default">
-            {{ _("CONFIRMAR ORDEN") }}
-        </a>
+            <a id = "btn_confirm_order"  class="btn button-master button-default">
+                {{ _("CONFIRMAR ORDEN") }}
+            </a>
+        {%endif%}
     {%endif%}
             
 {% endblock %}
@@ -177,6 +180,13 @@
                     {{order.phone}}
                 </div>
             </div>
+            <div class="row shadow p-3 mb-5 bg-white rounded">
+                <div class="col-md-12 label">
+                    Orden del cliente
+                </div>
+                <input type="text" class="form-control " {{ 'disabled' if order.status !="Draft" else '' }} id="qp_phoenix_order_customer" value={{order.qp_phoenix_order_customer if order.qp_phoenix_order_customer else "" }}>
+            </div>
+
         </div>
     
         <div class="col-sm-9 ">
@@ -283,17 +293,20 @@
                             Productos
                             <input type="hidden" id="order_id" value="{{order.so_name}}">
                         </div>
-                        <div class="col-sm-3">
-                            <a id="select_all" class = "confirm_link select_all" style="color: #1aa2aa !important"data-action = "1"> Seleccionar Todos</a>
-                            <a id="deselect_all" style ="display: none" class = "confirm_link select_all" data-action = "0"> Deseleccionar Todos</a>
-                        </div> 
-                        <div class="col-sm-3">
-                            <a id="selected_delete" class = "confirm_link" style = "display: none;">
-                                Eliminar Selección</a>
-                        </div> 
-                        <div class="col-sm-3">
-                            <a id="undo" class = "confirm_link" ></a>
-                        </div> 
+                        {%if order.status == "Draft"%}
+
+                            <div class="col-sm-3">
+                                <a id="select_all" class = "confirm_link select_all" style="color: #1aa2aa !important"data-action = "1"> Seleccionar Todos</a>
+                                <a id="deselect_all" style ="display: none" class = "confirm_link select_all" data-action = "0"> Deseleccionar Todos</a>
+                            </div> 
+                            <div class="col-sm-3">
+                                <a id="selected_delete" class = "confirm_link" style = "display: none;">
+                                    Eliminar Selección</a>
+                            </div> 
+                            <div class="col-sm-3">
+                                <a id="undo" class = "confirm_link" ></a>
+                            </div> 
+                        {%endif%}
                     </div>
                 </div>
                         
@@ -312,14 +325,28 @@
                         <div class="col-sm-10">
                             <div class="row">
                                 <div class="col-sm-12">
-                            
-                            <p class="order_id" style="margin-bottom: 0rem;">
-                                <input type="checkbox"
-                                    class="delecte_group"
-                                    name = "delecte_group" 
-                                    id = "ch_deleted_{{item.item_code | replace(':','-')}}"
-                                    data-id = "{{item.item_code | replace(':','-')}}"
-                                    > {{item.item_name}} &nbsp; 
+                                    <p class="order_id" style="margin-bottom: 0rem;">
+                            <div class="row">
+
+                                        <div class="col-sm-4" >
+                                            {%if order.status == "Draft"%}
+
+                                            <input type="checkbox"
+                                            class="delecte_group"
+                                            name = "delecte_group" 
+                                            id = "ch_deleted_{{item.item_code | replace(':','-')}}"
+                                            data-id = "{{item.item_code | replace(':','-')}}"
+                                                > {% endif %} {{item.item_name}}
+                                        </div> 
+                                        <div class="col-sm-6" >
+                                            {%if order.status !="Draft" %} 
+                                            <span style="font-size: 15px; color:{{item.qp_phoenix_status_color}}">{{item.qp_phoenix_status_title}} / Entrega: {{item.delivery_date}} </span> 
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                        </p>
+                                        
+                                    
 
                                 </div>
                             </div>

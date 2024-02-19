@@ -1,8 +1,9 @@
 import frappe
 from frappe import _
-from frappe.utils import get_url, getdate
+from frappe.utils import get_url, getdate,today
 import requests
 import json
+import copy
 from datetime import datetime
 from qp_phonix_front.qp_phonix_front.uses_cases.shipping_method.shipping_method_list import __get_customer
 from qp_phonix_front.qp_phonix_front.uses_cases.item_list.item_list import URL_IMG_EMPTY
@@ -10,7 +11,6 @@ from qp_phonix_front.qp_phonix_front.uses_cases.item_list.item_list import get_a
 from qp_phonix_front.qp_phonix_front.uses_cases.check_out_art.check_out_art import send_check_out_so
 from qp_phonix_front.qp_phonix_front.uses_cases.gp_service.gp_service import send_sales_order
 from qp_phonix_front.qp_phonix_front.uses_cases.item_list.item_list import __get_uom_list
-from frappe.utils import today
 
 SHIPPING_DEFAULT = 'N/S'
 DATE_DELIVERY_FORMAT_FIELD = "%Y-%m-%d"
@@ -120,6 +120,7 @@ def get_sales_order(sales_order):
             Select Distinct 
                 so.name as so_name, 
                 so.status, 
+                so.qp_phoenix_order_customer, 
                 item.item_group,
                 so.customer_name, 
                 addr.address_line1, 
@@ -138,6 +139,8 @@ def get_sales_order(sales_order):
             inner join tabAddress as addr on so.customer_address = addr.name
             left join tabqp_GP_ShippingType as shipping_type on shipping_type.name = so.qp_shipping_type
             where so.customer = '%s' and so.name = '%s'
+            order by so_items.qp_phoenix_status asc, so_items.item_code, so_items.description
+
         """ % (SHIPPING_DEFAULT, DATE_DELIVERY_FORMAT_FIELD, DATE_DELIVERY_FORMAT, customer.name, sales_order)
 
         so_obj = frappe.db.sql(sql_so_obj, as_dict=1)
@@ -145,7 +148,7 @@ def get_sales_order(sales_order):
         if so_obj:
 
             sql_so_items_obj = """
-                Select so_items.item_code,item.item_group,
+                Select so_items.item_code,item.item_group,qp_phoenix_order_customer,
                 so_items.item_name,
                 IF(so_items.image IS NULL or so_items.image = '', '%s', so_items.image) as image,
                 
@@ -155,6 +158,12 @@ def get_sales_order(sales_order):
                 so_items.qty as cantidad,
                 so_items.stock_uom,
                 so_items.amount,
+                so_items.delivery_date,
+                so_items.qp_phoenix_status_title,
+                so_items.qp_phoenix_status,
+                so_items.qp_phoenix_status_color,
+                so_items.line_number,
+                so_items.delivery_date_visible,
                 ROUND(net_amount,2) as total,
                 format(net_amount,0) as total_format,
                 so_items.description
@@ -162,7 +171,7 @@ def get_sales_order(sales_order):
                 inner join `tabSales Order Item` as so_items on so.name = so_items.parent
                 inner join tabItem as item on item.name = so_items.item_code
                 where so.customer = '%s' and so.name = '%s'
-                order by item.idx, so_items.description
+                order by so_items.qp_phoenix_status asc , so_items.delivery_date desc,so_items.item_code, so_items.description, so_items.delivery_date desc
             """ % (URL_IMG_EMPTY, customer.name, sales_order)
 
             so_items_obj = frappe.db.sql(sql_so_items_obj, as_dict=1)
@@ -186,6 +195,14 @@ def get_sales_order(sales_order):
                 item['inqt'] = uom_list and int(uom_list[0]['conversion_factor']) or 1
 
                 item['description'] = item.description
+
+                item['delivery_date'] = item.delivery_date.strftime('%d-%m-%y') if item.delivery_date_visible  else 'Pendiente'
+
+                item['qp_phoenix_status_title'] = item.qp_phoenix_status_title
+
+                item['qp_phoenix_status_color'] = item.qp_phoenix_status_color
+
+                item['line_number'] = item.line_number
                 
             so_obj = so_obj[0]
 
@@ -357,6 +374,7 @@ def sales_order_update(order_json):
             #qdoc.qp_shipping_type = so_shipping_type
         ##########################################
         # update items (qty and delivery_date)
+        
 
         items_so = [x.get('item_code') for x in qdoc.items]
 
@@ -405,11 +423,13 @@ def sales_order_update(order_json):
 
         if order_json.get('action') == "confirm":
 
+            qdoc.qp_phoenix_order_customer = order_json.get("qp_phoenix_order_customer")
+            
+            qdoc.save()
+
             if __validate_product_inventory():
 
-                # checkout
-
-                res_checkout = send_check_out_so(sales_order)
+                res_checkout = send_check_out_so(qdoc)
 
                 if not res_checkout.get("result") or res_checkout.get("result") != 200:
 
@@ -418,12 +438,29 @@ def sales_order_update(order_json):
                     rec_result['msg'] = res_checkout.get("msg")
 
                     raise vf_SaleOrderCheckOutError()
+            
 
             res = send_sales_order(sales_order)
 
             if not res.get("result") or res.get("result") != 200:
 
                 raise vf_SaleOrderConfirmError()
+
+            qdoc.qp_phonix_reference = res.get("response").get("ReturnDesc")
+
+            lines = []
+
+            for item in qdoc.items:
+                
+                lines += [ get_line(line, item) for line in res.get("response").get("ReturnJson").get("Lines") if line.get("Id") == item.item_code]
+            
+                item.delete()
+
+            qdoc.items = lines
+
+            qdoc.save()
+            
+            #estudiar la funcion despues de refactory
 
             frappe.log_error(message=res.get("body_data"), title="GP Send Confirm")
 
@@ -469,6 +506,25 @@ def sales_order_update(order_json):
 
     return rec_result
 
+def get_line(line, item):
+
+    line_new = copy.copy(item)
+
+    line_new.name = None
+
+    line_new.line_number = line.get("LineNumber")
+
+    line_new.qty = line.get("Quantity")
+
+    line_new.delivery_date = line.get("RequestDate") if line.get("RequestDate") != '1900-01-01' else today()
+
+    line_new.delivery_date_visible = True if line.get("RequestDate") != '1900-01-01' else False
+
+    line_new.qp_phoenix_status = line.get("Status")
+
+    line_new.insert()
+    
+    return line_new
 
 def __get_item_attr(item_code, attr):
 
