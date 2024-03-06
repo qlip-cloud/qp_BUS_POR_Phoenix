@@ -36,7 +36,9 @@ def get_context(context):
             
         if count_item:
             
-            set_order_data(context, order_id)       
+            set_order_data(context, order_id)
+
+            set_coupon_data(context, order_id)     
 
         set_has_sync(context)
         
@@ -100,3 +102,40 @@ def set_has_sync(context):
     result =  frappe.db.sql(sql, as_dict=1)
 
     context.has_sync = result[0]["qp_phonix_has_sync"]
+
+def set_coupon_data(context, order_id):
+
+    context.has_coupon = False
+
+    search_coupon_log = frappe.get_list("qp_pf_CouponLog", filters = {"order_id": order_id}, pluck = "name")
+
+    if search_coupon_log:
+
+        coupon_log = frappe.get_doc("qp_pf_CouponLog", search_coupon_log[0])
+
+        coupon = frappe.get_doc("qp_pf_Coupon", coupon_log.coupon)
+
+        description = "{}% ".format(coupon.percentage)
+        
+        if len(coupon_log.coupon_items):
+
+            description += "Descuento aplicado al precio de cada productos de la promoción"
+
+            for item in context.items_select:
+
+                for coupon_item in coupon_log.coupon_items:
+
+                    if item.item_code == coupon_item.item_code:
+
+                        item.setdefault("has_discount", True)
+        else:
+
+            description += "Descuento aplicado al subtotal de la factura"
+
+
+        context.coupon_description = description
+
+        context.coupon_title = coupon.title
+
+        context.has_coupon = True
+        

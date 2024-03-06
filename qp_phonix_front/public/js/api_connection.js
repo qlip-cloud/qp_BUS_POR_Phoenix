@@ -32,6 +32,15 @@ async function send_petition(payload, module_root, method, callresponse = null){
                     frappe.msgprint(__(`error: ${response.msg}`))
                 }
 
+                if (response.status == 500) {
+
+                    if (callresponse) {
+
+                        callresponse(response)
+
+                    }
+                }
+
 
             }
         })

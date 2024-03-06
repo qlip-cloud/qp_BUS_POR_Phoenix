@@ -1,148 +1,154 @@
 {% extends "qp_phonix_front/templates/main.html" %}
 
 {% block section_title %}
-    {%if is_valid%}                
-        Orden 
-    {%endif%}
+{%if is_valid%}
+Orden
+{%endif%}
 {% endblock %}
 
 {% block button_title %}
 
-    <a id="btn_edit_export" href="/api/method/qp_phonix_front.qp_phonix_front.uses_cases.export.order_xlsx.export_xlsx?order_id={{order.so_name}}" target="_blank"class="btn button-master button-default">
-        {{ _("EXPORTAR") }}
-    </a> 
-    {%if has_sync %}
+<a id="btn_edit_export"
+    href="/api/method/qp_phonix_front.qp_phonix_front.uses_cases.export.order_xlsx.export_xlsx?order_id={{order.so_name}}"
+    target="_blank" class="btn button-master button-default">
+    {{ _("EXPORTAR") }}
+</a>
+{%if has_sync %}
 
-        <a href="/order/index" class="btn button-master button-back">
-            {{ _("VOLVER A ORDENES") }}
+<a href="/order/index" class="btn button-master button-back">
+    {{ _("VOLVER A ORDENES") }}
     {% else %}
-        <a href="/order/item_formulary" class="btn button-master button-back">
-            {{ _("VOLVER A CONSULTAR ARTÍCULOS") }}
-    {%endif%}
-                
+    <a href="/order/item_formulary" class="btn button-master button-back">
+        {{ _("VOLVER A CONSULTAR ARTÍCULOS") }}
+        {%endif%}
+
     </a>
     {%if order.status == "Draft"%}
-        
-        {#if is_valid and order.status_code == 0#}
-    
 
-        <a id="btn_edit_order"  class="btn button-master button-default">
-            {{ _("EDITAR ORDEN") }}
-        </a>
+    {#if is_valid and order.status_code == 0#}
 
-        {%if has_sync and permission.confirm %}
-    
-            <a id = "btn_confirm_order"  class="btn button-master button-default">
-                {{ _("CONFIRMAR ORDEN") }}
-            </a>
-        {%endif%}
+
+    <a id="btn_edit_order" class="btn button-master button-default">
+        {{ _("EDITAR ORDEN") }}
+    </a>
+
+    {%if has_sync and permission.confirm %}
+
+    <a id="btn_confirm_order" class="btn button-master button-default">
+        {{ _("CONFIRMAR ORDEN") }}
+    </a>
     {%endif%}
-            
-{% endblock %}
+    {%endif%}
 
-{% block principal_content %}
+    {% endblock %}
 
-<style>
-    .datepicker_confirm{
-        background: rgba(77, 100, 68, 0.07);
-        color: #000;
-        box-shadow: none;
-        width: 100%;
-        height: 47px;
-    }
+    {% block principal_content %}
 
-    .form-control.quantity{
-        height:100% !important; 
-        margin: 0 !important; 
-        padding: 0 !important;
-    }
+    <style>
+        .coupon_error {
+            color: red;
+            font-size: 0.7em;
+        }
 
-
-    .cell_empty{
-        height: 38px;
-        
-    }
-
-    .modal .modal-footer{
-        justify-content: right;
-    }
-
-    .trash_SubCategoria{
-        background-color: #F1522E !important;
-    }
-
-    .modal-message{
-        text-align: left;
-        font: normal normal 600 24px/36px Montserrat;
-        letter-spacing: 0px;
-        color: #666A65;
-        opacity: 1;
-        margin-bottom: 10px;
-
-    }
-
-    .modal-title{
-        text-align: left;
-        font: normal normal bold 30px/82px Montserrat;
-        letter-spacing: 0px;
-        color: #4D6444;
-        opacity: 1;
-        margin-top: 50px;
-    }
-
-    .description-label{
-        display: none;
-        margin-bottom: 0.25em;
-
-    }
-
-    .total-responsive{
-        display: none;
-    }
-    @media (max-width: 576px){
-        .button-master{
+        .datepicker_confirm {
+            background: rgba(77, 100, 68, 0.07);
+            color: #000;
+            box-shadow: none;
             width: 100%;
-            margin-top: 0.25em;
+            height: 47px;
         }
 
-        .information-container{
-            padding-right: 0em;
+        .form-control.quantity {
+            height: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
         }
 
-        .details-container{
+
+        .cell_empty {
+            height: 38px;
+
+        }
+
+        .modal .modal-footer {
+            justify-content: right;
+        }
+
+        .trash_SubCategoria {
+            background-color: #F1522E !important;
+        }
+
+        .modal-message {
+            text-align: left;
+            font: normal normal 600 24px/36px Montserrat;
+            letter-spacing: 0px;
+            color: #666A65;
+            opacity: 1;
+            margin-bottom: 10px;
+
+        }
+
+        .modal-title {
+            text-align: left;
+            font: normal normal bold 30px/82px Montserrat;
+            letter-spacing: 0px;
+            color: #4D6444;
+            opacity: 1;
+            margin-top: 50px;
+        }
+
+        .description-label {
             display: none;
-        }
-
-        .description-column{
-            display: none;
-
-        }
-
-        .background-info{
-            margin-top: 0.25em;
-
-        }
-        .description-label{
             margin-bottom: 0.25em;
 
-            display:block;
         }
-        .total-content{
+
+        .total-responsive {
             display: none;
         }
 
-        .total-responsive{
-            display: block;
+        @media (max-width: 576px) {
+            .button-master {
+                width: 100%;
+                margin-top: 0.25em;
+            }
+
+            .information-container {
+                padding-right: 0em;
+            }
+
+            .details-container {
+                display: none;
+            }
+
+            .description-column {
+                display: none;
+
+            }
+
+            .background-info {
+                margin-top: 0.25em;
+
+            }
+
+            .description-label {
+                margin-bottom: 0.25em;
+
+                display: block;
+            }
+
+            .total-content {
+                display: none;
+            }
+
+            .total-responsive {
+                display: block;
+            }
         }
-    }
+    </style>
 
-
-</style>
-
-
-
-<div class="row"  style="margin-top: 30px;">
-    {%if is_valid%}
+    <div class="row" style="margin-top: 30px;">
+        {%if is_valid%}
 
         <div class="col-sm-12 col-lg-3 information-container" style="max-width: 100%; padding-right: 2em">
             <div class="row shadow p-3 mb-5 bg-white rounded">
@@ -168,7 +174,7 @@
                     {{order.city}}
                 </div>
                 <div class="col-md-12 label">
-                    Código  Postal
+                    Código Postal
                 </div>
                 <div class="col-md-12 info background-info information_label">
                     {{order.pincode}}
@@ -184,109 +190,101 @@
                 <div class="col-md-12 label">
                     Orden del cliente
                 </div>
-                <input type="text" class="form-control " {{ 'disabled' if order.status !="Draft" else '' }} id="qp_phoenix_order_customer" value={{order.qp_phoenix_order_customer if order.qp_phoenix_order_customer else "" }}>
+                <input type="text" class="form-control " {{ 'disabled' if order.status !="Draft" else '' }}
+                    id="qp_phoenix_order_customer" value={{order.qp_phoenix_order_customer if
+                    order.qp_phoenix_order_customer else "" }}>
             </div>
-
         </div>
-    
+
         <div class="col-sm-9 ">
             <div class="row">
-            <div class="col-sm-9 shadow p-3 mb-5 bg-white rounded details-container" style="max-width: 72%; margin-right: 0.75em;">
-                <!--div class="col">
-                    <div class="row">
-                        <div class=" col-md-12 subtitle">
-                            Delivery information
+                <div class="col-sm-9 shadow p-3 mb-5 bg-white rounded details-container"
+                    style="max-width: 72%; margin-right: 0.75em;">
+                    <div class="col-sm-12 section-coupon" style="display: {{none if has_coupon else ''}}">
+                        <div class="row">
+                            <div class=" col-md-12 subtitle">
+                                Descuento
+                            </div>
+                        </div>
+                        <div class="row label">
+                            <div class="col-md-4">
+                                Aplicar cupón
+                            </div>
+                        </div>
+                        <div class="row ">
+                            <div class="col-md-4">
+                                <input type="text" class="form-control" id="coupon">
+                                <p class='coupon_error' style="display: none;"></p>
+                            </div>
+                            <div class="col-md-2">
+                                <button class="btn button-master button-default" id="send_coupon">Canjear</button>
+                            </div>
                         </div>
                     </div>
-                    <div class="row label">
-                        <div class="col-md-4">
-                            Shipping type
-                        </div>
-                        <div class="col-md-4">
-                            Shipping date
-                        </div>
-                    </div>
-                    <div class="row ">
-                        <div class="col-md-4">
-                            {#if order.status_code == 0#}
 
-                                <div class="form-group">
-                                    <select data-value = "{#order.shipping_type#}" data-type-val="true" class="form-control datepicker_confirm shipping_data" id="select_shipping_method">
-                                        <option value="Shinpping type" disabled selected>Shipping type</option>
-                                        {#for shipping_method in shipping_method_list #}
-                                            {#if (shipping_method.name.lower() == order.shipping_type.lower())#}
-                                                <option value="{#shipping_method.name#}" selected>{#shipping_method.description#}</option>
-                                            {#else#}
-                                                <option value="{#shipping_method.name#}">{#shipping_method.description#}</option>
-                                            {#endif#}
-                                        {#endfor#}
-                                        
-                                        
-                                    </select>
-                                </div>   
-                                
-                                
-                            {#else#}
-                                <div class="background-info information_label">
-                                    {#order.shipping_description#}
-                                </div>
-                            {#endif#}     
+                    <div class="col-sm-12 section-redeem" style="display: {{none if not has_coupon else ''}}">
+                        <div class="row">
+                            <div class=" col-md-12 subtitle">
+                                Cupon Canjeado
+                            </div>
                         </div>
-                        <div class="col-md-4">
-                            {#if order.status_code == 0#}
-                                <div class="form-group">
-                                    <div class="input-group date">
-                                        <input data-value="{#order.shipping_date#}" data-type-val="true" type="text" id="datepicker" placeholder = "Shipping date" class="btn text-left datepicker_confirm shipping_data" value="{#order.shipping_date#}" readonly>
-                                        <div class="input-group-addon">
-                                            <span class="glyphicon glyphicon-th"></span>
-                                        </div>
-                                    </div>
-                                </div>          
-                            {#else#}
-                                <div class="background-info information_label">
-                                    {#order.shipping_date#}
-                                </div>
-                            {#endif#}
+                        <div class="row">
+                            <div class=" col-md-12 label coupon_legend">
+
+                                {{coupon_description}}
+
+                            </div>
+                        </div>
+                        <div class="row label">
+                            <div class="col-md-4">
+                                <ul class="coupon_name">
+                                    {% if has_coupon %}
+                                    <li>
+                                        {{coupon_title}}
+                                    </li>
+                                    {% endif %}
+                                </ul>
+                            </div>
                         </div>
                     </div>
-                </div-->
+
+                </div>
+                <div class="col-sm-3 shadow p-3 mb-5 bg-white rounded total-content">
+                    <div class=" col-md-12 subtitle">
+                        Costo Total Antes de IVA
+                    </div>
+                    <div class=" col-md-12 title" style="line-height: 48px;">
+                        $ <span id="" class="price_total ">{{order.total_format | replace(",", ".")}}</span>
+                    </div>
+                    <div class=" col-md-12 subtitle">
+                        COP
+                    </div>
+                </div>
             </div>
-            <div class="col-sm-3 shadow p-3 mb-5 bg-white rounded total-content">
-                <div class=" col-md-12 subtitle">
-                    Costo Total Antes de IVA
-                </div>
-                <div class=" col-md-12 title" style="line-height: 48px;">
-                    $ <span id="" class="price_total ">{{order.total_format | replace(",", ".")}}</span>
-                </div>
-                <div class=" col-md-12 subtitle">
-                    COP
-                </div>
-                </div>
-        </div>
             <div class="row">
                 {%if count_change_item_list%}
-                    <div class="col-sm-12">
-                        <div class="alert alert-warning text-center alert-dismissible fade show" role="alert">
-                            Algunos productos fueron eliminados de la listas debido a que ya no estan disponibles
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                              </button>
-                        </div>
+                <div class="col-sm-12">
+                    <div class="alert alert-warning text-center alert-dismissible fade show" role="alert">
+                        Algunos productos fueron eliminados de la listas debido a que ya no estan disponibles
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
+                </div>
                 {%endif%}
 
                 {#if count_change_price#}
                 {% if 0 %}
-                    <div class="col-sm-12">
-                        <div class="alert alert-warning text-center" role="alert">
-                            Los precios de algunos productos han sido actualizados
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                              </button>
-                        </div>
+                <div class="col-sm-12">
+                    <div class="alert alert-warning text-center" role="alert">
+                        Los precios de algunos productos han sido actualizados
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
+                </div>
                 {%endif%}
-            
+
                 <div class="col-sm-12 subtitle">
                     <div class="row">
                         <div class="col-sm-3" style="margin-left: -15px; margin-bottom: 15px;">
@@ -295,203 +293,211 @@
                         </div>
                         {%if order.status == "Draft"%}
 
-                            <div class="col-sm-3">
-                                <a id="select_all" class = "confirm_link select_all" style="color: #1aa2aa !important"data-action = "1"> Seleccionar Todos</a>
-                                <a id="deselect_all" style ="display: none" class = "confirm_link select_all" data-action = "0"> Deseleccionar Todos</a>
-                            </div> 
-                            <div class="col-sm-3">
-                                <a id="selected_delete" class = "confirm_link" style = "display: none;">
-                                    Eliminar Selección</a>
-                            </div> 
-                            <div class="col-sm-3">
-                                <a id="undo" class = "confirm_link" ></a>
-                            </div> 
+                        <div class="col-sm-3">
+                            <a id="select_all" class="confirm_link select_all" style="color: #1aa2aa !important"
+                                data-action="1"> Seleccionar Todos</a>
+                            <a id="deselect_all" style="display: none" class="confirm_link select_all" data-action="0">
+                                Deseleccionar Todos</a>
+                        </div>
+                        <div class="col-sm-3">
+                            <a id="selected_delete" class="confirm_link" style="display: none;">
+                                Eliminar Selección</a>
+                        </div>
+                        <div class="col-sm-3">
+                            <a id="undo" class="confirm_link"></a>
+                        </div>
                         {%endif%}
                     </div>
                 </div>
-                        
+
                 {%for item in items_select%}
 
-                    <div class="row line row_select" 
-                        data-price = {{item.price }} 
-                        data-subtotal = "{{item.price * item.cantidad}}" 
-                        data-item = "row-{{item.item_code}}" 
-                        data-description = "{{item.description}}"
-                        id = "row-{{item.item_code | replace(':','-')}}">
-                        <input type="hidden" class="subtotal" value={{item.price * item.cantidad}}>
-                        <div class="col-sm-2" >
-                            <img width="575px" height="575px" class="rounded" src="{{item.image}}" alt="">                       
+                <div class="row line row_select" data-price={{item.price }}
+                    data-subtotal="{{item.price * item.cantidad}}" data-item="row-{{item.item_code}}"
+                    data-description="{{item.description}}" id="row-{{item.item_code | replace(':','-')}}">
+                    <input type="hidden" class="subtotal" value={{item.price * item.cantidad}}>
+                    <div class="col-sm-2">
+                        <img width="575px" height="575px" class="rounded" src="{{item.image}}" alt="">
+                    </div>
+                    <div class="col-sm-10">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <p class="order_id" style="margin-bottom: 0rem;">
+                                <div class="row">
+
+                                    <div class="col-sm-4">
+                                        {%if order.status == "Draft"%}
+
+                                        <input type="checkbox" class="delecte_group" name="delecte_group"
+                                            id="ch_deleted_{{item.item_code | replace(':','-')}}"
+                                            data-id="{{item.item_code | replace(':','-')}}"> {% endif %}
+                                        {{item.item_name}}
+                                    </div>
+                                    <div class="col-sm-6">
+                                        {%if order.status !="Draft" %}
+                                        <span
+                                            style="font-size: 15px; color:{{item.qp_phoenix_status_color}}">{{item.qp_phoenix_status_title}}
+                                            / Entrega: {{item.delivery_date}} </span>
+                                        {% elif item.has_discount %}
+
+                                        <span style="color: #5aa83a; font-size: 0.8em;"
+                                            id="label-{{item.item_code | replace(':','-')}}">
+                                            Producto con descuento</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                </p>
+
+
+
+                            </div>
                         </div>
-                        <div class="col-sm-10">
-                            <div class="row">
-                                <div class="col-sm-12">
-                                    <p class="order_id" style="margin-bottom: 0rem;">
-                            <div class="row">
+                        <div class="row label description-column">
+                            <div class="col-lg-3">
+                                <!-- input type="checkbox"-->
+                                Código de item
+                                {#item.SubCategoria_title#}
+                            </div>
+                            <div class="col-sm-2">
+                                Cantidad
+                            </div>
+                            <div class="col-sm-3">
+                                Pedir por paquetes de
+                            </div>
+                            <div class="col-sm-2">
+                                Precio
+                            </div>
+                            <div class="col-sm-2">
+                                Total
+                            </div>
+                        </div>
 
-                                        <div class="col-sm-4" >
-                                            {%if order.status == "Draft"%}
-
-                                            <input type="checkbox"
-                                            class="delecte_group"
-                                            name = "delecte_group" 
-                                            id = "ch_deleted_{{item.item_code | replace(':','-')}}"
-                                            data-id = "{{item.item_code | replace(':','-')}}"
-                                                > {% endif %} {{item.item_name}}
-                                        </div> 
-                                        <div class="col-sm-6" >
-                                            {%if order.status !="Draft" %} 
-                                            <span style="font-size: 15px; color:{{item.qp_phoenix_status_color}}">{{item.qp_phoenix_status_title}} / Entrega: {{item.delivery_date}} </span> 
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                        </p>
-                                        
-                                    
-
+                        <div class="row info">
+                            <div class="col-sm-3">
+                                <div class="description-label">Código de item</div>
+                                <div
+                                    class="background-info information_label {#'' if item.SubCategoria_value else cell_empty#}">
+                                    {{item.item_code}}
                                 </div>
                             </div>
-                            <div class="row label description-column">
-                                <div class="col-lg-3">
-                            <!-- input type="checkbox"-->
-                                    Código de item
-                                    {#item.SubCategoria_title#}
-                                </div>
-                                <div class="col-sm-2">
-                                    Cantidad
-                                </div>
-                                <div class="col-sm-3">
-                                    Pedir por paquetes de
-                                </div>
-                                <div class="col-sm-2">
-                                    Precio
-                                </div>
-                                <div class="col-sm-2">
-                                    Total
+
+                            <div class="col-sm-2 ">
+                                <div class="description-label">Cantidad</div>
+                                <div class="background-info information_label">
+
+                                    <input type="hidden" name="" id="item_id" value="{{item.item_code}}">
+
+                                    {%if order.status_code == 0%}
+                                    <input type="number" class="form-control quantity" data-factor="{{item.inqt}}"
+                                        data-value="{{item.cantidad | int}}" id="quantity"
+                                        value="{{item.cantidad | int}}">
+                                    {%else%}
+                                    {{item.cantidad | int}}
+                                    {%endif%}
                                 </div>
                             </div>
-                    
-                            <div class="row info">
-                                <div class="col-sm-3">
-                                    <div class="description-label">Código de item</div>
-                                    <div class="background-info information_label {#'' if item.SubCategoria_value else cell_empty#}">
-                                        {{item.item_code}}
-                                    </div>
+                            <div class="col-sm-3">
+                                <div class="description-label">Pedir por paquetes de</div>
+                                <div class="background-info information_label">
+                                    Unidad x {{item.inqt}}
                                 </div>
-        
-                                <div class="col-sm-2 ">
-                                    <div class="description-label">Cantidad</div>
-                                    <div class="background-info information_label">
-
-                                        <input type="hidden" name="" id="item_id" value="{{item.item_code}}">
-
-                                        {%if order.status_code == 0%}
-                                            <input type="number"  class="form-control quantity" data-factor="{{item.inqt}}" data-value="{{item.cantidad | int}}" id="quantity" value="{{item.cantidad | int}}">
-                                        {%else%}
-                                                {{item.cantidad | int}}
-                                        {%endif%}
-                                    </div>
+                            </div>
+                            <div class="col-sm-2">
+                                <div class="description-label">Precio</div>
+                                <div class="background-info information_label ">
+                                    $ <span id="price-{{item.item_code | replace(':','-')}}">{{item.price_format |
+                                        replace(",", ".")}}</span>
                                 </div>
-                                <div class="col-sm-3">
-                                    <div class="description-label">Pedir por paquetes de</div>
-                                    <div class="background-info information_label">
-                                        Unidad x {{item.inqt}}
-                                    </div>
-                                </div>
-                                <div class="col-sm-2">
-                                    <div class="description-label">Precio</div>
-                                    <div class="background-info information_label">
-                                        $ {{item.price_format | replace(",", ".")}}
-                                    </div>
-                                </div>
-                                <div class="col-sm-2">
-                                    <div class="description-label">Total</div>
-                                    <div class="background-info information_label">
-                                        $ {{item.total_format | replace(",", ".")}}
-                                    </div>
+                            </div>
+                            <div class="col-sm-2">
+                                <div class="description-label">Total</div>
+                                <div class="background-info information_label ">
+                                    $ <span id="total-{{item.item_code | replace(':','-')}}">{{item.total_format |
+                                        replace(",", ".")}}</span>
                                 </div>
                             </div>
                         </div>
                     </div>
-                            
-                    <hr>
-                    {%endfor%}
+                </div>
+
+                <hr>
+                {%endfor%}
 
 
-            </div> 
+            </div>
             <div class="total-responsive">
 
-            <div class="row">
-                <div class="col-sm-3 shadow p-3 mb-5 bg-white rounded">
-                    <div class=" col-md-12 subtitle">
-                        Costo Total Antes de IVA
-                    </div>
-                    <div class=" col-md-12 title" style="line-height: 48px;">
-                        $ <span id="" class="price_total">{{order.total_format | replace(",", ".")}}</span>
-                    </div>
-                    <div class=" col-md-12 subtitle">
-                        COP
+                <div class="row">
+                    <div class="col-sm-3 shadow p-3 mb-5 bg-white rounded">
+                        <div class=" col-md-12 subtitle">
+                            Costo Total Antes de IVA
+                        </div>
+                        <div class=" col-md-12 title" style="line-height: 48px;">
+                            $ <span id="" class="price_total">{{order.total_format | replace(",", ".")}}</span>
+                        </div>
+                        <div class=" col-md-12 subtitle">
+                            COP
+                        </div>
                     </div>
                 </div>
             </div>
+
         </div>
-
-        </div> 
-    {%else%}
-    <div class="col-sm-12">    
-        <div class="alert alert-danger text-center" role="alert">
-            Debido a que el producto fue desabilitado la orden ha Sido eliminada
-        </div>
-    </div>
-    {%endif%}
-</div>
-
-
-<div class="modal" data-backdrop="static" data-keyboard="false"  id="confirm-modal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-
-        <div class="modal-body">
-            <div class="row">
-                <div class="col-sm-5">
-                    <img src="/assets/qp_phonix_front/img/modal_flower.png" alt="">
-                </div>
-                <div class="col-sm-7">
-                    <div class="row">
-                        <div class="col-sm-12 modal-title">
-                            <p>Gracias Por su orden</p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col sm-12 modal-message">
-                            <p>In the selected time you can enjoy the best products</p>
-                        </div>                
-                        
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <a href="/order/index" style="width: 100%; " class="btn button-master button-back">
-                                {{ _("BACK TO ORDERS") }}
-                            </a> 
-                        </div>
-                    </div>
-                    <div class="row" style="margin-top: 10px;">
-                        <div class="col-sm-6">
-                            <a href = "/order/new_type" style="width: 100%;" class="btn button-master button-default">
-                                {{ _("NEW ORDER") }}
-                            </a>
-                        </div>
-                        
-                    </div>
-                </div>
-                
+        {%else%}
+        <div class="col-sm-12">
+            <div class="alert alert-danger text-center" role="alert">
+                Debido a que el producto fue desabilitado la orden ha Sido eliminada
             </div>
-          
         </div>
-     
-      </div>
+        {%endif%}
     </div>
-  </div>
-{% endblock %}
 
 
+    <div class="modal" data-backdrop="static" data-keyboard="false" id="confirm-modal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-5">
+                            <img src="/assets/qp_phonix_front/img/modal_flower.png" alt="">
+                        </div>
+                        <div class="col-sm-7">
+                            <div class="row">
+                                <div class="col-sm-12 modal-title">
+                                    <p>Gracias Por su orden</p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col sm-12 modal-message">
+                                    <p>In the selected time you can enjoy the best products</p>
+                                </div>
+
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <a href="/order/index" style="width: 100%; " class="btn button-master button-back">
+                                        {{ _("BACK TO ORDERS") }}
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="row" style="margin-top: 10px;">
+                                <div class="col-sm-6">
+                                    <a href="/order/new_type" style="width: 100%;"
+                                        class="btn button-master button-default">
+                                        {{ _("NEW ORDER") }}
+                                    </a>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+    {% endblock %}
