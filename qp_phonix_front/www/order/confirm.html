@@ -254,10 +254,10 @@ Orden
                         Costo Total Antes de IVA
                     </div>
                     <div class=" col-md-12 title" style="line-height: 48px;">
-                        $ <span id="" class="price_total ">{{order.total_format | replace(",", ".")}}</span>
+                        {{order.currency_symbol}} <span id="" class="price_total ">{{order.total_format | replace(",", ".")}}</span>
                     </div>
                     <div class=" col-md-12 subtitle">
-                        COP
+                        {{order.currency}}
                     </div>
                 </div>
             </div>
@@ -405,14 +405,14 @@ Orden
                             <div class="col-sm-2">
                                 <div class="description-label">Precio</div>
                                 <div class="background-info information_label ">
-                                    $ <span id="price-{{item.item_code | replace(':','-')}}">{{item.price_format |
+                                    {{order.currency_symbol}} <span id="price-{{item.item_code | replace(':','-')}}">{{item.price_format |
                                         replace(",", ".")}}</span>
                                 </div>
                             </div>
                             <div class="col-sm-2">
                                 <div class="description-label">Total</div>
                                 <div class="background-info information_label ">
-                                    $ <span id="total-{{item.item_code | replace(':','-')}}">{{item.total_format |
+                                    {{order.currency_symbol}} <span id="total-{{item.item_code | replace(':','-')}}">{{item.total_format |
                                         replace(",", ".")}}</span>
                                 </div>
                             </div>

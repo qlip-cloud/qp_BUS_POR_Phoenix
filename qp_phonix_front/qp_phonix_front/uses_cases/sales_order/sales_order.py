@@ -11,8 +11,9 @@ from qp_phonix_front.qp_phonix_front.uses_cases.item_list.item_list import get_a
 from qp_phonix_front.qp_phonix_front.uses_cases.check_out_art.check_out_art import send_check_out_so
 from qp_phonix_front.qp_phonix_front.uses_cases.gp_service.gp_service import send_sales_order
 from qp_phonix_front.qp_phonix_front.uses_cases.item_list.item_list import __get_uom_list
-
+from gp_phonix_integration.gp_phonix_integration.service.utils import get_price_list
 SHIPPING_DEFAULT = 'N/S'
+
 DATE_DELIVERY_FORMAT_FIELD = "%Y-%m-%d"
 DATE_DELIVERY_FORMAT = "%W %Y-%m-%d"
 MSG_ERROR = _("Existe un error en el proceso, por favor contacte al administrador")
@@ -132,11 +133,15 @@ def get_sales_order(sales_order):
                 IF(shipping_type.description IS NULL or shipping_type.description = '', shipping_type.name,  shipping_type.description) as shipping_description,
                 DATE_FORMAT(so.delivery_date, '%s') as shipping_date, DATE_FORMAT(so.delivery_date, '%s') as shipping_date_format,
                 so.net_total,
-                format(so.net_total,0) as total_format
+                format(so.net_total,0) as total_format,
+                currency.name as currency,
+                currency.symbol as currency_symbol
             from `tabSales Order` as so
             inner join `tabSales Order Item` as so_items on so.name = so_items.parent
             inner join tabItem as item on item.name = so_items.item_code
             inner join tabAddress as addr on so.customer_address = addr.name
+            inner join `tabPrice List` as price_list on so.selling_price_list = price_list.name
+            inner join `tabCurrency` as currency on price_list.currency = currency.name
             left join tabqp_GP_ShippingType as shipping_type on shipping_type.name = so.qp_shipping_type
             where so.customer = '%s' and so.name = '%s'
             order by so_items.qp_phoenix_status asc, so_items.item_code, so_items.description
@@ -166,10 +171,14 @@ def get_sales_order(sales_order):
                 so_items.delivery_date_visible,
                 ROUND(net_amount,2) as total,
                 format(net_amount,0) as total_format,
-                so_items.description
+                so_items.description,
+                currency.name as currency,
+                currency.symbol as currency_symbol
                 from `tabSales Order` as so
                 inner join `tabSales Order Item` as so_items on so.name = so_items.parent
                 inner join tabItem as item on item.name = so_items.item_code
+                inner join `tabPrice List` as price_list on so.selling_price_list = price_list.name
+                inner join `tabCurrency` as currency on price_list.currency = currency.name
                 where so.customer = '%s' and so.name = '%s'
                 order by so_items.qp_phoenix_status asc , so_items.delivery_date desc,so_items.item_code, so_items.description, so_items.delivery_date desc
             """ % (URL_IMG_EMPTY, customer.name, sales_order)
@@ -581,12 +590,14 @@ def __get_body(json_data):
 
     customer = __get_customer()
 
+    price_list = get_price_list(customer)
+
     obj_data = {
         "customer": customer.name,
         
         "delivery_date": today(),
         "items": json_data.get('items'),
-        "items": json_data.get('items'),
+        "selling_price_list": price_list,
         "doctype": "Sales Order"    }
 
     if json_data.get('shipping_type'):
