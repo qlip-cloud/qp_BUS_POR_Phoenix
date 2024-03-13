@@ -77,9 +77,12 @@ def get_coupon(code):
 
 def redeem_coupon(coupon, order, coupon_log):
 
-    if coupon.items_group:
+    if coupon.levels_group:
 
-        redeem_coupon_item(coupon, order, coupon_log) 
+        redeem_coupon_level_group(coupon, order, coupon_log)
+    #if coupon.items_group:
+
+        #redeem_coupon_item(coupon, order, coupon_log) 
 
     redeem_coupon_subtotal(coupon, order)
 
@@ -88,6 +91,35 @@ def redeem_coupon_subtotal(coupon, order):
 
     order.additional_discount_percentage += coupon.percentage
 
+def redeem_coupon_level_group(coupon, order, coupon_log):
+
+    count = 0
+    
+    for key, item in enumerate(order.items):
+        
+        search_levels_group = list(filter(lambda x: item.qp_phonix_class ==  x.level_group, coupon.levels_group))
+
+        if search_levels_group:
+            
+            count += 1
+            #si no hay productos lanza error
+            coupon_log.append("coupon_items", {
+                "item_code": item.get('item_code'),
+                "discount_old": item.discount_percentage,
+                "rate_old": item.rate,
+                "discount_new": coupon.percentage,
+                "qty": item.get('qty')
+            })
+
+            order.append('items', {
+                    'item_code': item.get('item_code'),
+                    'qty': item.get('qty'),
+                    'discount_percentage': item.discount_percentage + coupon.percentage
+                    
+                })
+            
+            del order.items[key]
+##-------------------- refactor optional-------------------------
 def redeem_coupon_item(coupon, order, coupon_log):
 
     count = 0
@@ -116,7 +148,8 @@ def redeem_coupon_item(coupon, order, coupon_log):
                 })
             
             del order.items[key]
-    
+#-----------------------------------------------------------------
+            
 def create_coupon(coupon, customer, user,now, order_id):
     
     coupon_log = frappe.get_doc(doctype = "qp_pf_CouponLog", coupon = coupon.name, customer = customer.name, user = user, creation_date = now, 

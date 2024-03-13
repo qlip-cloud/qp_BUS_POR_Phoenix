@@ -20,6 +20,7 @@
   "ssusers",
   "customers",
   "items_group",
+  "levels_group",
   "is_active"
  ],
  "fields": [
@@ -104,13 +105,20 @@
   {
    "fieldname": "items_group",
    "fieldtype": "Table",
+   "hidden": 1,
    "label": "Items Group",
    "options": "qp_pf_CouponItemGroup"
+  },
+  {
+   "fieldname": "levels_group",
+   "fieldtype": "Table",
+   "label": "Levels Group",
+   "options": "qp_pf_CouponLevelGroup"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-03-06 09:20:48.576104",
+ "modified": "2024-03-13 12:17:06.481494",
  "modified_by": "Administrator",
  "module": "Qp Phonix Front",
  "name": "qp_pf_Coupon",
