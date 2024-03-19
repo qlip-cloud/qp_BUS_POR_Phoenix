@@ -82,8 +82,7 @@ def __get_master_setup(company):
 
 
 def __prepare_petition(master_name, sales_order):
-
-    payment_entry = frappe.get_doc("Payment Entry", "ACC-PAY-2024-00001")
+    
     so_json = {}
 
     so_obj = frappe.get_doc("Sales Order", sales_order)
