@@ -21,6 +21,7 @@
   "customers",
   "items_group",
   "levels_group",
+  "items",
   "is_active"
  ],
  "fields": [
@@ -114,11 +115,17 @@
    "fieldtype": "Table",
    "label": "Levels Group",
    "options": "qp_pf_CouponLevelGroup"
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "label": "Items",
+   "options": "qp_pf_CouponItems"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-03-13 12:17:06.481494",
+ "modified": "2024-04-11 10:23:37.386618",
  "modified_by": "Administrator",
  "module": "Qp Phonix Front",
  "name": "qp_pf_Coupon",

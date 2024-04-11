@@ -29,7 +29,7 @@ def handler(code, order_id):
 
         assert_coupon_has_customer_valid(coupon, customer)
 
-        assert_coupon_isnot_customer_repeat(coupon, customer)
+        #assert_coupon_isnot_customer_repeat(coupon, customer)
         
         coupon_log = create_coupon(coupon, customer, user,now, order_id)
 
@@ -79,37 +79,53 @@ def redeem_coupon(coupon, order, coupon_log):
 
     if coupon.levels_group:
 
-        redeem_coupon_level_group(coupon, order, coupon_log)
-    #if coupon.items_group:
+        return redeem_coupon_level_group(coupon, order, coupon_log)
 
-        #redeem_coupon_item(coupon, order, coupon_log) 
+    if coupon.items:
+
+        return redeem_coupon_items(coupon, order, coupon_log)
 
     redeem_coupon_subtotal(coupon, order)
 
+    #if coupon.items_group:
 
+        #redeem_coupon_item(coupon, order, coupon_log) 
 def redeem_coupon_subtotal(coupon, order):
 
     order.additional_discount_percentage += coupon.percentage
 
 def redeem_coupon_level_group(coupon, order, coupon_log):
 
-    count = 0
-    
-    for key, item in enumerate(order.items):
-        
-        search_levels_group = list(filter(lambda x: item.qp_phonix_class ==  x.level_group, coupon.levels_group))
+    def callback(item):
 
-        if search_levels_group:
+        return any(filter(lambda x: item.qp_phonix_class ==  x.level_group, coupon.levels_group))
+
+    setup_coupon_log(coupon, order, coupon_log, callback)      
+
+def redeem_coupon_items(coupon, order, coupon_log):
+
+    def callback(item):
+
+        return any(filter(lambda x: item.item_code ==  x.item, coupon.items))
+
+    setup_coupon_log(coupon, order, coupon_log, callback)               
+
+
+def setup_coupon_log(coupon, order, coupon_log, callback):
+
+    for key, item in enumerate(order.items):
+
+        is_redeemable = callback(item)
+
+        if is_redeemable:
             
-            count += 1
-            #si no hay productos lanza error
             coupon_log.append("coupon_items", {
-                "item_code": item.get('item_code'),
-                "discount_old": item.discount_percentage,
-                "rate_old": item.rate,
-                "discount_new": coupon.percentage,
-                "qty": item.get('qty')
-            })
+                        "item_code": item.get('item_code'),
+                        "discount_old": item.discount_percentage,
+                        "rate_old": item.rate,
+                        "discount_new": coupon.percentage,
+                        "qty": item.get('qty')
+                    })
 
             order.append('items', {
                     'item_code': item.get('item_code'),
@@ -119,6 +135,7 @@ def redeem_coupon_level_group(coupon, order, coupon_log):
                 })
             
             del order.items[key]
+
 ##-------------------- refactor optional-------------------------
 def redeem_coupon_item(coupon, order, coupon_log):
 
