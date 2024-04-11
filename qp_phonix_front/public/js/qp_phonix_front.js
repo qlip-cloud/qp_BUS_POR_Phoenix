@@ -381,11 +381,13 @@ function update_order(redirect_link = null, valid_empty = false, action = "updat
         url = "sales_order_update";
 
         order_id = $("#order_id").val()
-
-        save_order(url, redirect_link, action, valid_empty, order_id, is_return, is_async)
+        
+        sales_persons = $("#sales_persons").val()
+        
+        save_order(url, redirect_link, action, valid_empty, order_id, is_return, is_async, sales_persons)
 }
 
-function save_order(url, redirect_link, action = null, valid_empty = true, order_id = null, is_return = false, is_async = false){
+function save_order(url, redirect_link, action = null, valid_empty = true, order_id = null, is_return = false, is_async = false, sales_person = None){
 
         let base_url = "qp_phonix_front.qp_phonix_front.uses_cases.sales_order.sales_order"
 
@@ -462,6 +464,7 @@ function save_order(url, redirect_link, action = null, valid_empty = true, order
                         ,items
                         , order_id
                         , action
+                        , sales_person
                 }
         }
         

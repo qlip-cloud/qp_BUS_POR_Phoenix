@@ -4,7 +4,7 @@ from qp_phonix_front.qp_phonix_front.uses_cases.shipping_method.shipping_method_
 from qp_phonix_front.qp_phonix_front.uses_cases.item_list.item_list import vf_item_list, get_item_list
 from qp_phonix_front.qp_phonix_front.uses_cases.sales_order.sales_order import get_sales_order
 from gp_phonix_integration.gp_phonix_integration.use_case.get_item_inventary import handler as get_item_inventary
-
+import frappe
 def set_items_data(context, item_group_select, item_code_list = None, items_select = [], idlevel = None):
 
     product_response = vf_item_list(item_group =item_group_select, item_code_list = item_code_list, idlevel = idlevel)
@@ -102,6 +102,10 @@ def set_order_data(context, order_id):
     context.order = order_response.get("order")
 
     context.items_select = order_response.get("items")
+
+    order = frappe.get_doc("Sales Order", order_id)
+    
+    context.sales_team = order.sales_team[0] if order.sales_team else None
 
 def get_order_item_list(item_code_list):
 

@@ -1,7 +1,15 @@
 $(document).ready(function() {
+
+    $("#enable_sales_persons").on("click", function(){
+        
+        $("#sales_persons").prop("disabled", !$(this).is(":checked"))
+        
+    })
     
     sessionStorage.removeItem("order_id")
+
     $(".delecte_group").prop('checked', false);
+    
     $(".quantity").bind('blur mouseup', function () {
         
         value = $(this).val()

@@ -395,6 +395,15 @@ def sales_order_update(order_json):
 
         item_delete_list = list(set(items_so).difference(set(items_upd)))
 
+
+        if (order_json.get("sales_person")):
+
+            qdoc.append('sales_team', {
+                "sales_person": order_json.get("sales_person"),
+                "allocated_percentage": 100
+            })
+
+
         for item in order_item_json:
 
             if item.get('item_code') in item_update_list:

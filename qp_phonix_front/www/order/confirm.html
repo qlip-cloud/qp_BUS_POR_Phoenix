@@ -194,6 +194,31 @@ Orden
                     id="qp_phoenix_order_customer" value={{order.qp_phoenix_order_customer if
                     order.qp_phoenix_order_customer else "" }}>
             </div>
+            <div class="row shadow p-3 mb-5 bg-white rounded">
+
+                {% if order.status != 'Draft' %}
+
+                <div class="col-md-12 label">
+                    Vendedor
+                </div>
+                <div class="col-md-12 info background-info information_label">
+                    {{sales_team.sales_person}} 
+                </div>
+                {% else %}
+                <div class="col-md-12 label">
+                    <input type="checkbox" class="" name="" id='enable_sales_persons'> Habilitar Vendedores
+                </div>
+                <select name="" id="sales_persons" class="form-control" disabled>
+                    <option value="">Vendedores</option>
+                    {% for sales_person in sales_persons%}
+                    <option value="{{sales_person.name}}" data-gp_code="{{sales_person.gp_code}}" 
+                    {{ 'selected' if sales_team and sales_team.sales_person == sales_person.name else '' }}>
+                        
+                        {{sales_person.gp_code}} - {{sales_person.sales_person_name}}</option>
+                    {% endfor %}
+                </select>
+                {% endif %}
+            </div>
         </div>
 
         <div class="col-sm-9 ">
@@ -254,7 +279,8 @@ Orden
                         Costo Total Antes de IVA
                     </div>
                     <div class=" col-md-12 title" style="line-height: 48px;">
-                        {{order.currency_symbol}} <span id="" class="price_total ">{{order.total_format | replace(",", ".")}}</span>
+                        {{order.currency_symbol}} <span id="" class="price_total ">{{order.total_format | replace(",",
+                            ".")}}</span>
                     </div>
                     <div class=" col-md-12 subtitle">
                         {{order.currency}}
@@ -405,14 +431,16 @@ Orden
                             <div class="col-sm-2">
                                 <div class="description-label">Precio</div>
                                 <div class="background-info information_label ">
-                                    {{order.currency_symbol}} <span id="price-{{item.item_code | replace(':','-')}}">{{item.price_format |
+                                    {{order.currency_symbol}} <span
+                                        id="price-{{item.item_code | replace(':','-')}}">{{item.price_format |
                                         replace(",", ".")}}</span>
                                 </div>
                             </div>
                             <div class="col-sm-2">
                                 <div class="description-label">Total</div>
                                 <div class="background-info information_label ">
-                                    {{order.currency_symbol}} <span id="total-{{item.item_code | replace(':','-')}}">{{item.total_format |
+                                    {{order.currency_symbol}} <span
+                                        id="total-{{item.item_code | replace(':','-')}}">{{item.total_format |
                                         replace(",", ".")}}</span>
                                 </div>
                             </div>

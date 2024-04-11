@@ -41,6 +41,8 @@ def get_context(context):
             set_coupon_data(context, order_id)     
 
         set_has_sync(context)
+
+        set_sales_persons(context)
         
     try_catch(callback, context)
 
@@ -102,6 +104,10 @@ def set_has_sync(context):
     result =  frappe.db.sql(sql, as_dict=1)
 
     context.has_sync = result[0]["qp_phonix_has_sync"]
+
+def set_sales_persons(context):
+    
+    context.sales_persons = frappe.get_list("Sales Person", filters = {"is_group": False, "enabled": True}, fields = ["name", "sales_person_name", "gp_code"])
 
 def set_coupon_data(context, order_id):
 
