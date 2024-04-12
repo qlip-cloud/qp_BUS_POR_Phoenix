@@ -90,7 +90,7 @@ def set_permission(role):
     elif role == "Especificador Externo":
         
         permission.update({
-            "price_format": True,
+        "price_format": True,
             "discountpercentage": True,
             "price_discount_format": True,
             "quantity": True,
@@ -98,6 +98,17 @@ def set_permission(role):
             "inqt": True,
             "button_confirm": True
         })
+    elif role == "Ventas Externas Disponibilidad":
+
+        permission.update({
+            "quantity": True,
+            "stock_uom": True,
+            "inqt": True,
+            "stock_uom": True,
+            "sku": True,
+            "button_confirm": True
+        })
+
     else:
         frappe.throw("Este usuario no tiene un rol valido")
     
