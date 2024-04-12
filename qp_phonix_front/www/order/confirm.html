@@ -85,11 +85,12 @@ Orden
             color: #666A65;
             opacity: 1;
             margin-bottom: 10px;
+            margin-left: 11%;
 
         }
 
         .modal-title {
-            text-align: left;
+            text-align: center;
             font: normal normal bold 30px/82px Montserrat;
             letter-spacing: 0px;
             color: #4D6444;
@@ -202,7 +203,7 @@ Orden
                     Vendedor
                 </div>
                 <div class="col-md-12 info background-info information_label">
-                    {{sales_team.sales_person}} 
+                    {{sales_team.sales_person}}
                 </div>
                 {% else %}
                 <div class="col-md-12 label">
@@ -211,9 +212,9 @@ Orden
                 <select name="" id="sales_persons" class="form-control" disabled>
                     <option value="">Vendedores</option>
                     {% for sales_person in sales_persons%}
-                    <option value="{{sales_person.name}}" data-gp_code="{{sales_person.gp_code}}" 
-                    {{ 'selected' if sales_team and sales_team.sales_person == sales_person.name else '' }}>
-                        
+                    <option value="{{sales_person.name}}" data-gp_code="{{sales_person.gp_code}}" {{ 'selected' if
+                        sales_team and sales_team.sales_person==sales_person.name else '' }}>
+
                         {{sales_person.gp_code}} - {{sales_person.sales_person_name}}</option>
                     {% endfor %}
                 </select>
@@ -485,47 +486,46 @@ Orden
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
 
-                <div class="modal-body">
+                <div class="modal-body text-center">
                     <div class="row">
-                        <div class="col-sm-5">
-                            <img src="/assets/qp_phonix_front/img/modal_flower.png" alt="">
+                        <div class="col-sm-12">
+                            <img src="/assets/qp_phonix_front/img/logo_modal.png" alt="">
                         </div>
-                        <div class="col-sm-7">
-                            <div class="row">
-                                <div class="col-sm-12 modal-title">
-                                    <p>Gracias Por su orden</p>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col sm-12 modal-message">
-                                    <p>In the selected time you can enjoy the best products</p>
-                                </div>
-
-                            </div>
-
-                            <div class="row">
-                                <div class="col-sm-6">
-                                    <a href="/order/index" style="width: 100%; " class="btn button-master button-back">
-                                        {{ _("BACK TO ORDERS") }}
-                                    </a>
-                                </div>
-                            </div>
-                            <div class="row" style="margin-top: 10px;">
-                                <div class="col-sm-6">
-                                    <a href="/order/new_type" style="width: 100%;"
-                                        class="btn button-master button-default">
-                                        {{ _("NEW ORDER") }}
-                                    </a>
-                                </div>
-
-                            </div>
-                        </div>
-
                     </div>
+                    <div class="row text-center">
 
+                        <div class="col-sm-12 modal-title">
+                            <p>Gracias Por su orden</p>
+                        </div>
+                        <div class="col sm-12 modal-message">
+                            <p>Aqui pueses ver la confirmacion de tu pedido</p>
+                            <p>Estas fechas estan sujetas a cambios por parte de casa matriz</p>
+                        </div>
+                    </div>
+                    <div class="row">
+
+                        <div class="col align-self-center">
+                            <a href="/order/index" style="width: 30%; " class="btn button-master button-back">
+                                {{ _("BACK TO ORDERS") }}
+                            </a>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 10px;">
+
+                        <div class="col align-self-center">
+                            <a href="/order/new_type" style="width: 30%;" class="btn button-master button-default">
+                                {{ _("NEW ORDER") }}
+                            </a>
+                        </div>
+                    </div>
                 </div>
-
             </div>
+
         </div>
+
+    </div>
+
+    </div>
+    </div>
     </div>
     {% endblock %}
