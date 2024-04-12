@@ -27,11 +27,15 @@ def get_context(context):
 
         order_id = query_params.get("order_id")
         
+
+        test = frappe.get_doc("Sales Order", order_id)
+
+        print(test.as_json())
         get_delivery_update(order_id)
 
         count_item = get_count_update(context, order_id)
 
-        #context.shipping_method_list = vf_shipping_method_list()
+        #context.shipping_method_list = vf_shipping_method_list() 
         context.shipping_method_list = []
             
         if count_item:

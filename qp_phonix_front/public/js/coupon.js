@@ -70,10 +70,10 @@ $(document).ready(function() {
 
 function update_list_price(item_code, item){
 
-    $(`#row-${item_code}`).attr('data-price', item.rate);
+    $(`#row-${item_code}`).attr('data-price', item.net_rate);
     $(`#row-${item_code}`).attr('data-subtotal', item.net_amount);
     $(`#row-${item_code} > .subtotal`).val(item.net_amount)
-    $(`#price-${item_code}`).html(item.rate);
+    $(`#price-${item_code}`).html(item.net_rate);
     $(`#total-${item_code}`).html(item.net_amount);
     $(`#label-${item_code}`).show();
 }

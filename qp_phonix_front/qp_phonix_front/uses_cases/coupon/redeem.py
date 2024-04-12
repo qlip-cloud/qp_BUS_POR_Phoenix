@@ -29,7 +29,7 @@ def handler(code, order_id):
 
         assert_coupon_has_customer_valid(coupon, customer)
 
-        #assert_coupon_isnot_customer_repeat(coupon, customer)
+        assert_coupon_isnot_customer_repeat(coupon, customer)
         
         coupon_log = create_coupon(coupon, customer, user,now, order_id)
 
@@ -165,6 +165,7 @@ def redeem_coupon_item(coupon, order, coupon_log):
                 })
             
             del order.items[key]
+
 #-----------------------------------------------------------------
             
 def create_coupon(coupon, customer, user,now, order_id):

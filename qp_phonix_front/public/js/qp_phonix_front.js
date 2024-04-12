@@ -387,7 +387,7 @@ function update_order(redirect_link = null, valid_empty = false, action = "updat
         save_order(url, redirect_link, action, valid_empty, order_id, is_return, is_async, sales_persons)
 }
 
-function save_order(url, redirect_link, action = null, valid_empty = true, order_id = null, is_return = false, is_async = false, sales_person = None){
+function save_order(url, redirect_link, action = null, valid_empty = true, order_id = null, is_return = false, is_async = false, sales_person = null){
 
         let base_url = "qp_phonix_front.qp_phonix_front.uses_cases.sales_order.sales_order"
 

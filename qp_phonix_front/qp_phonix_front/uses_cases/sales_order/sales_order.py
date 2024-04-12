@@ -400,7 +400,10 @@ def sales_order_update(order_json):
 
             qdoc.append('sales_team', {
                 "sales_person": order_json.get("sales_person"),
-                "allocated_percentage": 100
+                "allocated_percentage": 100,
+                "allocated_amount": qdoc.base_total,
+                "incentives": 0
+                
             })
 
 
