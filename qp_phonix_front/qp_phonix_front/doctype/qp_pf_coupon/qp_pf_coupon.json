@@ -43,7 +43,8 @@
   {
    "fieldname": "end_date",
    "fieldtype": "Datetime",
-   "label": "Fecha final"
+   "label": "Fecha final",
+   "reqd": 1
   },
   {
    "fieldname": "percentage",
@@ -125,7 +126,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-04-11 10:23:37.386618",
+ "modified": "2024-04-19 10:18:15.410848",
  "modified_by": "Administrator",
  "module": "Qp Phonix Front",
  "name": "qp_pf_Coupon",
