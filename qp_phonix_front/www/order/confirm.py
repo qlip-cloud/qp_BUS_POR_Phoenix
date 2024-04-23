@@ -27,10 +27,6 @@ def get_context(context):
 
         order_id = query_params.get("order_id")
         
-
-        test = frappe.get_doc("Sales Order", order_id)
-
-        print(test.as_json())
         get_delivery_update(order_id)
 
         count_item = get_count_update(context, order_id)
@@ -62,20 +58,21 @@ def get_delivery_update(order_id):
 
         so_respose = execute_send(company_name=company, endpoint_code=ORDER, json_data=payload)
 
-
-        for item in sale_order.items:
+        if not so_respose.get("ReturnCode") == "FAILED":
             
-            for line in so_respose.get("ReturnJson").get("Lines"):
+            for item in sale_order.items:
                 
-                if line.get("Id") == item.item_code and line.get("LineNumber") == item.line_number and (item.delivery_date != getdate(line.get("RequestDate")) or item.qp_phoenix_status != getdate(line.get("Status"))):
+                for line in so_respose.get("ReturnJson").get("Lines"):
+                    
+                    if line.get("Id") == item.item_code and line.get("LineNumber") == item.line_number and (item.delivery_date != getdate(line.get("RequestDate")) or item.qp_phoenix_status != getdate(line.get("Status"))):
 
-                    item.delivery_date = getdate(line.get("RequestDate")) if line.get("RequestDate") != '1900-01-01' else today()
+                        item.delivery_date = getdate(line.get("RequestDate")) if line.get("RequestDate") != '1900-01-01' else today()
 
-                    item.qp_phoenix_status = line.get("Status")
+                        item.qp_phoenix_status = line.get("Status")
 
-                    item.delivery_date_visible = True if line.get("RequestDate") != '1900-01-01' else False
+                        item.delivery_date_visible = True if line.get("RequestDate") != '1900-01-01' else False
 
-                    item.save()
+                        item.save()
 
 def get_count_update(context, order_id):
 

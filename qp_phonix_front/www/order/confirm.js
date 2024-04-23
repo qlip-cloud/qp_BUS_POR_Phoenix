@@ -27,7 +27,10 @@ $(document).ready(function() {
 
         order_id = $("#order_id").val()
 
-        window.location.href = `/order/item_formulary?order_id=${order_id}`
+        redirect_link=`/order/item_formulary?order_id=${order_id}`
+
+        redirect(redirect_link)
+
     })
     
     $("#selected_delete").click( function(){

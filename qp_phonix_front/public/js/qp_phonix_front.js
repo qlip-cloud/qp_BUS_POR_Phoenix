@@ -14,7 +14,9 @@ $(document).ready(function() {
 
                 const order_id = sessionStorage.getItem("order_id")
 
-                window.location.href = `/order/item_formulary?order_id=${order_id}`
+                redirect_link=`/order/item_formulary?order_id=${order_id}`
+
+                redirect(redirect_link)
 
                 sessionStorage.removeItem("order_id")
         }
@@ -117,6 +119,14 @@ $(document).ready(function() {
         })
 
         total_update()
+
+        $(".btn-redirect").on("click",function(){
+
+                redirect_link = $(this).data("url")
+                
+                redirect(redirect_link)
+        
+            })
 
 })
 
@@ -596,7 +606,11 @@ $("#undo").click(()=>{
 
 function redirect(redirect_link){
         
-        window.location.href = redirect_link
+        division = redirect_link.includes('?') ? "&" : "?";
+
+        const uniqueTimestamp = new Date().getTime();
+
+        window.location.href = `${redirect_link}${division}control=${uniqueTimestamp}`;
 }
 
 function get_shipping_calendar(shipping_method){

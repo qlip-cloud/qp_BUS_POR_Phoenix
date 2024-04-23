@@ -8,21 +8,21 @@ Orden
 
 {% block button_title %}
 
-<a id="btn_edit_export"
-    href="/api/method/qp_phonix_front.qp_phonix_front.uses_cases.export.order_xlsx.export_xlsx?order_id={{order.so_name}}"
-    target="_blank" class="btn button-master button-default">
+<span id="btn_edit_export"
+    data-url="/api/method/qp_phonix_front.qp_phonix_front.uses_cases.export.order_xlsx.export_xlsx?order_id={{order.so_name}}"
+    class="btn button-master button-default btn-redirect">
     {{ _("EXPORTAR") }}
-</a>
+</span>
 {%if has_sync %}
 
-<a href="/order/index" class="btn button-master button-back">
+<span data-url="/order/index" class="btn button-master button-back  btn-redirect">
     {{ _("VOLVER A ORDENES") }}
     {% else %}
-    <a href="/order/item_formulary" class="btn button-master button-back">
+        <span data-url ="/order/item_formulary" class="btn button-master button-back btn-redirect">
         {{ _("VOLVER A CONSULTAR ARTÍCULOS") }}
-        {%endif%}
+    {%endif%}
 
-    </a>
+</span>
     {%if order.status == "Draft"%}
 
     {#if is_valid and order.status_code == 0#}
@@ -203,7 +203,7 @@ Orden
                     Vendedor
                 </div>
                 <div class="col-md-12 info background-info information_label">
-                    {{sales_team.sales_person}}
+                    {{sales_team.sales_person or ''}}
                 </div>
                 {% else %}
                 <div class="col-md-12 label">

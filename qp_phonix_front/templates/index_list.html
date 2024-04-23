@@ -35,7 +35,7 @@
     <div class="col-sm-10">
         <div class="row">
             <div class="col-sm-6">
-                <a href="/order/confirm?order_id={{order.so_name}}" class="order_id"> Order #{{order.so_name}} </a>
+                <span data-url="/order/confirm?order_id={{order.so_name}}" class="order_id btn-redirect"> Order #{{order.so_name}} </span>
             </div>
             <div class="col-sm-6">
                 <li class="{{'Draft' if order.status == 'Draft' else 'Delivery' }}">{{statues[order.status]}}</li>
