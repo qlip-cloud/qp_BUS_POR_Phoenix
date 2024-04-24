@@ -6,9 +6,12 @@
     {% endblock %}
 
     {% block button_title %}
-        <a href="/order/item_formulary" class="btn button-master button-new button-default">
+        <span data-url="/api/method/qp_phonix_front.www.order.index.export" target="_blank" class="btn button-master button-new button-default tab-section tab-all btn-redirect" style="display:none;">
+            {{ _("Exportar") }}
+        </span> 
+        <span data-url="/order/item_formulary" class="btn button-master button-new button-default btn-redirect">
             {{ _("Nueva Orden") }}
-        </a>              
+        </span>              
     {% endblock %}
 
 

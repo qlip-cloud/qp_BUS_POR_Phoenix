@@ -1,0 +1,163 @@
+{
+ "actions": [],
+ "autoname": "field:code",
+ "creation": "2024-02-28 12:45:34.174792",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "code",
+  "sscode",
+  "title",
+  "sccode",
+  "percentage",
+  "ssstart_date",
+  "start_date",
+  "min_amount",
+  "scstart_date",
+  "end_date",
+  "limit",
+  "ssusers",
+  "customers",
+  "items_group",
+  "levels_group",
+  "items",
+  "is_active"
+ ],
+ "fields": [
+  {
+   "fieldname": "code",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Codigo",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "start_date",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Fecha de inicio",
+   "reqd": 1
+  },
+  {
+   "fieldname": "end_date",
+   "fieldtype": "Datetime",
+   "label": "Fecha final",
+   "reqd": 1
+  },
+  {
+   "fieldname": "percentage",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Porcentaje",
+   "reqd": 1
+  },
+  {
+   "fieldname": "limit",
+   "fieldtype": "Int",
+   "label": "Limite de canje"
+  },
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Titulo",
+   "reqd": 1
+  },
+  {
+   "default": "1",
+   "fieldname": "is_active",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Activo"
+  },
+  {
+   "fieldname": "sscode",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "sccode",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "ssstart_date",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "scstart_date",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "ssusers",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "customers",
+   "fieldtype": "Table",
+   "label": "Clientes",
+   "options": "qp_pf_CouponCustomer"
+  },
+  {
+   "fieldname": "min_amount",
+   "fieldtype": "Float",
+   "label": "Monto Minimo",
+   "precision": "2"
+  },
+  {
+   "fieldname": "items_group",
+   "fieldtype": "Table",
+   "hidden": 1,
+   "label": "Items Group",
+   "options": "qp_pf_CouponItemGroup"
+  },
+  {
+   "fieldname": "levels_group",
+   "fieldtype": "Table",
+   "label": "Levels Group",
+   "options": "qp_pf_CouponLevelGroup"
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "label": "Items",
+   "options": "qp_pf_CouponItems"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-04-19 10:18:15.410848",
+ "modified_by": "Administrator",
+ "module": "Qp Phonix Front",
+ "name": "qp_pf_Coupon",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "All",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

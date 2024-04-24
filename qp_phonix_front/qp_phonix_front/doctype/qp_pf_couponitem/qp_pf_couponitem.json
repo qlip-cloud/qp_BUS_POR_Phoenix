@@ -1,0 +1,63 @@
+{
+ "actions": [],
+ "creation": "2024-03-05 11:23:24.250149",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "item_code",
+  "rate_old",
+  "rate_new",
+  "discount_old",
+  "discount_new",
+  "qty"
+ ],
+ "fields": [
+  {
+   "default": "1",
+   "fieldname": "rate_old",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "rate_old"
+  },
+  {
+   "fieldname": "rate_new",
+   "fieldtype": "Float",
+   "label": "rate_new"
+  },
+  {
+   "fieldname": "discount_old",
+   "fieldtype": "Float",
+   "label": "discount_old"
+  },
+  {
+   "fieldname": "discount_new",
+   "fieldtype": "Float",
+   "label": "discount_new"
+  },
+  {
+   "fieldname": "qty",
+   "fieldtype": "Int",
+   "label": "qty"
+  },
+  {
+   "fieldname": "item_code",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "item_code",
+   "options": "Item"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2024-03-05 13:24:15.749863",
+ "modified_by": "Administrator",
+ "module": "Qp Phonix Front",
+ "name": "qp_pf_CouponItem",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

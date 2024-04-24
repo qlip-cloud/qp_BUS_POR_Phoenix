@@ -3,6 +3,8 @@ import json
 from gp_phonix_integration.gp_phonix_integration.use_case.get_item_inventary import handler as get_item_inventary
 from gp_phonix_integration.gp_phonix_integration.constant.api_setup import QUANTITY_ITEM
 from gp_phonix_integration.gp_phonix_integration.service.connection import execute_send
+from qp_phonix_front.qp_phonix_front.uses_cases.shipping_method.shipping_method_list import __get_customer
+from gp_phonix_integration.gp_phonix_integration.service.utils import get_price_list
 
 URL_IMG_EMPTY = "/assets/qlip_bussines_theme/images/company_default_logo.jpg"
 
@@ -241,9 +243,19 @@ def get_filter_option(option, price_list):
             INNER JOIN
                 `tabItem Price` as price
             ON
-                prod.name = price.item_code and price.price_list = '{price_list}'
+                prod.name = price.item_code
+                 
+            INNER JOIN
+                `tabPrice List` as price_list
+            ON
+                price.price_list = price_list.name
+            INNER JOIN
+                `tabCurrency` as currency
+            ON
+                currency.name = price_list.currency
         WHERE
-            fGroup.idx = 1
+            fGroup.idx = 1 and
+            price_list.name = '{price_list}'
     ORDER BY prod.item_group, att.value
     """.format(option = option, price_list = price_list)
     
@@ -274,11 +286,22 @@ def get_filter_SubCategoria_option(price_list):
         ON
             fGroup.parent = iGroup.name and fGroup.parentfield = 'item_group_filter' and fGroup.item_attribute = att.attribute
         INNER JOIN
-            `tabItem Price` as price
-        ON
-            prod.name = price.item_code and price.price_list = '{price_list}'
+                `tabItem Price` as price
+            ON
+                prod.name = price.item_code
+                 
+            INNER JOIN
+                `tabPrice List` as price_list
+            ON
+                price.price_list = price_list.name
+            INNER JOIN
+                `tabCurrency` as currency
+            ON
+                currency.name = price_list.currency
         WHERE
-            fGroup.idx = 2
+            fGroup.idx = 2 and
+            price_list.name = '{price_list}'
+
         GROUP BY  prod.item_group, prod.name
         order by att.value
     """.format(price_list = price_list)
@@ -331,9 +354,20 @@ def get_filter_SubCategoria_option(price_list):
                                             fGroup.parent = iGroup.name and fGroup.parentfield = 'item_group_filter' and fGroup.item_attribute = att.attribute
                                         INNER JOIN
                                             `tabItem Price` as price
-                                        ON prod.name = price.item_code and price.price_list = '{price_list}'
+                                        ON
+                                            prod.name = price.item_code
+                                            
+                                        INNER JOIN
+                                            `tabPrice List` as price_list
+                                        ON
+                                            price.price_list = price_list.name
+                                        INNER JOIN
+                                            `tabCurrency` as currency
+                                        ON
+                                            currency.name = price_list.currency
                                         WHERE
                                             fGroup.idx = 1
+                                            and price_list.name = '{price_list}'
                                 ) as tbl_Categoria
                             ON tbl_SubCategoria.product_name = tbl_Categoria.parent
                         ) as tbl_ppal
@@ -506,14 +540,17 @@ def get_from_base(idlevel, cond_t = None, has_inventary = False):
     return """
         tabItem as prod
         {}
-        inner join `tabItem Price` as price on prod.name = price.item_code
+        INNER JOIN `tabItem Price` as price ON prod.name = price.item_code
+        INNER JOIN `tabPrice List` as price_list ON price.price_list = price_list.name
+        INNER JOIN `tabCurrency` as currency ON currency.name = price_list.currency
         {}
         left join `tabqp_GP_Level` as gp_level on (prod.qp_price_group = gp_level.group_type and gp_level.idlevel = '{}')
     """.format(item_quantity_inner,class_condition, idlevel)
 
 def get_where_base():
 
-    price_list = frappe.db.get_single_value("Selling Settings", "selling_price_list")
+    
+    price_list = get_price_list()
 
     return """
                 prod.disabled = 0
@@ -561,6 +598,8 @@ def get_tbl_product_list(item_group, from_base, where_base, item_code_list = Non
             IF(prod.image IS NULL or prod.image = '', '%s', prod.image) as image,
             price.price_list_rate as price,
             format(price.price_list_rate,0) as price_format,
+            currency.name as currency,
+            currency.symbol as currency_symbol,
             0 as cantidad,
             prod.stock_uom as stock_uom,
             prod.item_group as item_group,
@@ -568,6 +607,7 @@ def get_tbl_product_list(item_group, from_base, where_base, item_code_list = Non
             prod.qp_phoenix_shortdescription as qp_phoenix_shortdescription,
             prod.qp_phonix_class as qp_phonix_class,
             prod.qp_price_group as qp_price_group,
+            prod.description as description,
             %s
             %s
             IFNULL( gp_level.discountpercentage ,0) as discountpercentage,
@@ -688,6 +728,8 @@ def __get_select_attr_base():
             image,
             price,
             format(price,0) as price_format,
+            currency.name as currency,
+            currency.symbol as currency_symbol,
             cantidad,
             stock_uom,
             item_group,
@@ -696,6 +738,7 @@ def __get_select_attr_base():
             qp_phoenix_shortdescription,
             qp_price_group,
             discountpercentage,
+            description,
             (price - (price * discountpercentage) / 100) as price_discount,
             format((price - (price * discountpercentage) / 100),0) as price_discount_format
     """
@@ -765,6 +808,8 @@ def __get_select_attr_base_old():
             image,
             price,
             format(price,0) as price_format,
+            currency.name as currency,
+            currency.symbol as currency_symbol,
             cantidad,
             stock_uom,
             item_group,

@@ -82,7 +82,7 @@ def __get_master_setup(company):
 
 
 def __prepare_petition(master_name, sales_order):
-
+    
     so_json = {}
 
     so_obj = frappe.get_doc("Sales Order", sales_order)
@@ -106,12 +106,11 @@ def __prepare_petition(master_name, sales_order):
         """
         item_list.append(
             {
-                
-
                 "Id": item.item_code,
                 "Quantity": item.qty,
-                "Price": item.base_price_list_rate - item.discount_amount,
-                "DiscountPercentage": item.discount_percentage, #valida
+                "Price": item.base_rate if so_obj.additional_discount_percentage > 0 else item.base_net_rate,
+                #"DiscountPercentage": item.discount_percentage, #valida
+                "DiscountPercentage": 0, #valida
                 "DiscountPrice": 0, #valida
                 "Warehouse": item.item_group,
                 "ShippingMethod": None,
@@ -119,7 +118,7 @@ def __prepare_petition(master_name, sales_order):
             }
         )
 
-
+    vendor_id = frappe.db.get_value("Sales Person", so_obj.sales_team[0].sales_person,"gp_code" ) if so_obj.sales_team else ''
 
     order_id = __get_value_master(master_name, 'order_id')
 
@@ -136,6 +135,8 @@ def __prepare_petition(master_name, sales_order):
     so_json['Lot'] = ""
     so_json['Warehouse'] = item_types[0].title
     so_json['WarehousesAlter'] = bdg_alter #valida
+    so_json['DiscountAmount'] = so_obj.base_discount_amount
+    so_json['VendorId'] = vendor_id #valida
     so_json['Lines'] = item_list
     so_json['IdCustomer'] = so_obj.customer
     so_json['NameCustomer'] = so_obj.customer_name

@@ -1,0 +1,112 @@
+{
+ "actions": [],
+ "creation": "2024-02-28 15:53:53.060333",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "coupon",
+  "coupon_title",
+  "customer",
+  "customer_name",
+  "user",
+  "creation_date",
+  "order_id",
+  "discount_percentage",
+  "coupon_items"
+ ],
+ "fields": [
+  {
+   "fieldname": "coupon",
+   "fieldtype": "Link",
+   "label": "coupon",
+   "options": "qp_pf_Coupon"
+  },
+  {
+   "fetch_from": "coupon.title",
+   "fieldname": "coupon_title",
+   "fieldtype": "Read Only",
+   "in_list_view": 1,
+   "label": "coupon_title"
+  },
+  {
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "label": "customer",
+   "options": "Customer"
+  },
+  {
+   "fieldname": "user",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "user",
+   "options": "User"
+  },
+  {
+   "fieldname": "creation_date",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "creation_date"
+  },
+  {
+   "fetch_from": "customer.customer_name",
+   "fieldname": "customer_name",
+   "fieldtype": "Read Only",
+   "in_list_view": 1,
+   "label": "customer_name"
+  },
+  {
+   "fieldname": "order_id",
+   "fieldtype": "Link",
+   "label": "order_id",
+   "options": "Sales Order"
+  },
+  {
+   "fieldname": "discount_percentage",
+   "fieldtype": "Float",
+   "label": "discount_percentage"
+  },
+  {
+   "fieldname": "coupon_items",
+   "fieldtype": "Table",
+   "label": "Coupon Items",
+   "options": "qp_pf_CouponItem"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-03-06 09:20:22.769100",
+ "modified_by": "Administrator",
+ "module": "Qp Phonix Front",
+ "name": "qp_pf_CouponLog",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "All",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

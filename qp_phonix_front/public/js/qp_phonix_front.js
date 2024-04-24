@@ -14,7 +14,9 @@ $(document).ready(function() {
 
                 const order_id = sessionStorage.getItem("order_id")
 
-                window.location.href = `/order/item_formulary?order_id=${order_id}`
+                redirect_link=`/order/item_formulary?order_id=${order_id}`
+
+                redirect(redirect_link)
 
                 sessionStorage.removeItem("order_id")
         }
@@ -117,6 +119,14 @@ $(document).ready(function() {
         })
 
         total_update()
+
+        $(".btn-redirect").on("click",function(){
+
+                redirect_link = $(this).data("url")
+                
+                redirect(redirect_link)
+        
+            })
 
 })
 
@@ -381,11 +391,13 @@ function update_order(redirect_link = null, valid_empty = false, action = "updat
         url = "sales_order_update";
 
         order_id = $("#order_id").val()
-
-        save_order(url, redirect_link, action, valid_empty, order_id, is_return, is_async)
+        
+        sales_persons = $("#sales_persons").val()
+        
+        save_order(url, redirect_link, action, valid_empty, order_id, is_return, is_async, sales_persons)
 }
 
-function save_order(url, redirect_link, action = null, valid_empty = true, order_id = null, is_return = false, is_async = false){
+function save_order(url, redirect_link, action = null, valid_empty = true, order_id = null, is_return = false, is_async = false, sales_person = null){
 
         let base_url = "qp_phonix_front.qp_phonix_front.uses_cases.sales_order.sales_order"
 
@@ -404,6 +416,7 @@ function save_order(url, redirect_link, action = null, valid_empty = true, order
             let qty = parseInt($(this).find("#quantity").val())
             let quantity = parseInt($(this).find("#quantity").attr("data-quantity"))
             let quantity_dis = parseInt($(this).find("#quantity").attr("data-quantity_dis"))
+            let description = $(this).attr("data-description")
 
             if (qty > 0){
 
@@ -442,7 +455,8 @@ function save_order(url, redirect_link, action = null, valid_empty = true, order
                 obj = {
                     qty: qty,
                     item_code: $(this).find("#item_id").val(),
-                    description: action == "confirm" ? $(this).data("description") : $(this).find("#item_id").val() + "_" + len,
+                    description,
+                    //description: action == "confirm" ? $(this).data("description") : $(this).find("#item_id").val() + "_" + len,
                     rate: $(this).find("#item_price").val(),
                     discount_percentage: $(this).find("#item_discount").val(),
                     
@@ -450,7 +464,7 @@ function save_order(url, redirect_link, action = null, valid_empty = true, order
                     //,delivery_date
                 }
                 items.push(obj);
-
+                console.log(obj)
                 len ++;
             }
             
@@ -462,6 +476,7 @@ function save_order(url, redirect_link, action = null, valid_empty = true, order
                         ,items
                         , order_id
                         , action
+                        , sales_person
                 }
         }
         
@@ -593,7 +608,11 @@ $("#undo").click(()=>{
 
 function redirect(redirect_link){
         
-        window.location.href = redirect_link
+        division = redirect_link.includes('?') ? "&" : "?";
+
+        const uniqueTimestamp = new Date().getTime();
+
+        window.location.href = `${redirect_link}${division}control=${uniqueTimestamp}`;
 }
 
 function get_shipping_calendar(shipping_method){

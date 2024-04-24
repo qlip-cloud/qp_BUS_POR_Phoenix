@@ -1,6 +1,6 @@
 {%for  item in item_list %}
     {% set count = 4 %}
-    <tr data-item-name = "{{item.item_name}}" data-phonix-class = "{{item.qp_phonix_class if item.qp_phonix_class else ''}}" class="inventary-{{'SI' if item.quantity > 0 else 'NO'}} {{item.sku}} {{item.class_title}} item-row {{item.qp_phoenix_shortdescription}} {{item.name | replace(':','-')}} {{item.item_group}} {{item.initial}} {{'row_select' if item.cantidad else ''}} {{'filter' if disabled_off else ''}}" style="{{'display: none;' if not disabled_off else ''}}" data-id = "{{item.name}}">
+    <tr data-item-name = "{{item.item_name}}" data-phonix-class = "{{item.qp_phonix_class if item.qp_phonix_class else ''}}" class="inventary-{{'SI' if item.quantity > 0 else 'NO'}} {{item.sku}} {{item.class_title}} item-row {{item.qp_phoenix_shortdescription}} {{item.name | replace(':','-')}} {{item.item_group}} {{item.initial}} {{'row_select' if item.cantidad else ''}} {{'filter' if disabled_off else ''}}" style="{{'display: none;' if not disabled_off else ''}}" data-id = "{{item.name}}" data-description = "{{item.description}}">
         <input type="hidden" id = "item_id" value= "{{item.name}}" >
         <input type="hidden" id = "item_discount" value= "{{item.discountpercentage}}" >
         
@@ -12,7 +12,7 @@
 
         {% if permission.price_format %}
             {% set count = count + 1 %}
-            <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">$ {{item.price_format | replace(",",".")}} COP</div></td>
+            <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">{{item.currency_symbol}} {{item.price_format | replace(",",".")}} {{item.currency}}</div></td>
         {%endif%}
 
         {% if permission.discountpercentage %}
@@ -24,7 +24,7 @@
         {% if permission.price_discount_format %}
             {% set count = count + 1 %}
 
-            <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">$ {{item.price_discount_format | replace(",",".")}} COP</div></td>
+            <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">{{item.currency_symbol}} {{item.price_discount_format | replace(",",".")}} {{item.currency}}</div></td>
 
         {%endif%}
 
