@@ -325,6 +325,7 @@ def sales_order_update(order_json):
         # validates
 
         if not isinstance(order_json, dict):
+
             order_json = json.loads(order_json)
 
         sales_order = order_json.get("order_id")
@@ -427,6 +428,7 @@ def sales_order_update(order_json):
 
                 qdoc.append('items', {
                     'item_code': item.get('item_code'),
+                    'description': item.get('description'),
                     'qty': item.get('qty'),
                     'rate': item.get('rate')
                     

@@ -607,6 +607,7 @@ def get_tbl_product_list(item_group, from_base, where_base, item_code_list = Non
             prod.qp_phoenix_shortdescription as qp_phoenix_shortdescription,
             prod.qp_phonix_class as qp_phonix_class,
             prod.qp_price_group as qp_price_group,
+            prod.description as description,
             %s
             %s
             IFNULL( gp_level.discountpercentage ,0) as discountpercentage,
@@ -737,6 +738,7 @@ def __get_select_attr_base():
             qp_phoenix_shortdescription,
             qp_price_group,
             discountpercentage,
+            description,
             (price - (price * discountpercentage) / 100) as price_discount,
             format((price - (price * discountpercentage) / 100),0) as price_discount_format
     """
