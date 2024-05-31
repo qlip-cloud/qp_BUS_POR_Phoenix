@@ -1,0 +1,59 @@
+{
+ "actions": [],
+ "autoname": "field:role_name",
+ "creation": "2024-05-31 13:30:57.723395",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "role_name",
+  "role_code"
+ ],
+ "fields": [
+  {
+   "fieldname": "role_name",
+   "fieldtype": "Data",
+   "label": "Role Name",
+   "unique": 1
+  },
+  {
+   "fieldname": "role_code",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Role code"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-05-31 17:35:43.656936",
+ "modified_by": "Administrator",
+ "module": "Qp Phonix Front",
+ "name": "qp_pf_Rol",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "All",
+   "share": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

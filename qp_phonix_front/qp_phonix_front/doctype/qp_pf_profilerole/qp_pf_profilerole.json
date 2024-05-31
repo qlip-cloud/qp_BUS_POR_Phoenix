@@ -1,0 +1,62 @@
+{
+ "actions": [],
+ "autoname": "field:profile_name",
+ "creation": "2024-05-31 13:42:25.921358",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "profile_name",
+  "roles_html",
+  "roles"
+ ],
+ "fields": [
+  {
+   "fieldname": "profile_name",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Profile_name",
+   "options": "Role Profile",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "roles_html",
+   "fieldtype": "HTML",
+   "label": "Roles HTML"
+  },
+  {
+   "fieldname": "roles",
+   "fieldtype": "Table",
+   "hidden": 1,
+   "label": "Roles Assigned",
+   "options": "qp_pf_HasRole",
+   "print_hide": 1,
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-05-31 16:33:27.118655",
+ "modified_by": "Administrator",
+ "module": "Qp Phonix Front",
+ "name": "qp_pf_ProfileRole",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
