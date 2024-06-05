@@ -142,6 +142,7 @@ function und_factor($quantity){
         let qp_box_sku = parseInt($("#qp_box_sku").val())
         let qp_buy_no_sku = parseInt($("#qp_buy_no_sku").val())
         let sku = $quantity.data("sku")
+        let qp_prioritize_unit_package = $quantity.data("qp_prioritize_unit_package")
         let incomplete_boxes = parseInt($("#incomplete_boxes").val())
         let calc_incomplete_boxes = true;
         
@@ -166,13 +167,13 @@ function und_factor($quantity){
                 });
         }
 
-        if (is_factor && value > 0){
+        if (is_factor && value > 0 || qp_prioritize_unit_package == "1"){
 
                 factor = parseInt($quantity.data("factor"))
 
                 let buy_no_sku = false;
                 
-                if (qp_buy_no_sku && sku == "NO"){
+                if (qp_buy_no_sku && sku == "NO" || qp_prioritize_unit_package == "1"){
 
                         base_result = Number((max_value / factor).toFixed(2));
                         base_decimal =Number(( base_result - parseInt(base_result)).toFixed(2));
@@ -189,7 +190,7 @@ function und_factor($quantity){
 
                 }
 
-                if (((value % factor != 0) && (!(buy_no_sku) && calc_incomplete_boxes))){
+                if (((value % factor != 0) && (!(buy_no_sku) && calc_incomplete_boxes)) || qp_prioritize_unit_package == "1"){
 
                         result = parseInt(value / factor) + 1;
 
