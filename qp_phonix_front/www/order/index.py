@@ -31,13 +31,32 @@ def export():
 
     filename = f"Confirmadas {now.strftime('%d%m%Y%H%M%S')}"
 
-    content = [['Qlip ID', 'GP ID', 'Fecha de entrega']]
+    content = [['Qlip ID', 'GP ID', 'Fecha de entrega', "Producto", "Nombre","Precio"]]
 
     customer = __get_customer()
 
-    rows = frappe.get_list("Sales Order", filters = {"status": "To Deliver and Bill", "customer": customer.name }, 
-                           fields = ["name", "qp_phonix_reference", "delivery_date"], 
-                           as_list = True)
+    sql = """
+        SELECT
+            sales_order.name
+            ,sales_order.qp_phonix_reference
+            ,sales_order.delivery_date
+            ,item.item_code
+            ,item.item_name
+            ,item.net_amount
+        FROM
+            `tabSales Order` as sales_order
+        INNER JOIN
+            `tabSales Order Item` as item
+            on (item.parent = sales_order.name)
+        where
+            status = 'To Deliver and Bill' and
+            customer = '{}'
+            
+    """.format(customer.name)
+    
+    #rows = frappe.get_list("Sales Order", filters = {"status": "To Deliver and Bill", "customer": customer.name },                            fields = ["name", "qp_phonix_reference", "delivery_date", "items"],                            as_list = True)
+    
+    rows = frappe.db.sql(sql, as_list = True)
     
     content += list(map(lambda row: list(row),rows))
    
