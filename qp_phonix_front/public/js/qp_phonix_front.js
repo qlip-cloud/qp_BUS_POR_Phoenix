@@ -32,9 +32,15 @@ $(document).ready(function () {
         })
 
 
+        $("#table_content").on('focus', ".quantity", function () {
+                $(this).val("");
+        })
         $("#table_content").on('blur', ".quantity", function () {
-
-                und_factor($(this))
+                if ($(this).val()){
+                        und_factor($(this))
+                }else{
+                        $(this).val(0)
+                }
         })
 
 
