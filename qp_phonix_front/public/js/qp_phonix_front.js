@@ -33,7 +33,9 @@ $(document).ready(function () {
 
 
         $("#table_content").on('focus', ".quantity", function () {
-                $(this).val("");
+                if (!$(this).val() || $(this).val() == "0"){
+                        $(this).val("");
+                }
         })
         $("#table_content").on('blur', ".quantity", function () {
                 if ($(this).val()){
