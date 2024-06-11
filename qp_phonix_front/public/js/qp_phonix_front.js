@@ -184,6 +184,10 @@ function und_factor($quantity) {
                         base_decimal = Number((base_result - parseInt(base_result)).toFixed(2));
                         base_mult_ue = Number((base_decimal * factor).toFixed(2));
 
+                        console.log(base_result,base_result)
+                        console.log(base_decimal,base_decimal)
+                        console.log(base_mult_ue,base_mult_ue)
+
                         result = Number((value / factor).toFixed(2));
                         decimal_value = Number((result - parseInt(result)).toFixed(2));
                         mult_ue = Number((decimal_value * factor).toFixed(2));
@@ -194,8 +198,8 @@ function und_factor($quantity) {
                         buy_no_sku = (up_value - down_value) >= mult_ue ? true : false;
 
                 }
-
-                if (((value % factor != 0) && (!(buy_no_sku) && calc_incomplete_boxes)) || qp_prioritize_unit_package == "1") {
+                
+                if (((value % factor != 0) && (!(buy_no_sku) && calc_incomplete_boxes))) {
 
                         result = parseInt(value / factor) + 1;
 
