@@ -1,115 +1,36 @@
 import frappe
 
-
-
-def get_permission():
-    return {
-        "price_format": False,
-        "discountpercentage": False,
-        "price_discount_format": False,
-        "quantity_format": False,
-        "quantity": False,
-        "stock_uom": False,
-        "sku": True,
-        "inqt": False,
-        "button_confirm": False,
-        "confirm": True
-    } 
-
 def handler():
     
-    role = get_role()
-
-    return set_permission(role)
-
-def get_role():
-
     email = frappe.session.user
 
-    sql = """SELECT 
-                role_profile_name
-            FROM
-                tabUser as user
-            where user.name = '{}';""".format(email)
+    sql = """
+    SELECT
+        role.role_code
+    FROM
+        tabUser as user
+    inner join
+        tabqp_pf_ProfileRole as profile_role
+        on (user.role_profile_name = profile_role.profile_name)
+    inner join tabqp_pf_HasRole as has_role
+        on (profile_role.profile_name = has_role.parent)
+    inner join tabqp_pf_Rol as role
+        on (has_role.role = role.name)
+    where user.name = '{email}'
+    """.format(email = email)
 
-    role =  frappe.db.sql(sql, as_dict=1)
+    permission_format = {}
     
-    if not role:
+    permissions =  frappe.db.sql(sql, as_dict = 1)
 
-        frappe.throw("Este usuario no esta configurado")
+    if not permissions:
 
-    return  role[0]["role_profile_name"]
+        frappe.throw("Este usuario no tiene un Perfil valido")
 
-def set_permission(role):
-    
-    permission = get_permission()
+    all_permission = frappe.get_list("qp_pf_Rol",fields = ["role_code"])
 
-    if role == "Compras Externas":
+    for permission in all_permission:
 
-        permission.update({
-            "price_format": True,
-            "discountpercentage": True,
-            "price_discount_format": True,
-            "quantity": True,
-            "stock_uom": True,
-            "inqt": True,
-            "button_confirm": True
-        })
-        
-    elif role == "Ventas Internas":
-        
-        permission.update({
-            "quantity": True,
-            "inqt": True,
-            "button_confirm": True,
-            "price_format": True,
-            "confirm": False,
-            "quantity_format": True
-        })
+        permission_format.setdefault(permission.get("role_code"), True if permission in  permissions else False)
 
-    elif role == "Ventas Externas":
-        
-        permission.update({
-            "quantity": True,
-            "price_format": True,
-            "inqt": True,
-            "button_confirm": True
-
-        })
-
-    elif role == "Admin":
-        
-        permission.update({
-            "price_format": True,
-            "quantity_format": True,
-            "quantity": True,
-            "stock_uom": True,
-            "inqt": True,
-            "button_confirm": True
-        })
-    elif role == "Especificador Externo":
-        
-        permission.update({
-        "price_format": True,
-            "discountpercentage": True,
-            "price_discount_format": True,
-            "quantity": True,
-            "stock_uom": True,
-            "inqt": True,
-            "button_confirm": True
-        })
-    elif role == "Ventas Externas Disponibilidad":
-
-        permission.update({
-            "quantity": True,
-            "stock_uom": True,
-            "inqt": True,
-            "stock_uom": True,
-            "sku": True,
-            "button_confirm": True
-        })
-
-    else:
-        frappe.throw("Este usuario no tiene un rol valido")
-    
-    return permission
+    return permission_format
