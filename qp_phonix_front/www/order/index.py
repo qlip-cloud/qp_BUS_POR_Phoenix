@@ -43,6 +43,7 @@ def export():
             ,item.item_code
             ,item.item_name
             ,item.net_amount
+            ,sales_order.qp_phoenix_order_customer as OrdenCliente
         FROM
             `tabSales Order` as sales_order
         INNER JOIN
