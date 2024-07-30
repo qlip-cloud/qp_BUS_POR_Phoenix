@@ -597,7 +597,7 @@ def get_tbl_product_list(item_group, from_base, where_base, item_code_list = Non
             prod.item_name as item_name,
             IF(prod.image IS NULL or prod.image = '', '%s', prod.image) as image,
             price.price_list_rate as price,
-            format(price.price_list_rate,0) as price_format,
+            format(price.price_list_rate,2) as price_format,
             currency.name as currency,
             currency.symbol as currency_symbol,
             0 as cantidad,
@@ -613,7 +613,7 @@ def get_tbl_product_list(item_group, from_base, where_base, item_code_list = Non
             %s
             IFNULL( gp_level.discountpercentage ,0) as discountpercentage,
             (price.price_list_rate - (price.price_list_rate * IFNULL( gp_level.discountpercentage ,0)) / 100) as price_discount,
-            format((price.price_list_rate - (price.price_list_rate * IFNULL( gp_level.discountpercentage ,0)) / 100),0) as price_discount_format
+            format((price.price_list_rate - (price.price_list_rate * IFNULL( gp_level.discountpercentage ,0)) / 100),2) as price_discount_format
             """ % (URL_IMG_EMPTY, class_condition, item_quantity_select) 
     
     #if item_group:
@@ -728,7 +728,7 @@ def __get_select_attr_base():
             item_name,
             image,
             price,
-            format(price,0) as price_format,
+            format(price,2) as price_format,
             currency.name as currency,
             currency.symbol as currency_symbol,
             cantidad,
@@ -742,7 +742,7 @@ def __get_select_attr_base():
             discountpercentage,
             description,
             (price - (price * discountpercentage) / 100) as price_discount,
-            format((price - (price * discountpercentage) / 100),0) as price_discount_format
+            format((price - (price * discountpercentage) / 100),2) as price_discount_format
     """
 
 #__get_select_attr_base original
@@ -809,7 +809,7 @@ def __get_select_attr_base_old():
             item_name,
             image,
             price,
-            format(price,0) as price_format,
+            format(price,2) as price_format,
             currency.name as currency,
             currency.symbol as currency_symbol,
             cantidad,
@@ -822,7 +822,7 @@ def __get_select_attr_base_old():
             qp_price_group,
             discountpercentage,
             (price - (price * discountpercentage) / 100) as price_discount,
-            format((price - (price * discountpercentage) / 100),0) as price_discount_format
+            format((price - (price * discountpercentage) / 100),2) as price_discount_format
     """
 
     return sql_base_attr
