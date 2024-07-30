@@ -133,7 +133,7 @@ def get_sales_order(sales_order):
                 IF(shipping_type.description IS NULL or shipping_type.description = '', shipping_type.name,  shipping_type.description) as shipping_description,
                 DATE_FORMAT(so.delivery_date, '%s') as shipping_date, DATE_FORMAT(so.delivery_date, '%s') as shipping_date_format,
                 so.net_total,
-                format(so.net_total,0) as total_format,
+                FORMAT(so.net_total,2) as total_format,
                 currency.name as currency,
                 currency.symbol as currency_symbol
             from `tabSales Order` as so
@@ -158,7 +158,7 @@ def get_sales_order(sales_order):
                 IF(so_items.image IS NULL or so_items.image = '', '%s', so_items.image) as image,
                 
                 so_items.net_rate as price,
-                FORMAT(so_items.net_rate,0) as price_format,
+                FORMAT(so_items.net_rate,2) as price_format,
 
                 so_items.qty as cantidad,
                 so_items.stock_uom,
@@ -170,7 +170,7 @@ def get_sales_order(sales_order):
                 so_items.line_number,
                 so_items.delivery_date_visible,
                 ROUND(net_amount,2) as total,
-                format(net_amount,0) as total_format,
+                FORMAT(net_amount,2) as total_format,
                 so_items.description,
                 currency.name as currency,
                 currency.symbol as currency_symbol
