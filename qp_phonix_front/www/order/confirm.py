@@ -44,6 +44,12 @@ def get_context(context):
 
         set_sales_persons(context)
         
+        cache = frappe.cache()
+        
+        if(not cache.get("is_phoenix")):
+            
+            cache.set("is_phoenix", "1")
+            
     try_catch(callback, context)
 
 def get_delivery_update(order_id):
@@ -67,6 +73,8 @@ def get_delivery_update(order_id):
                     if line.get("Id") == item.item_code and line.get("LineNumber") == item.line_number and (item.delivery_date != getdate(line.get("RequestDate")) or item.qp_phoenix_status != getdate(line.get("Status"))):
 
                         item.delivery_date = getdate(line.get("RequestDate")) if line.get("RequestDate") != '1900-01-01' else today()
+                        
+                        #item.qp_delivery_date = getdate(line.get("RequestDate")) if line.get("RequestDate") != '1900-01-01' else ''
 
                         item.qp_phoenix_status = line.get("Status")
 
