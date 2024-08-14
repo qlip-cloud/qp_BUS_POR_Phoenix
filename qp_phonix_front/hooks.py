@@ -114,7 +114,7 @@ doc_events = {
 
 scheduler_events = {
     "cron":{
-        "0 9 * * *": [
+        "*/15 * * * *": [
 			"qp_phonix_front.qp_phonix_front.tasks.update_delivery.all"
 		]
     },
