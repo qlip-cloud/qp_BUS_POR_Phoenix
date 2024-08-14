@@ -195,6 +195,7 @@ Orden
                     id="qp_phoenix_order_customer" value={{order.qp_phoenix_order_customer if
                     order.qp_phoenix_order_customer else "" }}>
             </div>
+            
             <div class="row shadow p-3 mb-5 bg-white rounded">
 
                 {% if order.status != 'Draft' %}
@@ -219,6 +220,14 @@ Orden
                     {% endfor %}
                 </select>
                 {% endif %}
+            </div>
+            <div class="row shadow p-3 mb-5 bg-white rounded">
+                <div class="col-md-12 label">
+                    Comentarios
+                </div>
+                <textarea type="text" class="form-control " {{ 'disabled' if order.status !="Draft" else '' }}
+                    id="qp_phoenix_order_comment" > {{order.qp_phoenix_order_comment if
+                        order.qp_phoenix_order_comment else "" }}</textarea>
             </div>
         </div>
 

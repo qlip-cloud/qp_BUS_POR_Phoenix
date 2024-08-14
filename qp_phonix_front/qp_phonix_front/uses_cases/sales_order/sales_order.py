@@ -122,6 +122,7 @@ def get_sales_order(sales_order):
                 so.name as so_name, 
                 so.status, 
                 so.qp_phoenix_order_customer, 
+                so.qp_phoenix_order_comment, 
                 item.item_group,
                 so.customer_name, 
                 addr.address_line1, 
@@ -159,7 +160,7 @@ def get_sales_order(sales_order):
                 
                 so_items.net_rate as price,
                 FORMAT(so_items.net_rate,2) as price_format,
-
+                so.qp_phoenix_order_comment,
                 so_items.qty as cantidad,
                 so_items.stock_uom,
                 so_items.amount,
@@ -407,6 +408,7 @@ def sales_order_update(order_json):
                 
             })
 
+        qdoc.qp_phoenix_order_comment = order_json.get("qp_phoenix_order_comment")
 
         for item in order_item_json:
 
@@ -433,6 +435,7 @@ def sales_order_update(order_json):
                     'rate': item.get('rate')
                     
                 })
+                
 
         for so_item_doc in qdoc.items:
 

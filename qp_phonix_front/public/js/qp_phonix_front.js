@@ -487,6 +487,7 @@ function save_order(url, redirect_link, action = null, valid_empty = true, order
                         , order_id
                         , action
                         , sales_person
+                        , "qp_phoenix_order_comment": $("#qp_phoenix_order_comment").val()
                 }
         }
 

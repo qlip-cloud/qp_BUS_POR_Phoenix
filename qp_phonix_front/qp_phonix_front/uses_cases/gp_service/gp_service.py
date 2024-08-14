@@ -137,6 +137,7 @@ def __prepare_petition(master_name, sales_order):
     so_json['WarehousesAlter'] = bdg_alter #valida
     so_json['DiscountAmount'] = so_obj.base_discount_amount
     so_json['VendorId'] = vendor_id #valida
+    so_json['Currency'] = so_obj.currency
     so_json['Lines'] = item_list
     so_json['IdCustomer'] = so_obj.customer
     so_json['NameCustomer'] = so_obj.customer_name
@@ -153,6 +154,7 @@ def __prepare_petition(master_name, sales_order):
     so_json['Reference1'] = customer_addr.city #define
     so_json['Reference2'] = None
     so_json['Reference3'] = None
+    so_json['Comment'] = so_obj.qp_phoenix_order_comment or ""
 
     return json.dumps(so_json)
 
