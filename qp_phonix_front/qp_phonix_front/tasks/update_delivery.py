@@ -12,8 +12,7 @@ def all():
     sales_names = frappe.db.get_list("Sales Order", 
                                     filters = {
                                          "status": "To Deliver and Bill", 
-                                         #"delivery_date":[">=", today()],
-                                         "name":"SAL-ORD-2023-00138",
+                                         "delivery_date":[">=", today()],
                                          "qp_phonix_reference": ["IS", "set"]
                                     }, pluck='name')
     
