@@ -22,7 +22,10 @@
   "items_group",
   "levels_group",
   "items",
-  "is_active"
+  "ss_comprobar_section",
+  "is_active",
+  "sc_comprobar_column",
+  "is_automatic"
  ],
  "fields": [
   {
@@ -122,11 +125,26 @@
    "fieldtype": "Table",
    "label": "Items",
    "options": "qp_pf_CouponItems"
+  },
+  {
+   "fieldname": "sc_comprobar_column",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_automatic",
+   "fieldtype": "Check",
+   "label": "Is Automatic"
+  },
+  {
+   "fieldname": "ss_comprobar_section",
+   "fieldtype": "Section Break",
+   "label": "ss_comprobar"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-04-19 10:18:15.410848",
+ "modified": "2024-08-16 12:59:08.099584",
  "modified_by": "Administrator",
  "module": "Qp Phonix Front",
  "name": "qp_pf_Coupon",

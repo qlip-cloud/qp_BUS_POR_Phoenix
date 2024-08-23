@@ -8,6 +8,7 @@ $(document).mousemove( function(e) {
 $(document).ready(function() {
     
     $("#with_inventary").prop("checked", false);
+    $("#only_discount").prop("checked", false);
 
     $("#with_list_price").prop("checked", false);
 
@@ -193,7 +194,7 @@ $(document).ready(function() {
 
 function validate_has_filter(){
 
-    if ($('#select-SubCategoria').val() || $('#sku_true').prop("checked")|| $('#with_list_price').prop("checked") || $('#filter_text').val() || $('#with_inventary').prop("checked"))
+    if ($('#select-SubCategoria').val() || $('#sku_true').prop("checked")|| $('#with_list_price').prop("checked") || $('#filter_text').val() || $('#with_inventary').prop("checked") || $('#only_discount').prop("checked"))
         return true
     return false
 }
@@ -578,6 +579,8 @@ function get_rows(is_valid = false, is_letter = false, is_class = false){
 
             has_inventary = $("#with_inventary").is(':checked');
 
+            has_auto_coupon = $("#only_discount").is(':checked');
+
             with_list_price = $("#with_list_price").is(':checked');
             
             let item_code_list = []
@@ -599,7 +602,8 @@ function get_rows(is_valid = false, is_letter = false, is_class = false){
                 filter_text,
                 idlevel,
                 has_inventary,
-                with_list_price
+                with_list_price,
+                has_auto_coupon
             }
 
             module_root = "render.item_formulary.item_formulary_render"
@@ -631,7 +635,7 @@ function get_rows(is_valid = false, is_letter = false, is_class = false){
                     setup_filter(letter_filter)
 
                 }
-                if (has_inventary && !is_class){
+                if ((has_inventary || has_auto_coupon) && !is_class){
                     
                     group_filter = get_group_filter();
 

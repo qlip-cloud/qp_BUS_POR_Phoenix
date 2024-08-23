@@ -6,6 +6,7 @@
  "engine": "InnoDB",
  "field_order": [
   "item",
+  "count",
   "is_active"
  ],
  "fields": [
@@ -22,12 +23,18 @@
    "fieldtype": "Check",
    "in_list_view": 1,
    "label": "is active"
+  },
+  {
+   "fieldname": "count",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "count"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-04-11 10:21:16.833452",
+ "modified": "2024-08-20 12:34:22.498770",
  "modified_by": "Administrator",
  "module": "Qp Phonix Front",
  "name": "qp_pf_CouponItems",

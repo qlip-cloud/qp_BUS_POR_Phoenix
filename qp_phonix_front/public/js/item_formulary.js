@@ -35,6 +35,14 @@ $(document).ready(function() {
 
     })
 
+    $("#only_discount").on("change", function(){
+        if ($("#only_discount").is(':checked')){
+            get_rows()
+
+        }
+
+    })
+
     $(".link_abc").click(function(){
         
         if(window.navigator.onLine){

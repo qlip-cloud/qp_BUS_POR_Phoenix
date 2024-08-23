@@ -9,7 +9,8 @@ from qp_phonix_front.qp_phonix_front.services.manager_permission import handler 
 import json
 
 @frappe.whitelist()
-def paginator(order_id = None, item_group = None, item_Categoria = None, item_SubCategoria = None, item_code_list = None, letter_filter = None, filter_text = None, idlevel = None, has_inventary = False, with_list_price = None):
+def paginator(order_id = None, item_group = None, item_Categoria = None, item_SubCategoria = None, item_code_list = None, letter_filter = None, 
+              filter_text = None, idlevel = None, has_inventary = False, with_list_price = None, has_auto_coupon = False):
     
     origin = "render item formulary paginator"
 
@@ -17,7 +18,9 @@ def paginator(order_id = None, item_group = None, item_Categoria = None, item_Su
     
     def callback():
 
-        item_list = paginator_item_list(item_group, item_Categoria, item_SubCategoria, item_code_list, letter_filter, filter_text, idlevel = idlevel, has_inventary = json.loads(has_inventary), with_list_price = 'true' in [with_list_price])
+        item_list = paginator_item_list(item_group, item_Categoria, item_SubCategoria, item_code_list, letter_filter, filter_text, idlevel = idlevel, 
+                                        has_inventary = json.loads(has_inventary), with_list_price = 'true' in [with_list_price], 
+                                        has_auto_coupon= json.loads(has_auto_coupon))
 
         list(map(lambda x: x.update({"initial": x.item_name[0].upper()}), item_list))
 

@@ -5,13 +5,15 @@ import requests
 import json
 import copy
 from datetime import datetime
-from qp_phonix_front.qp_phonix_front.uses_cases.shipping_method.shipping_method_list import __get_customer
+from qp_phonix_front.qp_phonix_front.uses_cases.shipping_method.shipping_method_list import __get_customer as get_customer_party
 from qp_phonix_front.qp_phonix_front.uses_cases.item_list.item_list import URL_IMG_EMPTY
 from qp_phonix_front.qp_phonix_front.uses_cases.item_list.item_list import get_attrs_filters_item_group
 from qp_phonix_front.qp_phonix_front.uses_cases.check_out_art.check_out_art import send_check_out_so
 from qp_phonix_front.qp_phonix_front.uses_cases.gp_service.gp_service import send_sales_order
 from qp_phonix_front.qp_phonix_front.uses_cases.item_list.item_list import __get_uom_list
 from gp_phonix_integration.gp_phonix_integration.service.utils import get_price_list
+from qp_phonix_front.qp_phonix_front.uses_cases.coupon.redeem import get_coupon, create_coupon, set_coupont_items_log,set_coupon_order
+from datetime import datetime
 SHIPPING_DEFAULT = 'N/S'
 
 DATE_DELIVERY_FORMAT_FIELD = "%Y-%m-%d"
@@ -39,7 +41,7 @@ def sales_order_list():
 
     try:
 
-        customer = __get_customer()
+        customer = get_customer_party()
 
         sql_so_list = """
             Select so.name as so_name, so.status, so.total,
@@ -115,7 +117,7 @@ def get_sales_order(sales_order):
 
     try:
 
-        customer = __get_customer()
+        customer = get_customer_party()
 
         sql_so_obj = """
             Select Distinct 
@@ -154,32 +156,37 @@ def get_sales_order(sales_order):
         if so_obj:
 
             sql_so_items_obj = """
-                Select so_items.item_code,item.item_group,qp_phoenix_order_customer,
-                so_items.item_name,
-                IF(so_items.image IS NULL or so_items.image = '', '%s', so_items.image) as image,
-                
-                so_items.net_rate as price,
-                FORMAT(so_items.net_rate,2) as price_format,
-                so.qp_phoenix_order_comment,
-                so_items.qty as cantidad,
-                so_items.stock_uom,
-                so_items.amount,
-                so_items.delivery_date,
-                so_items.qp_phoenix_status_title,
-                so_items.qp_phoenix_status,
-                so_items.qp_phoenix_status_color,
-                so_items.line_number,
-                so_items.delivery_date_visible,
-                ROUND(net_amount,2) as total,
-                FORMAT(net_amount,2) as total_format,
-                so_items.description,
-                currency.name as currency,
-                currency.symbol as currency_symbol
+                Select 
+                    so_items.item_code,item.item_group,qp_phoenix_order_customer,
+                    so_items.item_name,
+                    IF(so_items.image IS NULL or so_items.image = '', '%s', so_items.image) as image,
+                    so_items.net_rate as price,
+                    FORMAT(so_items.net_rate,2) as price_format,
+                    so.qp_phoenix_order_comment,
+                    so_items.qty as cantidad,
+                    so_items.stock_uom,
+                    so_items.amount,
+                    so_items.delivery_date,
+                    so_items.qp_phoenix_status_title,
+                    so_items.qp_phoenix_status,
+                    so_items.qp_phoenix_status_color,
+                    so_items.line_number,
+                    so_items.delivery_date_visible,
+                    ROUND(net_amount,2) as total,
+                    FORMAT(net_amount,2) as total_format,
+                    so_items.description,
+                    currency.name as currency,
+                    currency.symbol as currency_symbol,
+                    IFNULL(coupon.percentage, 0) as auto_discount
                 from `tabSales Order` as so
                 inner join `tabSales Order Item` as so_items on so.name = so_items.parent
                 inner join tabItem as item on item.name = so_items.item_code
                 inner join `tabPrice List` as price_list on so.selling_price_list = price_list.name
                 inner join `tabCurrency` as currency on price_list.currency = currency.name
+                left join `tabqp_pf_CouponItems` as coupon_item
+                on (so_items.item_code = coupon_item.item and coupon_item.count > 0)
+                left join `tabqp_pf_Coupon` as coupon
+                on (coupon.name = coupon_item.parent and coupon.is_automatic = 1)
                 where so.customer = '%s' and so.name = '%s'
                 order by so_items.qp_phoenix_status asc , so_items.delivery_date desc,so_items.item_code, so_items.description, so_items.delivery_date desc
             """ % (URL_IMG_EMPTY, customer.name, sales_order)
@@ -246,57 +253,23 @@ def create_sales_order(order_json):
     try:
 
         if not isinstance(order_json, dict):
+            
             order_json = json.loads(order_json)
 
-        #url_base = frappe.utils.get_url()
-
-        #api_key, generated_secret = __autenticate()
-
-        #url = "{0}/api/resource/Sales Order".format(url_base)
-        #print(order_json);
-
-        #print(order_json)
         string_obj = __get_body(order_json)
 
         sale_order =  frappe.get_doc(string_obj)
-
+        
+        search_automatic_discount(sale_order)
+        
         sale_order.insert()
 
-        #print(sale_order.as_dict());
-
-        #frappe.throw("rompete")
         rec_result['name'] = sale_order.name
 
         rec_result['msg'] = "Success"
         
         frappe.db.commit()
         
-        """headers = _get_header(api_key, generated_secret)
-
-        result =  requests.post(url=url, data=string_obj, headers=headers)
-
-        rec_result['result'] = result.status_code
-
-        if result.status_code == 200:
-
-            obj_so = result.json().get('data')
-            
-            print(obj_so)
-
-            frappe.throw("habla!")
-
-            frappe.throw("habla!")
-
-            rec_result['name'] = obj_so.get('name')
-
-            rec_result['msg'] = "Success"
-
-        else:
-
-            rec_result['msg'] = MSG_ERROR
-
-            frappe.log_error(message='\n'.join((str(string_obj), str(result.text))), title=_("Call New SO"))"""
-
     except Exception as error:
 
         rec_result['result'] = 400
@@ -309,6 +282,9 @@ def create_sales_order(order_json):
 
     return rec_result
 
+def search_automatic_discount(sale_order):
+    for item in  sale_order.items:
+        print(item)
 
 @frappe.whitelist()
 def sales_order_update(order_json):
@@ -320,74 +296,26 @@ def sales_order_update(order_json):
     res_checkout = {}
 
     res = {}
+    
+    if not isinstance(order_json, dict):
 
+        order_json = json.loads(order_json)
+        
     try:
 
-        # validates
-
-        if not isinstance(order_json, dict):
-
-            order_json = json.loads(order_json)
-
-        sales_order = order_json.get("order_id")
-
-        order_item_json = order_json.get("items")
-
-        if not sales_order:
-
-            rec_result['msg'] = _('The Sales Order value is empty')
-
-            return rec_result
-
-        if not order_item_json:
-
-            rec_result['msg'] = _('The Sales Order Item is empty')
-
-            return rec_result
-
-        customer = __get_customer()
-
-        qdoc = frappe.get_doc("Sales Order", sales_order)
-
-        if qdoc.docstatus != 0:
-            
-            rec_result['msg'] = _('The Sales Order is confirmed')
-
-            return rec_result
-
-        if customer.name != qdoc.customer:
-
-            rec_result['msg'] = _('The user is not associated with the customer contact')
-
-            return rec_result
+        setup_order_json(order_json)
         
-        #delivery_date = min([x.get("delivery_date") for x in order_item_json])
-
-        #delivery_date = delivery_date or qdoc.delivery_date
-        delivery_date = qdoc.delivery_date
-        ########eliminado para phoenix############
-
-        #if not __dates_validate(delivery_date):
-
-            #rec_result['msg'] = _('Shipping date is not current')
-
-            #return rec_result
-
-        #so_shipping_type = order_json.get('shipping_type')
-        ##########################################
-
-        # update qp_shipping_type
-
-
-        ########eliminado para phoenix############
-        #if so_shipping_type:
-
-            #qdoc.qp_shipping_type = so_shipping_type
-        ##########################################
-        # update items (qty and delivery_date)
+        order_id = __get_order_id(order_json)
         
+        rec_result["name"] = order_id
+        
+        order_item_json = __get_order_item_json(order_json)
 
-        items_so = [x.get('item_code') for x in qdoc.items]
+        sales_order = __get_sales_order(order_id)
+
+        __validate_customer(sales_order)
+        
+        items_so = [x.get('item_code') for x in sales_order.items]
 
         items_upd = [x.get('item_code') for x in order_item_json]
 
@@ -397,141 +325,326 @@ def sales_order_update(order_json):
 
         item_delete_list = list(set(items_so).difference(set(items_upd)))
 
+        __set_sales_team(order_json, sales_order)
 
-        if (order_json.get("sales_person")):
+        __set_order_data(sales_order, order_json)
 
-            qdoc.append('sales_team', {
-                "sales_person": order_json.get("sales_person"),
-                "allocated_percentage": 100,
-                "allocated_amount": qdoc.base_total,
-                "incentives": 0
+        __update_items(order_item_json, sales_order, item_update_list, item_insert_list)
                 
-            })
-
-        qdoc.qp_phoenix_order_comment = order_json.get("qp_phoenix_order_comment")
-
-        for item in order_item_json:
-
-            if item.get('item_code') in item_update_list:
-
-                for so_item_doc in qdoc.items:
-
-                    if so_item_doc.item_code == item['item_code'] and so_item_doc.description == item['description']:
-
-                        so_item_doc.qty = item.get('qty')
-
-                    #item_delivery_date = datetime.strptime(item.get('delivery_date'), DATE_DELIVERY_FORMAT_FIELD).date()
-
-                    #if item_delivery_date:
-
-                        #so_item_doc.delivery_date = item_delivery_date
-
-            if item.get('item_code') in item_insert_list:
-
-                qdoc.append('items', {
-                    'item_code': item.get('item_code'),
-                    'description': item.get('description'),
-                    'qty': item.get('qty'),
-                    'rate': item.get('rate')
-                    
-                })
+        __delete_items(sales_order, item_delete_list)
                 
-
-        for so_item_doc in qdoc.items:
-
-            if so_item_doc.get('item_code') in item_delete_list:
-
-                so_item_doc.delete()
-
-        qdoc.save()
-
-        # confirm
-
-        if order_json.get('action') == "confirm":
-
-            qdoc.qp_phoenix_order_customer = order_json.get("qp_phoenix_order_customer")
+        is_confirm = __confirm_sales_order(order_json, sales_order)
             
-            qdoc.save()
-
-            if __validate_product_inventory():
-
-                res_checkout = send_check_out_so(qdoc)
-
-                if not res_checkout.get("result") or res_checkout.get("result") != 200:
-
-                    rec_result['name'] = sales_order
-
-                    rec_result['msg'] = res_checkout.get("msg")
-
-                    raise vf_SaleOrderCheckOutError()
+        
+        if not is_confirm:
             
-
-            res = send_sales_order(sales_order)
-
-            if not res.get("result") or res.get("result") != 200:
-
-                raise vf_SaleOrderConfirmError()
-
-            qdoc.qp_phonix_reference = res.get("response").get("ReturnDesc")
-
-            lines = []
-
-            for item in qdoc.items:
-                
-                lines += [ get_line(line, item) for line in res.get("response").get("ReturnJson").get("Lines") if line.get("Id") == item.item_code]
+            sales_order.save()
             
-                item.delete()
-
-            qdoc.items = lines
-
-            qdoc.save()
-            
-            #estudiar la funcion despues de refactory
-
-            frappe.log_error(message=res.get("body_data"), title="GP Send Confirm")
-
-            rec_log(doc_ref=sales_order, msg_body=res.get("body_data"), msg_res=res.get("response"), valid=1)
-
-            qdoc.qp_phonix_reference = res.get("reference")
-
-            qdoc.submit()
 
         frappe.db.commit()
 
         rec_result['result'] = 200
 
-        rec_result['name'] = sales_order
+        rec_result['name'] = order_id
 
         rec_result['msg'] = "Success"
 
     except vf_SaleOrderCheckOutError as error_checkoutapi:
 
+        rec_result['msg'] = str(error_checkoutapi)
+        
         frappe.db.rollback()
+        
+        frappe.log_error(message='\n'.join((str(error_checkoutapi.art_json), str(error_checkoutapi.so_respose))), title=_("Call Check Out GP"))
 
-        rec_log(doc_ref="CHECKOUT-{0}".format(sales_order), msg_body=res_checkout.get("body_data"), msg_res=res_checkout.get("response"))
+        rec_log(doc_ref="CHECKOUT-{0}".format(sales_order.name), msg_body= error_checkoutapi.res_checkout.get("body_data"), msg_res=error_checkoutapi.res_checkout.get("response"))
 
-        checkout_rec_log(res_checkout.get("details"))
+        checkout_rec_log(error_checkoutapi.res_checkout.get("details"))
+        
+        print(frappe.get_traceback())
 
         frappe.db.commit()
 
     except vf_SaleOrderConfirmError as error_confirmapi:
-
+    
+        rec_result['msg'] = str(error_confirmapi)
+    
         frappe.db.rollback()
+        
+        frappe.log_error(message='\n'.join((error_confirmapi.so_name, error_confirmapi.so_json, error_confirmapi.so_respose)), title=_("Call GP"))
 
         rec_log(doc_ref=sales_order, msg_body=res.get("body_data"), msg_res=res.get("response"))
+        
+        print(frappe.get_traceback())
         
         frappe.db.commit()
 
     except Exception as error:
-
+        
+        rec_result['msg'] = str(error)
+        
         frappe.db.rollback()
 
         frappe.log_error(message=frappe.get_traceback(), title=title)
-
+        
+        print(frappe.get_traceback())
         pass
 
     return rec_result
 
+def __confirm_sales_order(order_json, sales_order):
+
+    if order_json.get('action') == "confirm":
+
+        __send_check_out_so(sales_order)
+        
+        __set_auto_discount(sales_order)
+        
+        sales_order.save()
+        
+        __send_sales_order(sales_order)
+        
+        sales_order.submit()
+        
+        return True
+    
+    return False
+
+def __set_auto_discount(sales_order):
+    
+    sql ="""
+        select 
+            coupon.percentage as percentage,
+            coupon_item.count as count,
+            coupon.code as code
+        from
+            `tabqp_pf_Coupon` as coupon
+        inner join
+            `tabqp_pf_CouponItems` as coupon_item
+            on (coupon.name = coupon_item.parent)
+        where coupon.is_automatic = 1 and coupon_item.count > 0 and coupon_item.item = %(item)s
+    """
+  
+    coupon_control = {}
+    
+    items = copy.deepcopy(sales_order.items)
+    
+    for key, item in enumerate(items):
+    
+        result = frappe.db.sql(sql, values = {"item": item.item_code}, as_dict = 1)
+        
+        if result:
+            
+            code = result[0].get("code")
+            
+            __init_coupon_control(code, coupon_control,sales_order.name)
+            
+            coupon = coupon_control[code]["coupon"]
+            
+            coupon_log = coupon_control[code]["coupon_log"]
+            
+            if result[0].get("count") < item.qty:
+                
+                item.qty = result[0].get("count")
+                            
+            set_coupont_items_log(coupon_log, item, coupon)
+            
+            set_coupon_order(sales_order, item, coupon)
+            
+            __update_coupon_item_count(coupon, item, coupon_control, code)
+            
+            __update_order_items(sales_order, item)           
+                        
+    __save_coupon(coupon_control)            
+
+def __update_order_items(sales_order, item):
+    
+    order_is_found = False
+    
+    key = 0
+    
+    while order_is_found == False and len(sales_order.items) > key:
+        
+        if sales_order.items[key].item_code == item.item_code and sales_order.items[key].stock_qty:
+            
+            order_is_found = True
+            
+            if sales_order.items[key].qty > item.qty:
+            
+                sales_order.items[key].qty =  sales_order.items[key].qty - item.qty
+            
+            else:  
+            
+                del sales_order.items[key]
+                
+        key += 1
+                    
+def __save_coupon(coupon_control):
+    
+    if coupon_control:
+        
+        for control in coupon_control.items():
+            
+            control[1]["coupon_log"].save()
+            control[1]["coupon"].save()
+            
+def __update_coupon_item_count(coupon, item, coupon_control, code):
+    
+    for coupon_key, coupon_item in  enumerate(coupon.items):
+        
+        if coupon_item.item == item.get('item_code'):
+            
+            coupon_control[code]["coupon"].items[coupon_key].count -= item.qty
+                    
+def __init_coupon_control(code, coupon_control,sales_order_name):
+    
+    if code not in coupon_control:
+        
+        user = frappe.session.user
+        
+        customer = get_customer_party()
+    
+        now = datetime.now()
+        
+        coupon = get_coupon(code)
+        
+        coupon_control.setdefault(code, {"coupon": coupon})
+        
+        coupon_log = create_coupon(coupon, customer, user, now, sales_order_name)
+        
+        coupon_control[code].update({"coupon_log": coupon_log})
+    
+                 
+def __send_sales_order(sales_order):
+    
+    res = send_sales_order(sales_order, vf_SaleOrderConfirmError)
+
+    __set_sales_order_response(sales_order, res.get("reference"), res.get("response"))
+            
+    frappe.log_error(message=res.get("body_data"), title="GP Send Confirm")
+
+    rec_log(doc_ref=sales_order.name, msg_body=res.get("body_data"), msg_res=res.get("response"), valid=1)
+
+def __set_sales_order_response(sales_order, reference, response):
+    
+#    sales_order.qp_phonix_reference = res.get("response").get("ReturnDesc")
+    
+    sales_order.qp_phonix_reference = reference
+    
+    sales_order.items = __get_sales_order_items_response(sales_order.items, response.get("ReturnJson"))
+    
+def __get_sales_order_items_response(items, returnJson):
+    
+    lines = []
+
+    for item in items:
+        
+        lines += [ get_line(line, item) for line in returnJson.get("Lines") if line.get("Id") == item.item_code]
+    
+        item.delete()
+
+    return lines    
+    
+def __send_check_out_so(sales_order):
+        
+    if __validate_product_inventory():
+
+        send_check_out_so(sales_order, vf_SaleOrderCheckOutError)
+
+def __delete_items(sales_order, item_delete_list):
+
+    for so_item_doc in sales_order.items:
+
+        if so_item_doc.get('item_code') in item_delete_list:
+
+            so_item_doc.delete()
+                
+def __update_items(order_item_json, sales_order, item_update_list, item_insert_list):
+    
+    for item in order_item_json:
+
+        if item.get('item_code') in item_update_list:
+
+            for so_item_doc in sales_order.items:
+
+                if so_item_doc.item_code == item['item_code'] and so_item_doc.description == item['description']:
+
+                    so_item_doc.qty = item.get('qty')
+
+                #item_delivery_date = datetime.strptime(item.get('delivery_date'), DATE_DELIVERY_FORMAT_FIELD).date()
+
+                #if item_delivery_date:
+
+                    #so_item_doc.delivery_date = item_delivery_date
+
+        if item.get('item_code') in item_insert_list:
+
+            sales_order.append('items', {
+                'item_code': item.get('item_code'),
+                'description': item.get('description'),
+                'qty': item.get('qty'),
+                'rate': item.get('rate')
+                
+            })
+                
+def __set_order_data(sales_order, order_json):
+    
+    sales_order.qp_phoenix_order_customer = order_json.get("qp_phoenix_order_customer")
+        
+    sales_order.qp_phoenix_order_comment = order_json.get("qp_phoenix_order_comment")
+        
+def __set_sales_team(order_json, sales_order):
+    
+    if (order_json.get("sales_person")):
+
+        sales_order.append('sales_team', {
+            "sales_person": order_json.get("sales_person"),
+            "allocated_percentage": 100,
+            "allocated_amount": sales_order.base_total,
+            "incentives": 0
+            
+        })
+        
+def __validate_customer(sales_order):
+        
+    customer = get_customer_party()
+        
+    if customer.name != sales_order.customer:
+
+        raise Exception(_('The user is not associated with the customer contact'))
+        
+def __get_sales_order(order_id):
+
+    qdoc = frappe.get_doc("Sales Order", order_id)
+
+    if qdoc.docstatus != 0:
+        
+        raise Exception(_('The Sales Order is confirmed'))
+        
+    return qdoc
+        
+def __get_order_item_json(order_json):
+    
+    if order_json.get("items"):
+        
+        return order_json.get("items")
+        
+    raise Exception(_('The Sales Order Item is empty'))
+
+def __get_order_id(order_json):
+    
+    if order_json.get("order_id"):
+        
+        return order_json.get("order_id")
+
+    raise Exception(_('The Sales Order Item is empty'))
+
+def setup_order_json(order_json):
+    
+    if not isinstance(order_json, dict):
+
+        order_json = json.loads(order_json)
+            
 def get_line(line, item):
 
     line_new = copy.copy(item)
@@ -605,7 +718,7 @@ def __generate_keys(user):
 
 def __get_body(json_data):
 
-    customer = __get_customer()
+    customer = get_customer_party()
 
     price_list = get_price_list(customer)
 
@@ -647,7 +760,7 @@ def __dates_validate(delivery_date):
 
 def __customer_validate(qdoc_customer):
 
-    customer = __get_customer()
+    customer = get_customer_party()
 
     return customer.name == qdoc_customer
 
@@ -675,8 +788,6 @@ def rec_log(doc_ref='No', msg_body='No body', msg_res='Error', valid=0):
 
     return res
 
-
-
 def __validate_product_inventory():
 
     company = frappe.defaults.get_user_default("company")
@@ -684,7 +795,6 @@ def __validate_product_inventory():
     company_obj = frappe.get_doc("Company", company)
 
     return bool(company_obj.gp_validate_product_inventory)
-
 
 def checkout_rec_log(res_checkout_det):
 
@@ -721,13 +831,31 @@ def checkout_rec_log(res_checkout_det):
 
 class vf_SaleOrderConfirmError(Exception):
 
+    def __init__(self, message = _("Error Sales Order API Confirm"), so_name = None, so_json = None, so_respose = None ):
+        
+        self.message = message
+        self.so_name = so_name
+        self.so_json = so_json
+        self.so_respose = so_respose
+
+        super().__init__(self.message)
+        
     def __str__(self):
 
-        return _("Error Sales Order API Confirm")
+        return self.message
 
 
 class vf_SaleOrderCheckOutError(Exception):
+    
+    def __init__(self, message = _("Error Sales Order API Check Out"), art_json = None, so_respose = None, res_checkout = None):
+        
+        self.message = message
+        self.art_json = art_json
+        self.so_respose = so_respose
+        self.res_checkout = res_checkout
 
+        super().__init__(self.message)
+    
     def __str__(self):
 
-        return _("Error Sales Order API Check Out")
+        return self.message

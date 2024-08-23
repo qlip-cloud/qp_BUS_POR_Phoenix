@@ -13,7 +13,7 @@ MSG_ERROR = _("<li>Product {}. At this time we have the amount of {}.</li>")
 
 MSG_ERROR_FINAL = _("</ol><br><b>Please make the necessary changes before continuing with the confirmation of your purchase.</b>")
 
-def send_check_out_so(sales_order):
+def send_check_out_so(sales_order, vf_SaleOrderCheckOutError):
 
     res = {'name': '', 'msg': 'Fail', 'result': 400, 'body_data': '', 'response': ''}
 
@@ -23,114 +23,98 @@ def send_check_out_so(sales_order):
 
     so_respose = None
 
-    try:
+    company = frappe.defaults.get_user_default("company")
 
-        company = frappe.defaults.get_user_default("company")
+    art_json = __prepare_petition(sales_order)
 
-        art_json = __prepare_petition(sales_order)
+    res['body_data'] = art_json
 
-        res['body_data'] = art_json
+    so_respose = execute_send(company_name=company, endpoint_code=CHECKOUTART, json_data=art_json)
 
-        so_respose = execute_send(company_name=company, endpoint_code=CHECKOUTART, json_data=art_json)
+    res['response'] = so_respose
 
-        res['response'] = so_respose
+    if not so_respose.get("Error") or not so_respose.get("Error").get("Estado") == "Exitoso":
 
-        if so_respose.get("Error") and so_respose.get("Error").get("Estado") == "Exitoso":
+        raise vf_SaleOrderCheckOutError(art_json = art_json, so_respose = so_respose, res_checkout = res)
+        
+    # verificar existencias y devolver resultado
 
-            # verificar existencias y devolver resultado
+    checkoutart_list = []
 
-            so_obj = frappe.get_doc("Sales Order", sales_order)
+    for item_gp in so_respose.get("Articulos"):
 
-            checkoutart_list = []
+        item_code = item_gp.get("IdArticulo")
 
-            for item_gp in so_respose.get("Articulos"):
+        item_obj = next(x for x in sales_order.items if x.item_code == item_code)
 
-                item_code = item_gp.get("IdArticulo")
+        qty_gp = float(item_gp.get("CantidadArt"))
 
-                item_obj = next(x for x in so_obj.items if x.item_code == item_code)
+        item_type_gp = int(item_gp.get("ItemType"))
 
-                qty_gp = float(item_gp.get("CantidadArt"))
+        if item_type_gp == 1 and qty_gp < float(item_obj.get("qty")):
 
-                item_type_gp = int(item_gp.get("ItemType"))
+            # Determinar multiplos próximo para armar el mensaje del resultado
 
-                if item_type_gp == 1 and qty_gp < float(item_obj.get("qty")):
+            conversion_factor = __get_conversion_factor(item_code)
 
-                    # Determinar multiplos próximo para armar el mensaje del resultado
+            multi_qty = __round_down(qty_gp, conversion_factor)
 
-                    conversion_factor = __get_conversion_factor(item_code)
+            multi_qty = multi_qty if multi_qty > 0 else 0
 
-                    multi_qty = __round_down(qty_gp, conversion_factor)
+            # TODO: concatenar checkoutart_list
 
-                    multi_qty = multi_qty if multi_qty > 0 else 0
+            checkoutart_list.append(
+                {
+                    "item_name": item_obj.get("item_name"),
+                    "multi_qty": multi_qty,
+                    "qty": item_obj.get("qty"),
+                    "qty_gp": qty_gp
+                }
+            )
 
-                    # TODO: concatenar checkoutart_list
+    if checkoutart_list:
 
-                    checkoutart_list.append(
-                        {
-                            "item_name": item_obj.get("item_name"),
-                            "multi_qty": multi_qty,
-                            "qty": item_obj.get("qty"),
-                            "qty_gp": qty_gp
-                        }
-                    )
+        res['result'] = 400
 
-            if not checkoutart_list:
+        res['name'] = sales_order.name
 
-                res['name'] = sales_order
+        msg_str = _(MSG_ERROR_INI)
 
-                res['msg'] = 'Success'
+        details_list = []
 
-                res['result'] = 200
+        for row in checkoutart_list:
 
-            else:
+            msg_str = msg_str + _(MSG_ERROR).format(row.get("item_name"), row.get("multi_qty")) 
 
-                res['result'] = 400
+            details_list.append(
+                {
+                    "customer": sales_order.get("customer"),
+                    "customer_name": sales_order.get("customer_name"),
+                    "item_name": row.get("item_name"),
+                    "qty": row.get("qty"),
+                    "qty_gp": row.get("qty_gp"),
+                    "sales_order": sales_order.name
+                }
+            )
 
-                res['name'] = sales_order
+        res['msg'] = msg_str + _(MSG_ERROR_FINAL)
 
-                msg_str = _(MSG_ERROR_INI)
+        res['details'] = details_list
+        
+        raise vf_SaleOrderCheckOutError(message = msg_str, art_json = art_json, so_respose = so_respose, res_checkout = res)
+        
+    res['name'] = sales_order.name
 
-                details_list = []
+    res['msg'] = 'Success'
 
-                for row in checkoutart_list:
-
-                    msg_str = msg_str + _(MSG_ERROR).format(row.get("item_name"), row.get("multi_qty")) 
-
-                    details_list.append(
-                        {
-                            "customer": so_obj.get("customer"),
-                            "customer_name": so_obj.get("customer_name"),
-                            "item_name": row.get("item_name"),
-                            "qty": row.get("qty"),
-                            "qty_gp": row.get("qty_gp"),
-                            "sales_order": sales_order
-                        }
-                    )
-
-                res['msg'] = msg_str + _(MSG_ERROR_FINAL)
-
-                res['details'] = details_list
-
-            return res
-
-        else:
-
-            frappe.log_error(message='\n'.join((str(art_json), str(so_respose))), title=_("Call Check Out GP"))
-
-    except Exception as error:
-
-        frappe.log_error(message=frappe.get_traceback(), title=title)
-
-        pass
+    res['result'] = 200
 
     return res
 
 
-def __prepare_petition(sales_order):
+def __prepare_petition(so_obj):
 
     art_json = {}
-
-    so_obj = frappe.get_doc("Sales Order", sales_order)
 
     art_body = []
 

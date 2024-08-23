@@ -18,7 +18,14 @@
         {% if permission.discountpercentage %}
             {% set count = count + 1 %}
 
-            <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">{{item.discountpercentage}} %</div></td>
+            <td class="{{'item_select' if item.cantidad else ''}}" style="text-align: center;">
+                <div class="margin-left">
+                <p class="discount-style">{{item.discountpercentage}} %</p>
+                {% if item.discountpercentage_coupon %}
+                    <p class="discount-style green">+ {{item.discountpercentage_coupon}} %</p>
+                {%endif%}
+
+            </div></td>
         {%endif%}
 
         {% if permission.price_discount_format %}
