@@ -41,9 +41,10 @@ $(document).ready(function() {
 
     })*/
 
-    $("#filter_text").on("keyup", function(){
-           
+    $("#filter_text").on("keyup", function(event){
+        if (event.keyCode === 13) { // 13 es el código de la tecla Enter
             get_filter_text()
+        }
     })
 
     
@@ -587,8 +588,8 @@ function get_rows(is_valid = false, is_letter = false, is_class = false){
 
             order_id = $("#order_id").val()
 
-            $(`.item-row`).each(function(){
-                item_code_list.push($(this).data("id"))
+            $(`.item-row-base`).each(function(){
+                item_code_list.push( $(this).data("id").toString())
             })
 
             

@@ -665,11 +665,10 @@ def get_tbl_product_list(item_group, from_base, where_base, item_code_list = Non
         
         """ % (select_base, from_base, where_base)
 
-def __get_text_filter_condition(filter_text):
+def __get_text_filter_condition(filter_array):
 
-    if filter_text:
+    if filter_array:
 
-        filter_array = filter_text.split(" ")
         
         if len(filter_array) > 1:
         
