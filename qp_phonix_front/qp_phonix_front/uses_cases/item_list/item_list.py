@@ -12,7 +12,8 @@ URL_IMG_EMPTY = "/assets/qlip_bussines_theme/images/company_default_logo.jpg"
 
 @frappe.whitelist()
 def paginator_item_list(item_group = None, item_Categoria = None, item_SubCategoria = None, item_code_list = None,
-                letter_filter = None, filter_text = None, idlevel = None, has_inventary = None, item_with_inventary = [], with_list_price = False):
+                letter_filter = None, filter_text = None, idlevel = None, has_inventary = None, item_with_inventary = [], 
+                with_list_price = False, has_auto_coupon = False):
 
     item_Categoria = json.loads(item_Categoria) if item_Categoria else None
     
@@ -23,7 +24,7 @@ def paginator_item_list(item_group = None, item_Categoria = None, item_SubCatego
     #setup = get_table_and_condition(item_group, item_Categoria, item_SubCategoria, item_code_list = item_code_list, idlevel = idlevel)
     
     return callback_get_inventary(item_group, item_Categoria, item_SubCategoria, letter_filter, filter_text, 
-    idlevel, has_inventary,item_code_list, [], with_list_price)
+    idlevel, has_inventary,item_code_list, [], with_list_price, has_auto_coupon)
     
     
     
@@ -51,14 +52,15 @@ def paginator_item_list(item_group = None, item_Categoria = None, item_SubCatego
     return response"""
 
 def callback_get_inventary(item_group = None, item_Categoria= None, item_SubCategoria= None, letter_filter= None, filter_text= None, 
-    idlevel = None, has_inventary = False,item_code_list = [], item_with_inventary = [], with_list_price = False):
+    idlevel = None, has_inventary = False,item_code_list = [], item_with_inventary = [], with_list_price = False, has_auto_coupon = False):
 
     if has_inventary:
         
         sync_item_quantity()
     
     setup = get_table_and_condition(item_group, item_Categoria, item_SubCategoria, filter_text = filter_text, 
-                                    item_code_list = item_code_list, idlevel = idlevel, has_inventary = has_inventary, with_list_price = with_list_price)
+                                    item_code_list = item_code_list, idlevel = idlevel, has_inventary = has_inventary, with_list_price = with_list_price, 
+                                    has_auto_coupon = has_auto_coupon)
     
     result =  __get_product_list(setup.get("tbl_product_list"), setup.get("cond_c"), setup.get("cond_t"), has_limit=True)
 
@@ -404,7 +406,7 @@ def get_filter_SubCategoria_option(price_list):
 
 
 def get_table_and_condition(item_group = None, item_Categoria = None, item_SubCategoria = None, item_code_list = None, letter_filter = None, 
-                is_equal = False, filter_text = None, idlevel= None, has_inventary = False, with_list_price = False):
+                is_equal = False, filter_text = None, idlevel= None, has_inventary = False, with_list_price = False, has_auto_coupon = False):
 
     where_base = get_where_base()
 
@@ -418,7 +420,7 @@ def get_table_and_condition(item_group = None, item_Categoria = None, item_SubCa
 
     cond_t = __get_cond("class_sync.title",list(map(lambda x: x.replace("--", " ") , item_SubCategoria)) if item_SubCategoria else None)
     
-    from_base = get_from_base(idlevel, cond_t, has_inventary)
+    from_base = get_from_base(idlevel, cond_t, has_inventary, has_auto_coupon)
     
     tbl_product_list = get_tbl_product_list(item_group, from_base, where_base, item_code_list, letter_filter, is_equal, filter_text = filter_text, cond_t = cond_t, has_inventary = has_inventary)
 
@@ -531,12 +533,15 @@ def get_attrs_filters_item_group(item_group):
     return res
 
 
-def get_from_base(idlevel, cond_t = None, has_inventary = False):
+def get_from_base(idlevel, cond_t = None, has_inventary = False, has_auto_coupon = False):
     
     class_condition = "" if cond_t == "1=1" else "left join `tabqp_GP_ClassSync` as class_sync on(prod.qp_phonix_class = class_sync.id)"
     
     item_quantity_inner = """inner join `tabqp_GP_ItemQuantity` as item_quantity
             on (prod.name = item_quantity.iditem)""" if has_inventary else ""
+            
+    coupon_inner = "inner" if has_auto_coupon else "left"
+            
     return """
         tabItem as prod
         {}
@@ -545,7 +550,11 @@ def get_from_base(idlevel, cond_t = None, has_inventary = False):
         INNER JOIN `tabCurrency` as currency ON currency.name = price_list.currency
         {}
         left join `tabqp_GP_Level` as gp_level on (prod.qp_price_group = gp_level.group_type and gp_level.idlevel = '{}')
-    """.format(item_quantity_inner,class_condition, idlevel)
+        {coupon_inner} join `tabqp_pf_CouponItems` as coupon_item
+        on (prod.name = coupon_item.item and coupon_item.count > 0)
+        {coupon_inner} join `tabqp_pf_Coupon` as coupon
+        on (coupon.name = coupon_item.parent and coupon.is_automatic = 1)
+    """.format(item_quantity_inner,class_condition, idlevel, coupon_inner = coupon_inner)
 
 def get_where_base():
 
@@ -612,8 +621,9 @@ def get_tbl_product_list(item_group, from_base, where_base, item_code_list = Non
             %s
             %s
             IFNULL( gp_level.discountpercentage ,0) as discountpercentage,
-            (price.price_list_rate - (price.price_list_rate * IFNULL( gp_level.discountpercentage ,0)) / 100) as price_discount,
-            format((price.price_list_rate - (price.price_list_rate * IFNULL( gp_level.discountpercentage ,0)) / 100),2) as price_discount_format
+            IFNULL( coupon.percentage ,0) as discountpercentage_coupon,
+            (price.price_list_rate - (price.price_list_rate * (IFNULL( gp_level.discountpercentage ,0) )) / 100) as price_discount,
+            format((price.price_list_rate - (price.price_list_rate * (IFNULL( gp_level.discountpercentage ,0))) / 100),2) as price_discount_format
             """ % (URL_IMG_EMPTY, class_condition, item_quantity_select) 
     
     #if item_group:
@@ -655,11 +665,10 @@ def get_tbl_product_list(item_group, from_base, where_base, item_code_list = Non
         
         """ % (select_base, from_base, where_base)
 
-def __get_text_filter_condition(filter_text):
+def __get_text_filter_condition(filter_array):
 
-    if filter_text:
+    if filter_array:
 
-        filter_array = filter_text.split(" ")
         
         if len(filter_array) > 1:
         
@@ -710,6 +719,8 @@ def __get_product_list(tbl_product_list, cond_c, cond_t, has_limit = True ):
 
     """ % (tbl_product_list, cond_c, cond_t, limit)  
     #print(sql_product_list)
+    
+    print(sql_product_list)
     product_list = frappe.db.sql(sql_product_list, as_dict=1)
     for item in product_list:
         

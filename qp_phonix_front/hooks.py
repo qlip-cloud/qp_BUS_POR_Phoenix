@@ -112,7 +112,12 @@ doc_events = {
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
+scheduler_events = {
+    "cron":{
+        "*/15 * * * *": [
+			"qp_phonix_front.qp_phonix_front.tasks.update_delivery.all"
+		]
+    },
 # 	"all": [
 # 		"qp_phonix_front.tasks.all"
 # 	],
@@ -128,7 +133,7 @@ doc_events = {
 # 	"monthly": [
 # 		"qp_phonix_front.tasks.monthly"
 # 	]
-# }
+}
 
 # Testing
 # -------

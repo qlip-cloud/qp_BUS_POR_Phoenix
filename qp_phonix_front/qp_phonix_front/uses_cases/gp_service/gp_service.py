@@ -9,11 +9,9 @@ from gp_phonix_integration.gp_phonix_integration.service.utils import get_master
 from gp_phonix_integration.gp_phonix_integration.constant.api_setup import INTGVENT
 from qp_phonix_front.qp_phonix_front.uses_cases.item_group.item_group_list import vf_item_group_list
 
-
 MSG_ERROR = _("Existe un error en el proceso al conectar con GP, por favor contacte al administrador")
 
-
-def send_sales_order(sales_order):
+def send_sales_order(sales_order, vf_SaleOrderConfirmError):
 
     res = {'name': '', 'msg': 'Fail', 'result': 400, 'body_data': '', 'response': ''}
 
@@ -23,47 +21,35 @@ def send_sales_order(sales_order):
 
     so_respose = None
 
-    try:
+    company = frappe.defaults.get_user_default("company")
 
-        company = frappe.defaults.get_user_default("company")
+    master_name = __get_master_setup(company)
 
-        master_name = __get_master_setup(company)
+    if not master_name:
 
-        if not master_name:
+        res["msg"] = _('The recordset of Master Setup is empty')
 
-            res["msg"] = _('The recordset of Master Setup is empty')
+        return res
 
-            return res
+    so_json = __prepare_petition(master_name, sales_order)
 
-        so_json = __prepare_petition(master_name, sales_order)
+    res['body_data'] = so_json
 
-        res['body_data'] = so_json
+    so_respose = execute_send(company_name=company, endpoint_code=INTGVENT, json_data=so_json)
 
-        so_respose = execute_send(company_name=company, endpoint_code=INTGVENT, json_data=so_json)
+    res['response'] = so_respose
 
-        res['response'] = so_respose
+    if so_respose.get("ReturnCode") != "SUCCESS":
+        
+        raise vf_SaleOrderConfirmError(message = MSG_ERROR, so_name = str(sales_order.name), so_json = str(so_json), so_respose = str(so_respose))
 
-        if so_respose.get("ReturnCode") == "SUCCESS":
+    res['name'] = sales_order.name
 
-            res['name'] = sales_order
+    res['msg'] = 'Success'
 
-            res['msg'] = 'Success'
-
-            res['result'] = 200
-            
-            res['reference'] = so_respose.get("ReturnDesc")
-
-            return res
-
-        else:
-
-            frappe.log_error(message='\n'.join((str(sales_order), str(so_json), str(so_respose))), title=_("Call GP"))
-
-    except Exception as error:
-
-        frappe.log_error(message='\n'.join((sales_order, frappe.get_traceback())), title=title)
-
-        pass
+    res['result'] = 200
+    
+    res['reference'] = so_respose.get("ReturnDesc")
 
     return res
 
@@ -81,11 +67,9 @@ def __get_master_setup(company):
     return master_name and master_name[0] or {}
 
 
-def __prepare_petition(master_name, sales_order):
+def __prepare_petition(master_name, so_obj):
     
     so_json = {}
-
-    so_obj = frappe.get_doc("Sales Order", sales_order)
 
     customer_email = frappe.db.get_value("Customer", so_obj.customer, "email_id")
 
@@ -137,6 +121,7 @@ def __prepare_petition(master_name, sales_order):
     so_json['WarehousesAlter'] = bdg_alter #valida
     so_json['DiscountAmount'] = so_obj.base_discount_amount
     so_json['VendorId'] = vendor_id #valida
+    so_json['Currency'] = so_obj.price_list_currency
     so_json['Lines'] = item_list
     so_json['IdCustomer'] = so_obj.customer
     so_json['NameCustomer'] = so_obj.customer_name
@@ -153,6 +138,7 @@ def __prepare_petition(master_name, sales_order):
     so_json['Reference1'] = customer_addr.city #define
     so_json['Reference2'] = None
     so_json['Reference3'] = None
+    so_json['Comment'] = so_obj.qp_phoenix_order_comment or ""
 
     return json.dumps(so_json)
 

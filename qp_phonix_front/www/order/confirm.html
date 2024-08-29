@@ -195,6 +195,7 @@ Orden
                     id="qp_phoenix_order_customer" value={{order.qp_phoenix_order_customer if
                     order.qp_phoenix_order_customer else "" }}>
             </div>
+            
             <div class="row shadow p-3 mb-5 bg-white rounded">
 
                 {% if order.status != 'Draft' %}
@@ -219,6 +220,14 @@ Orden
                     {% endfor %}
                 </select>
                 {% endif %}
+            </div>
+            <div class="row shadow p-3 mb-5 bg-white rounded">
+                <div class="col-md-12 label">
+                    Comentarios
+                </div>
+                <textarea type="text" class="form-control " {{ 'disabled' if order.status !="Draft" else '' }}
+                    id="qp_phoenix_order_comment" > {{order.qp_phoenix_order_comment if
+                        order.qp_phoenix_order_comment else "" }}</textarea>
             </div>
         </div>
 
@@ -341,7 +350,8 @@ Orden
 
                 <div class="row line row_select" data-price={{item.price }}
                     data-subtotal="{{item.price * item.cantidad}}" data-item="row-{{item.item_code}}"
-                    data-description="{{item.description}}" id="row-{{item.item_code | replace(':','-')}}">
+                    data-description="{{item.description}}" 
+                    data-code="{{item.code}}"id="row-{{item.item_code | replace(':','-')}}">
                     <input type="hidden" class="subtotal" value={{item.price * item.cantidad}}>
                     <div class="col-sm-2">
                         <img width="575px" height="575px" class="rounded" src="{{item.image}}" alt="">
@@ -370,6 +380,11 @@ Orden
                                         <span style="color: #5aa83a; font-size: 0.8em;"
                                             id="label-{{item.item_code | replace(':','-')}}">
                                             Producto con descuento</span>
+                                        {% elif item.auto_discount %}
+
+                                        <span style="color: #5aa83a; font-size: 0.8em;text-shadow: 0.5px 0.5px #a6a6a6;"
+                                            id="label-{{item.item_code | replace(':','-')}}">
+                                            Producto aplicable a {{item.auto_discount}}% de descuento, al confirmar la orden el total será {{item.auto_discount_total}}</span>
                                         {% endif %}
                                     </div>
                                 </div>

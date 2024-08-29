@@ -119,24 +119,34 @@ def setup_coupon_log(coupon, order, coupon_log, callback):
 
         if is_redeemable:
             
-            coupon_log.append("coupon_items", {
-                        "item_code": item.get('item_code'),
-                        "discount_old": item.discount_percentage,
-                        "rate_old": item.rate,
-                        "discount_new": coupon.percentage,
-                        "qty": item.get('qty')
-                    })
+            set_coupont_items_log(coupon_log, item, coupon)
 
-            order.append('items', {
-                    'item_code': item.get('item_code'),
-                    'qty': item.get('qty'),
-                    'discount_percentage': item.discount_percentage + coupon.percentage
-                    
-                })
+            set_coupon_order(order, item, coupon)
             
             del order.items[key]
 
+def set_coupon_order(order, item, coupon):
+    
+    order.append('items', {
+            'item_code': item.get('item_code'),
+            'qty': item.get('qty'),
+            'discount_percentage': item.discount_percentage + coupon.percentage
+            
+        })
+
+def set_coupont_items_log(coupon_log, item, coupon):
+    
+    coupon_log.append("coupon_items", {
+                    "item_code": item.get('item_code'),
+                    "discount_old": item.discount_percentage,
+                    "rate_old": item.rate,
+                    "discount_new": coupon.percentage,
+                    "qty": item.get('qty')
+                })
+    
+    
 ##-------------------- refactor optional-------------------------
+
 def redeem_coupon_item(coupon, order, coupon_log):
 
     count = 0

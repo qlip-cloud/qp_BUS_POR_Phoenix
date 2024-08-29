@@ -1,6 +1,9 @@
 {%for  item in item_list %}
     {% set count = 4 %}
-    <tr data-item-name = "{{item.item_name}}" data-phonix-class = "{{item.qp_phonix_class if item.qp_phonix_class else ''}}" class="inventary-{{'SI' if item.quantity > 0 else 'NO'}} {{item.sku}} {{item.class_title}} item-row {{item.qp_phoenix_shortdescription}} {{item.name | replace(':','-')}} {{item.item_group}} {{item.initial}} {{'row_select' if item.cantidad else ''}} {{'filter' if disabled_off else ''}}" style="{{'display: none;' if not disabled_off else ''}}" data-id = "{{item.name}}" data-description = "{{item.description}}">
+                    
+    <tr data-item-name = "{{item.item_name}}" data-phonix-class = "{{item.qp_phonix_class if item.qp_phonix_class else ''}}" class="inventary-{{'SI' if item.quantity > 0 else 'NO'}} {{item.sku}} {{item.class_title}} item-row item-row-base {{item.qp_phoenix_shortdescription}} {{item.name | replace(':','-')}} {{item.item_group}} {{item.initial}} {{'row_select' if item.cantidad else ''}} {{'filter' if disabled_off else ''}}" style="{{'display: none;' if not disabled_off else ''}}" data-id = "{{item.name}}" data-description = "{{item.description}}" data-code = "{{item.code}}">
+        
+
         <input type="hidden" id = "item_id" value= "{{item.name}}" >
         <input type="hidden" id = "item_discount" value= "{{item.discountpercentage}}" >
         
@@ -18,7 +21,14 @@
         {% if permission.discountpercentage %}
             {% set count = count + 1 %}
 
-            <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">{{item.discountpercentage}} %</div></td>
+            <td class="{{'item_select' if item.cantidad else ''}}" style="text-align: center;">
+                <div class="margin-left">
+                <p class="discount-style">{{item.discountpercentage}} %</p>
+                {% if item.discountpercentage_coupon %}
+                    <p class="discount-style green">+ {{item.discountpercentage_coupon}} %</p>
+                {%endif%}
+
+            </div></td>
         {%endif%}
 
         {% if permission.price_discount_format %}
@@ -53,6 +63,7 @@
                     data-quantity_dis= "{{item.quantity_dis}}"
                     data-quantity_format = {{permission.quantity_format}}
                     data-next = {{key}}
+                    data-code = {{item.code}}
                      >
             </td>
         {%endif%}
