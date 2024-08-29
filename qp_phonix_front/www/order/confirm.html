@@ -382,9 +382,9 @@ Orden
                                             Producto con descuento</span>
                                         {% elif item.auto_discount %}
 
-                                        <span style="color: #ecdd09; font-size: 0.8em;text-shadow: 0.5px 0.5px #a6a6a6;"
+                                        <span style="color: #5aa83a; font-size: 0.8em;text-shadow: 0.5px 0.5px #a6a6a6;"
                                             id="label-{{item.item_code | replace(':','-')}}">
-                                            Producto con {{item.auto_discount}}% de descuento disponible, total puede ser de {{item.auto_discount_total}}</span>
+                                            Producto aplicable a {{item.auto_discount}}% de descuento, al confirmar la orden el total será {{item.auto_discount_total}}</span>
                                         {% endif %}
                                     </div>
                                 </div>
