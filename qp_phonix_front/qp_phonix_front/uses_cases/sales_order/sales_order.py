@@ -157,6 +157,7 @@ def get_sales_order(sales_order):
 
             sql_so_items_obj = """
                 Select 
+                    so_items.name as code,
                     so_items.item_code,item.item_group,qp_phoenix_order_customer,
                     so_items.item_name,
                     IF(so_items.image IS NULL or so_items.image = '', '%s', so_items.image) as image,
@@ -315,9 +316,9 @@ def sales_order_update(order_json):
 
         __validate_customer(sales_order)
         
-        items_so = [x.get('item_code') for x in sales_order.items]
+        items_so = [x.get('name') for x in sales_order.items]
 
-        items_upd = [x.get('item_code') for x in order_item_json]
+        items_upd = [x.get('code') for x in order_item_json]
 
         item_update_list = list(set(items_so).intersection(set(items_upd)))
 
@@ -539,7 +540,7 @@ def __get_sales_order_items_response(items, returnJson):
 
     for item in items:
         
-        lines += [ get_line(line, item) for line in returnJson.get("Lines") if line.get("Id") == item.item_code]
+        lines += [ get_line(line, item) for line in returnJson.get("Lines") if line.get("Id") == item.item_code and not line.get("merge")]
     
         item.delete()
 
@@ -555,7 +556,7 @@ def __delete_items(sales_order, item_delete_list):
 
     for so_item_doc in sales_order.items:
 
-        if so_item_doc.get('item_code') in item_delete_list:
+        if so_item_doc.get('code') in item_delete_list:
 
             so_item_doc.delete()
                 
@@ -563,11 +564,11 @@ def __update_items(order_item_json, sales_order, item_update_list, item_insert_l
     
     for item in order_item_json:
 
-        if item.get('item_code') in item_update_list:
+        if item.get('code') in item_update_list:
 
             for so_item_doc in sales_order.items:
 
-                if so_item_doc.item_code == item['item_code'] and so_item_doc.description == item['description']:
+                if so_item_doc.name == item['code']:
 
                     so_item_doc.qty = item.get('qty')
 
@@ -577,7 +578,7 @@ def __update_items(order_item_json, sales_order, item_update_list, item_insert_l
 
                     #so_item_doc.delivery_date = item_delivery_date
 
-        if item.get('item_code') in item_insert_list:
+        if item.get('code') in item_insert_list:
 
             sales_order.append('items', {
                 'item_code': item.get('item_code'),
@@ -662,7 +663,7 @@ def get_line(line, item):
     line_new.qp_phoenix_status = line.get("Status")
 
     line_new.insert()
-    
+    line.setdefault("merge", True)
     return line_new
 
 def __get_item_attr(item_code, attr):

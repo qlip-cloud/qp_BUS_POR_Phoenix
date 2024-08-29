@@ -427,7 +427,10 @@ function save_order(url, redirect_link, action = null, valid_empty = true, order
                 let quantity = parseInt($(this).find("#quantity").attr("data-quantity"))
                 let quantity_dis = parseInt($(this).find("#quantity").attr("data-quantity_dis"))
                 let description = $(this).attr("data-description")
-
+                let code = $(this).attr("data-code")
+                let rate= $(this).find("#item_price").val()
+                let discount_percentage=  $(this).find("#item_discount").val()
+                let item_code = $(this).find("#item_id").val()
                 if (qty > 0) {
 
                         /*if(action != "confirm"){
@@ -463,12 +466,13 @@ function save_order(url, redirect_link, action = null, valid_empty = true, order
                         }*/
 
                         obj = {
-                                qty: qty,
-                                item_code: $(this).find("#item_id").val(),
+                                qty,
+                                code,
+                                item_code,
                                 description,
                                 //description: action == "confirm" ? $(this).data("description") : $(this).find("#item_id").val() + "_" + len,
-                                rate: $(this).find("#item_price").val(),
-                                discount_percentage: $(this).find("#item_discount").val(),
+                                rate,
+                                discount_percentage,
 
 
                                 //,delivery_date

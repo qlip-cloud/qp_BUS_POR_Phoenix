@@ -350,7 +350,8 @@ Orden
 
                 <div class="row line row_select" data-price={{item.price }}
                     data-subtotal="{{item.price * item.cantidad}}" data-item="row-{{item.item_code}}"
-                    data-description="{{item.description}}" id="row-{{item.item_code | replace(':','-')}}">
+                    data-description="{{item.description}}" 
+                    data-code="{{item.code}}"id="row-{{item.item_code | replace(':','-')}}">
                     <input type="hidden" class="subtotal" value={{item.price * item.cantidad}}>
                     <div class="col-sm-2">
                         <img width="575px" height="575px" class="rounded" src="{{item.image}}" alt="">
