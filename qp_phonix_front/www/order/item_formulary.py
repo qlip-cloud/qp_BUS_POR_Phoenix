@@ -158,6 +158,8 @@ def add_qty_item_list(items_select, item_list):
             if item_select.get("item_code") == item.get("name"):
 
                 item["cantidad"] =  item_select.get("cantidad")
+                item["code"] =  item_select.get("code")
+                item["code"] =  item_select.get("code")
 
 def get_autosave_control():
 

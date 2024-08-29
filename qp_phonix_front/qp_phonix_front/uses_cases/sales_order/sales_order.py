@@ -178,7 +178,8 @@ def get_sales_order(sales_order):
                     so_items.description,
                     currency.name as currency,
                     currency.symbol as currency_symbol,
-                    IFNULL(coupon.percentage, 0) as auto_discount
+                    IFNULL(coupon.percentage, 0) as auto_discount,
+                    FORMAT((price_list_rate * so_items.qty ) - ((price_list_rate * so_items.qty ) * (IFNULL(coupon.percentage, 0) + so_items.discount_percentage) / 100) ,2) as auto_discount_total
                 from `tabSales Order` as so
                 inner join `tabSales Order Item` as so_items on so.name = so_items.parent
                 inner join tabItem as item on item.name = so_items.item_code
