@@ -1,20 +1,20 @@
 
-$(document).ready(function() {
+$(document).ready(function () {
 
     $('#select_shipping_method').selectpicker();
 
-    $(".quantity").each(function(){
+    $(".quantity").each(function () {
         $(this).val($(this).data("value"))
     })
 
     $('.disabled').show();
 
-    $("#with_inventary").on("change", function(){
+    $("#with_inventary").on("change", function () {
 
         group_filter = get_group_filter();
 
-        if ($("#with_inventary").is(':checked')){
-            
+        if ($("#with_inventary").is(':checked')) {
+
             $('.item-row.filter').not(`.inventary-SI.SI`).hide()
 
             $(`.item-row.filter.inventary-SI.SI`).filter(group_filter).show()
@@ -22,12 +22,33 @@ $(document).ready(function() {
             get_rows()
 
 
-        }else{
-            if (!group_filter){
+        } else {
+            if (!group_filter) {
                 visible_filter_select($("#sku_true").is(':checked'))
             }
 
             $(`.item-row.filter.SI`).filter(group_filter).show()
+
+            $("#pagination_control").val(0)
+        }
+
+    })
+
+    $("#only_discount").on("change", function () {
+
+        group_filter = get_group_filter();
+
+        if ($(this).is(':checked')) {
+
+            $('.item-row.filter').not(`.auto_discount`).hide()
+
+            $(`.item-row.filter.auto_discount`).filter(group_filter).show()
+
+            get_rows()
+
+        } else {
+
+            $(`.item-row.filter`).filter(group_filter).show()
 
             $("#pagination_control").val(0)
 
@@ -35,19 +56,11 @@ $(document).ready(function() {
 
     })
 
-    $("#only_discount").on("change", function(){
-        if ($("#only_discount").is(':checked')){
-            get_rows()
+    $(".link_abc").click(function () {
 
-        }
+        if (window.navigator.onLine) {
 
-    })
-
-    $(".link_abc").click(function(){
-        
-        if(window.navigator.onLine){
-
-            if($(this).hasClass("selected")){
+            if ($(this).hasClass("selected")) {
 
                 $(this).removeClass("selected")
 
@@ -57,8 +70,8 @@ $(document).ready(function() {
 
                 $(".selectpicker").selectpicker("refresh")
 
-            }else{
-                
+            } else {
+
                 $("#filter_text").val("")
 
                 $(".link_abc.selected").removeClass("selected")
@@ -66,51 +79,18 @@ $(document).ready(function() {
                 $(this).addClass("selected")
 
                 link_abc = $(this).data("value")
-                
+
                 setup_filter(link_abc)
 
                 get_rows(false, true)
-                    
+
             }
         }
     })
 
-    /*$("#table_content").on('keypress', ".quantity",function (event) {
-        var keycode = (event.keyCode ? event.keyCode : event.which);
-        if(keycode == '13'){
-            console.log("aqui")
-            und_factor($(this))
-
-       
-        }
-    })*/
-
-    /*$("#table_content").on('blur', ".quantity",function () {
-
-        und_factor($(this))
-       
-        
-    })*/
-
 });
-/*
-function und_factor($quantity){
-    
-    value = $quantity.val()
-        
-    row = $quantity.data("select")
-    
-    if (value && value > 0){
-        $(`tr.${row} td`).addClass("item_select")
-        $(`tr.${row}`).addClass("row_select")
-    }else{
-        $(`tr.${row} td`).removeClass("item_select")
-        $(`tr.${row}`).removeClass("row_select")
 
-    }
-}*/
-
-function setup_filter(link_abc){
+function setup_filter(link_abc) {
 
     $('.item-row.filter').not(`.${link_abc}`).hide()
 
@@ -118,9 +98,9 @@ function setup_filter(link_abc){
 
     $item_filter = $('.item-row.filter:visible');
 
-    get_class($item_filter )
+    get_class($item_filter)
 }
-function get_class($item_filter){
+function get_class($item_filter) {
 
     SubCategoria_list = []
 
@@ -129,8 +109,8 @@ function get_class($item_filter){
     $select_option = $(".option, .select-option")
 
     $select_option.hide()
-    
-    $item_filter.each(function(){
+
+    $item_filter.each(function () {
 
         array_class = $(this).attr("class").split(" ")
 
@@ -145,11 +125,6 @@ function get_class($item_filter){
 
     })
 
-    // $('#select-SubCategoria').selectpicker('val', SubCategoria_list);
-
     $(".selectpicker").selectpicker("refresh")
-
-    // $("#select-SubCategoria").selectpicker("refresh")
-
 
 }

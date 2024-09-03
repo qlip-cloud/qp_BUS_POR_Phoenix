@@ -535,7 +535,7 @@ def get_attrs_filters_item_group(item_group):
 
 def get_from_base(idlevel, cond_t = None, has_inventary = False, has_auto_coupon = False):
     
-    class_condition = "" if cond_t == "1=1" else "left join `tabqp_GP_ClassSync` as class_sync on(prod.qp_phonix_class = class_sync.id)"
+    class_condition = "left join `tabqp_GP_ClassSync` as class_sync on(prod.qp_phonix_class = class_sync.id)"
     
     item_quantity_inner = """inner join `tabqp_GP_ItemQuantity` as item_quantity
             on (prod.name = item_quantity.iditem)""" if has_inventary else ""
@@ -596,7 +596,7 @@ def get_tbl_product_list(item_group, from_base, where_base, item_code_list = Non
     
     text_filter_condition = __get_text_filter_condition(filter_text)
 
-    class_condition = "" if cond_t == "1=1" else "REPLACE( class_sync.title , ' ', '--' ) as class_title,"
+    class_condition =  "REPLACE( class_sync.title , ' ', '--' ) as class_title,"
     
     has_inventary_condition = " and (item_quantity.quantity > 0 or item_quantity.quantitydis > 0)" if has_inventary else ""
 

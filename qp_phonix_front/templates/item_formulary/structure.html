@@ -18,7 +18,7 @@
 <link rel="stylesheet" href="/assets/qp_phonix_front/css/img_detail.css">
 <link rel="stylesheet" href="/assets/qp_phonix_front/css/loader.css">
 <link rel="stylesheet" href="/assets/qp_phonix_front/css/general.css">
-
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 {% endblock %}
 
 {% block section_title %}                 
@@ -223,6 +223,12 @@ button {
     .discount-style.green{
         color:green;
     }
+    .search{
+        padding: 0 10px;
+    }
+    .material-symbols-outlined{
+        line-height: 1.5;
+    }
 
 </style>
     <input type="hidden" id="order_id" value="{{order.so_name if order else ''}}">
@@ -307,6 +313,14 @@ button {
         <div class="col-sm-12 col-md-5 text-left row-abc">
             <input type="text" id = "filter_text" class="form-control" name="" id="" placeholder="Buscar por Código de ítems">
         </div>
+        <div class="col-sm-12 col-md-5 text-left row-abc">
+            <button class="button-master button-default search" id = "search_text">
+                <span class="material-symbols-outlined">
+                    search
+                    </span>
+            </button>
+            
+</div>
     </div>
     <div class="row ">
         <div class="clear-responsive">
