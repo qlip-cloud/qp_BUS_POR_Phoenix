@@ -39,6 +39,12 @@ $(document).ready(function () {
         }
     })
 
+    $("#search_text").on("click", function (event) {
+      
+            get_filter_text()
+            
+    })
+
 
     item_group_active = $("#item_group_active").val()
 
