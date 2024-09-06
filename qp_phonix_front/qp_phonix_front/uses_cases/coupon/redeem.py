@@ -130,9 +130,15 @@ def set_coupon_order(order, item, coupon):
     order.append('items', {
             'item_code': item.get('item_code'),
             'qty': item.get('qty'),
-            'discount_percentage': item.discount_percentage + coupon.percentage
+            'discount_percentage': __get_discount_total_with_auto_discount(item, coupon)
             
         })
+
+def __get_discount_total_with_auto_discount(item, coupon):
+    
+        final_price = item.price_list_rate * (1 - item.discount_percentage / 100) * (1 - coupon.percentage / 100)
+        
+        return (1 - final_price / item.price_list_rate) * 100
 
 def set_coupont_items_log(coupon_log, item, coupon):
     
@@ -140,7 +146,7 @@ def set_coupont_items_log(coupon_log, item, coupon):
                     "item_code": item.get('item_code'),
                     "discount_old": item.discount_percentage,
                     "rate_old": item.rate,
-                    "discount_new": coupon.percentage,
+                    "discount_new": item.discount_percentage,
                     "qty": item.get('qty')
                 })
     

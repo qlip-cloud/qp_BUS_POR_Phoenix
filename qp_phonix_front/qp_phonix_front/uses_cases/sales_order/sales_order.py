@@ -179,7 +179,7 @@ def get_sales_order(sales_order):
                     currency.name as currency,
                     currency.symbol as currency_symbol,
                     IFNULL(coupon.percentage, 0) as auto_discount,
-                    FORMAT((price_list_rate * so_items.qty ) - ((price_list_rate * so_items.qty )    * (IFNULL(coupon.percentage, 0) + so_items.discount_percentage) / 100) ,2) as auto_discount_total
+                    FORMAT((amount) - (amount * (IFNULL(coupon.percentage, 0)) / 100) ,2) as auto_discount_total
                 from `tabSales Order` as so
                 inner join `tabSales Order Item` as so_items on so.name = so_items.parent
                 inner join tabItem as item on item.name = so_items.item_code
@@ -262,7 +262,7 @@ def create_sales_order(order_json):
 
         sale_order =  frappe.get_doc(string_obj)
         
-        search_automatic_discount(sale_order)
+        #search_automatic_discount(sale_order)
         
         sale_order.insert()
 
@@ -284,9 +284,7 @@ def create_sales_order(order_json):
 
     return rec_result
 
-def search_automatic_discount(sale_order):
-    for item in  sale_order.items:
-        print(item)
+
 
 @frappe.whitelist()
 def sales_order_update(order_json):
