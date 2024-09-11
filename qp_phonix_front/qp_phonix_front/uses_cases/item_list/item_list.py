@@ -5,6 +5,7 @@ from gp_phonix_integration.gp_phonix_integration.constant.api_setup import QUANT
 from gp_phonix_integration.gp_phonix_integration.service.connection import execute_send
 from qp_phonix_front.qp_phonix_front.uses_cases.shipping_method.shipping_method_list import __get_customer
 from gp_phonix_integration.gp_phonix_integration.service.utils import get_price_list
+import copy
 
 URL_IMG_EMPTY = "/assets/qlip_bussines_theme/images/company_default_logo.jpg"
 
@@ -62,7 +63,7 @@ def callback_get_inventary(item_group = None, item_Categoria= None, item_SubCate
                                     item_code_list = item_code_list, idlevel = idlevel, has_inventary = has_inventary, with_list_price = with_list_price, 
                                     has_auto_coupon = has_auto_coupon)
     
-    result =  __get_product_list(setup.get("tbl_product_list"), setup.get("cond_c"), setup.get("cond_t"), has_limit=True)
+    result =  __get_product_list(setup.get("tbl_product_list"), setup.get("cond_c"), setup.get("cond_t"), has_limit=True, filter_text = filter_text)
 
     if not has_inventary:
 
@@ -702,10 +703,22 @@ def __get_cond(attribute, item_value):
 
 
 #def __get_product_list(tbl_product_list, tlb_product_attr_select, tlb_product_attr_body, cond_c, cond_t, has_limit = True ):
-def __get_product_list(tbl_product_list, cond_c, cond_t, has_limit = True ):
+def __get_product_list(tbl_product_list, cond_c, cond_t, has_limit = True, filter_text   = [] ):
 
     limit = "LIMIT 0, 10" if has_limit else ""
-
+    
+    order_by = "order by prod.item_name"
+    
+    if len(filter_text) > 1:
+        
+        items_code = copy.deepcopy(filter_text)
+        
+        items_code.insert(0, {})
+        
+        tuple_filter = str(tuple(items_code)).format("prod.item_code")
+        
+        order_by = "order by FIELD%s" % tuple_filter
+    
     #select_attr_base = __get_select_attr_base()
     #print("select_attr_base:", select_attr_base,"tbl_product_list:", tbl_product_list,"cond_c: ", cond_c,"cond_t: ", cond_t,"limit", limit)  
     #print("cond_c: ", cond_c,"cond_t: ", cond_t,"limit", limit)  
@@ -713,11 +726,11 @@ def __get_product_list(tbl_product_list, cond_c, cond_t, has_limit = True ):
         %s
         and %s
         and %s
-        order by prod.item_name
+        %s
         %s
         
 
-    """ % (tbl_product_list, cond_c, cond_t, limit)  
+    """ % (tbl_product_list, cond_c, cond_t, order_by, limit)  
     #print(sql_product_list)
     
     print(sql_product_list)
