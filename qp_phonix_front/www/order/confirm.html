@@ -370,7 +370,7 @@ Orden
                                             data-id="{{item.item_code | replace(':','-')}}"> {% endif %}
                                         {{item.item_name}}
                                     </div>
-                                    <div class="col-sm-6">
+                                    <div class="col-sm-8">
                                         {%if order.status !="Draft" %}
                                         <span
                                             style="font-size: 15px; color:{{item.qp_phoenix_status_color}}">{{item.qp_phoenix_status_title}}
@@ -384,7 +384,8 @@ Orden
 
                                         <span style="color: #5aa83a; font-size: 0.8em;text-shadow: 0.5px 0.5px #a6a6a6;"
                                             id="label-{{item.item_code | replace(':','-')}}">
-                                            Producto aplicable a {{item.auto_discount}}% de descuento, al confirmar la orden el total será {{item.auto_discount_total}}</span>
+                                            {{item.auto_qty | int}} Producto aplican a {{item.auto_discount}}% de descuento, 
+                                            al confirmar la orden el total será {{order.currency_symbol}}{{item.auto_discount_total_format}} + {{order.currency_symbol}}{{item.auto_difference_total_format}} = {{order.currency_symbol}}{{item.auto_total_format}}</span>
                                         {% endif %}
                                     </div>
                                 </div>

@@ -155,44 +155,89 @@ def get_sales_order(sales_order):
 
         if so_obj:
 
-            sql_so_items_obj = """
-                Select 
-                    so_items.name as code,
-                    so_items.item_code,item.item_group,qp_phoenix_order_customer,
-                    so_items.item_name,
-                    IF(so_items.image IS NULL or so_items.image = '', '%s', so_items.image) as image,
-                    so_items.net_rate as price,
-                    FORMAT(so_items.net_rate,2) as price_format,
-                    so.qp_phoenix_order_comment,
-                    so_items.qty as cantidad,
-                    so_items.stock_uom,
-                    so_items.amount,
-                    so_items.delivery_date,
-                    so_items.qp_phoenix_status_title,
-                    so_items.qp_phoenix_status,
-                    so_items.qp_phoenix_status_color,
-                    so_items.line_number,
-                    so_items.delivery_date_visible,
-                    ROUND(net_amount,2) as total,
-                    FORMAT(net_amount,2) as total_format,
-                    so_items.description,
-                    currency.name as currency,
-                    currency.symbol as currency_symbol,
-                    IFNULL(coupon.percentage, 0) as auto_discount,
-                    FORMAT((amount) - (amount * (IFNULL(coupon.percentage, 0)) / 100) ,2) as auto_discount_total
-                from `tabSales Order` as so
-                inner join `tabSales Order Item` as so_items on so.name = so_items.parent
-                inner join tabItem as item on item.name = so_items.item_code
-                inner join `tabPrice List` as price_list on so.selling_price_list = price_list.name
-                inner join `tabCurrency` as currency on price_list.currency = currency.name
-                left join `tabqp_pf_CouponItems` as coupon_item
-                on (so_items.item_code = coupon_item.item and coupon_item.count > 0)
-                left join `tabqp_pf_Coupon` as coupon
-                on (coupon.name = coupon_item.parent and coupon.is_automatic = 1)
-                where so.customer = '%s' and so.name = '%s'
-                order by so_items.qp_phoenix_status asc , so_items.delivery_date desc,so_items.item_code, so_items.description, so_items.delivery_date desc
-            """ % (URL_IMG_EMPTY, customer.name, sales_order)
-
+            sql_so_items_obj = """          
+                SELECT
+                    *,
+                    format(auto_discount_total,2) as auto_discount_total_format,
+                    format(auto_diference_total,2) as auto_difference_total_format,
+                    format(auto_discount_total + auto_diference_total,2) as auto_total_format
+                from (
+                    
+                    Select 
+                        so_items.name as code,
+                        so_items.item_code,item.item_group,qp_phoenix_order_customer,
+                        so_items.item_name,
+                        IF(so_items.image IS NULL or so_items.image = '', '%s', so_items.image) as image,
+                        so_items.net_rate as price,
+                        FORMAT(so_items.net_rate,2) as price_format,
+                        so.qp_phoenix_order_comment,
+                        so_items.qty as cantidad,
+                        so_items.stock_uom,
+                        so_items.amount,
+                        so_items.delivery_date,
+                        so_items.qp_phoenix_status_title,
+                        so_items.qp_phoenix_status,
+                        so_items.qp_phoenix_status_color,
+                        so_items.line_number,
+                        so_items.delivery_date_visible,
+                        ROUND(net_amount,2) as total,
+                        FORMAT(net_amount,2) as total_format,
+                        so_items.description,
+                        currency.name as currency,
+                        currency.symbol as currency_symbol,
+                        IFNULL(coupon.percentage, 0) as auto_discount,
+                        IFNULL(coupon_item.count, 0) as auto_count,
+                        case
+                            when 
+                                so_items.qty > IFNULL(coupon_item.count, 0)
+                            then
+                                IFNULL(coupon_item.count, 0)
+                            else
+                                so_items.qty
+                                
+                        end as auto_qty,
+                        
+                        case
+                            when 
+                                so_items.qty > IFNULL(coupon_item.count, 0)
+                            then
+                                so_items.qty - IFNULL(coupon_item.count, 0)
+                            else
+                                so_items.qty
+                                
+                        end as auto_diference,
+                        
+                        case
+                            when 
+                                so_items.qty > IFNULL(coupon_item.count, 0)
+                            then
+                                (so_items.qty - IFNULL(coupon_item.count, 0)) * so_items.rate
+                            else
+                                amount
+                                
+                        end as auto_diference_total,                    
+                        case
+                            when 
+                                so_items.qty > IFNULL(coupon_item.count, 0)
+                            then
+                                (IFNULL(coupon_item.count, 0) * so_items.rate) - ((IFNULL(coupon_item.count, 0) * so_items.rate)* (IFNULL(coupon.percentage, 0)) / 100)
+                            else
+                                amount - (amount * (IFNULL(coupon.percentage, 0)) / 100)
+                                
+                        end as auto_discount_total
+                        
+                    from `tabSales Order` as so
+                    inner join `tabSales Order Item` as so_items on so.name = so_items.parent
+                    inner join tabItem as item on item.name = so_items.item_code
+                    inner join `tabPrice List` as price_list on so.selling_price_list = price_list.name
+                    inner join `tabCurrency` as currency on price_list.currency = currency.name
+                    left join `tabqp_pf_CouponItems` as coupon_item
+                    on (so_items.item_code = coupon_item.item and coupon_item.count > 0)
+                    left join `tabqp_pf_Coupon` as coupon
+                    on (coupon.name = coupon_item.parent and coupon.is_automatic = 1)
+                    where so.customer = '%s' and so.name = '%s'
+                    order by so_items.qp_phoenix_status asc , so_items.delivery_date desc,so_items.item_code, so_items.description, so_items.delivery_date desc
+                ) AS subquery""" % (URL_IMG_EMPTY, customer.name, sales_order)
             so_items_obj = frappe.db.sql(sql_so_items_obj, as_dict=1)
 
             for item in so_items_obj:
