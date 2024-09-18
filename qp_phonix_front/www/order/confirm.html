@@ -384,11 +384,8 @@ Orden
 
                                         <span style="color: #5aa83a; font-size: 0.8em;text-shadow: 0.5px 0.5px #a6a6a6;"
                                             id="label-{{item.item_code | replace(':','-')}}">
-                                            {{item.auto_qty | int}} Producto aplican a {{item.auto_discount}}% de descuento, 
-                                            al confirmar la orden el total será {{order.currency_symbol}}{{item.auto_discount_total_format}} 
-                                            {%if item.cantidad > item.auto_qty  %}
-                                                + {{order.currency_symbol}}{{item.auto_difference_total_format}} = {{order.currency_symbol}}{{item.auto_total_format}}</span>
-                                            {% endif %}
+                                            {{item.auto_qty | int}} UNIDADES APLICAN A {{item.auto_discount}}% DE DCTO PARA UN AHORRO TOTAL DE {{order.currency_symbol}}{{item.auto_discount_percentage}} 
+                                            
                                         {% endif %}
                                     </div>
                                 </div>

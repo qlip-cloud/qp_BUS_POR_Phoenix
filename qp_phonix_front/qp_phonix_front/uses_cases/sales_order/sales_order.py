@@ -160,7 +160,8 @@ def get_sales_order(sales_order):
                     *,
                     format(auto_discount_total,2) as auto_discount_total_format,
                     format(auto_diference_total,2) as auto_difference_total_format,
-                    format(auto_discount_total + auto_diference_total,2) as auto_total_format
+                    format(auto_discount_total + auto_diference_total,2) as auto_total_format,
+                    format(amount - (auto_discount_total + auto_diference_total),2) as auto_discount_percentage
                 from (
                     
                     Select 
@@ -213,7 +214,7 @@ def get_sales_order(sales_order):
                             then
                                 (so_items.qty - IFNULL(coupon_item.count, 0)) * so_items.rate
                             else
-                                amount
+                                0
                                 
                         end as auto_diference_total,                    
                         case
