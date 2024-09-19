@@ -161,7 +161,8 @@ def get_sales_order(sales_order):
                     format(auto_discount_total,2) as auto_discount_total_format,
                     format(auto_diference_total,2) as auto_difference_total_format,
                     format(auto_discount_total + auto_diference_total,2) as auto_total_format,
-                    format(amount - (auto_discount_total + auto_diference_total),2) as auto_discount_percentage
+                    format(amount - (auto_discount_total + auto_diference_total),2) as auto_discount_percentage_format,
+                    IFNULL(amount - (auto_discount_total + auto_diference_total),0) as auto_discount_percentage
                 from (
                     
                     Select 
