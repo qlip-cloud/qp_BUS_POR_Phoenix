@@ -44,7 +44,7 @@ def send_sales_order(sales_order):
 
         so_json = __prepare_petition(master_name, sales_order, so_upd)
 
-        print("so_json--->", so_json)
+        #print("so_json--->", so_json)
 
         res['body_data'] = so_json
 
@@ -53,11 +53,11 @@ def send_sales_order(sales_order):
         # so_respose = {'Estado': 'Falla', 'Detalle': ''}
         # so_respose =  {'Estado': 'Exitoso', 'Detalle': 'PRB-003'}
 
-        print("so_respose-->", so_respose)
+        #print("so_respose-->", so_respose)
 
         res['response'] = so_respose
 
-        print("so_respose.get(Estado)", so_respose.get("Estado"))
+        #print("so_respose.get(Estado)", so_respose.get("Estado"))
 
         if so_respose.get("Estado") == "Exitoso":
 

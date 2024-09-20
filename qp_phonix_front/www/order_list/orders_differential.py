@@ -22,7 +22,7 @@ def get_context(context):
         
         context.so_differential = get_order_differential(process_name)
 
-        print("context.so_differential", context.so_differential)
+        #print("context.so_differential", context.so_differential)
 
         context.process = process_name
 

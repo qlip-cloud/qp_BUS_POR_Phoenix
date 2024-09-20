@@ -733,7 +733,7 @@ def __get_product_list(tbl_product_list, cond_c, cond_t, has_limit = True, filte
     """ % (tbl_product_list, cond_c, cond_t, order_by, limit)  
     #print(sql_product_list)
     
-    print(sql_product_list)
+    #print(sql_product_list)
     product_list = frappe.db.sql(sql_product_list, as_dict=1)
     for item in product_list:
         

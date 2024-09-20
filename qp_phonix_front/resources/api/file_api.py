@@ -49,7 +49,7 @@ def load_so(adv_int_name):
 @frappe.whitelist()
 def sent_so2gp(adv_int_name):
 
-    print("sent_so2gp")
+    #print("sent_so2gp")
 
     origin = "api_sent_so_to_GP"
 
