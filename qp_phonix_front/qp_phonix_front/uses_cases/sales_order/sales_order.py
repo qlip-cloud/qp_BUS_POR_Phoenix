@@ -312,6 +312,9 @@ def create_sales_order(order_json):
         #search_automatic_discount(sale_order)
         
         sale_order.insert()
+        
+        set_qp_subtotal(sale_order)
+        sale_order.save()
 
         rec_result['name'] = sale_order.name
 
@@ -449,7 +452,10 @@ def __confirm_sales_order(order_json, sales_order):
         
         sales_order.save()
         
+        
         __send_sales_order(sales_order)
+        
+        set_qp_subtotal(sales_order)
         
         sales_order.submit()
         
@@ -771,7 +777,7 @@ def __get_body(json_data):
 
     obj_data = {
         "customer": customer.name,
-        
+        "currency": customer.default_currency,  
         "delivery_date": today(),
         "items": json_data.get('items'),
         "selling_price_list": price_list,
@@ -875,7 +881,12 @@ def checkout_rec_log(res_checkout_det):
 
     return res
 
-
+def set_qp_subtotal(sale_order):
+    
+    sale_order.qp_phoenix_order_subtotal = sum(map(lambda item: item.price_list_rate * item.qty, sale_order.items))
+    
+    sale_order.qp_phoenix_order_discount = sale_order.qp_phoenix_order_subtotal - sale_order.total
+    
 class vf_SaleOrderConfirmError(Exception):
 
     def __init__(self, message = _("Error Sales Order API Confirm"), so_name = None, so_json = None, so_respose = None ):
