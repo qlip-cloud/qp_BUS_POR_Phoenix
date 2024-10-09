@@ -302,10 +302,13 @@ Orden
                     <div class=" col-md-12 subtitle">
                         Costo Total Antes de IVA
                     </div>
-                    <div class=" col-md-12 title" style="line-height: 48px;text-overflow: ellipsis;  white-space: nowrap;">
+                    <div class=" col-md-12 title"
+                        style="line-height: 48px;text-overflow: ellipsis;  white-space: nowrap;">
                         {{order.currency_symbol}} <span id="" class="price_total ">{{order.total_format | replace(",",
                             ".")}}</span>
                     </div>
+                    {% if order.status == 'Draft' %}
+
                     <div class=" col-md-12 subtitle green-discount" id="green-discount" style="display: none;">
 
 
@@ -316,6 +319,8 @@ Orden
                         </div>
 
                     </div>
+                    {%endif%}
+
                     <div class=" col-md-12 subtitle">
                         {{order.currency}}
                     </div>
