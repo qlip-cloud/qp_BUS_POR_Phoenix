@@ -69,6 +69,8 @@ def callback_get_inventary(item_group = None, item_Categoria= None, item_SubCate
 
         return get_item_inventary(result)
     
+    
+    
     return result
     
     #if has_inventary:

@@ -486,7 +486,7 @@ function get_rows(is_valid = false, is_letter = false, is_class = false) {
             method = "paginator"
 
             callresponse = (response) => {
-
+                
                 if (!response.data) {
                     $pagination_control.val(1)
                 }
