@@ -464,7 +464,7 @@ Orden
                                     {%if order.status_code == 0%}
                                     <input type="number" class="form-control quantity" data-factor="{{item.inqt}}"
                                         data-value="{{item.cantidad | int}}" id="quantity"
-                                        value="{{item.cantidad | int}}">
+                                        value="{{item.cantidad | int}}" readonly>
                                     {%else%}
                                     {{item.cantidad | int}}
                                     {%endif%}
