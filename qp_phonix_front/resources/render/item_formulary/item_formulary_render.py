@@ -18,6 +18,8 @@ def paginator(order_id = None, item_group = None, item_Categoria = None, item_Su
     
     has_filter_text = False
     
+    order_filter_text = []
+    
     if filter_text:
             
             order_filter_text = filter_text.split(" ")
