@@ -726,7 +726,7 @@ def __get_body(json_data):
 
     obj_data = {
         "customer": customer.name,
-        
+        "currency": price_list,  
         "delivery_date": today(),
         "items": json_data.get('items'),
         "selling_price_list": price_list,
