@@ -208,10 +208,14 @@ function und_factor($quantity) {
         }
         $inventory_quantity = $(`#table_content #inventory_quantity-${item_name}`);
 
-        if (quantity_format == "False" && max_value > 0) {
+        control_value = transit_value + max_value;
+
+        if (quantity_format == "False" && control_value > 0) {
+
 
                 if (parseInt(value) > parseInt(max_value)) {
-                        if ((transit_value + max_value) >= value)
+                        
+                        if (control_value >= value)
 
                                 $inventory_quantity.html("En tránsito");
                         else

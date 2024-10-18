@@ -10,6 +10,8 @@ from datetime import datetime
 
 def get_context(context):
     
+    context.no_cache = 1
+    
     frappe.clear_cache()
         
     frappe.website.render.clear_cache()
