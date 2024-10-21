@@ -18,11 +18,11 @@ Orden
 <span data-url="/order/index" class="btn button-master button-back  btn-redirect">
     {{ _("VOLVER A ORDENES") }}
     {% else %}
-        <span data-url ="/order/item_formulary" class="btn button-master button-back btn-redirect">
+    <span data-url="/order/item_formulary" class="btn button-master button-back btn-redirect">
         {{ _("VOLVER A CONSULTAR ARTÍCULOS") }}
-    {%endif%}
+        {%endif%}
 
-</span>
+    </span>
     {%if order.status == "Draft"%}
 
     {#if is_valid and order.status_code == 0#}
@@ -45,6 +45,11 @@ Orden
     {% block principal_content %}
 
     <style>
+        .total-content>.subtitle {
+            font-size: 0.7vw !important;
+
+        }
+
         .coupon_error {
             color: red;
             font-size: 0.7em;
@@ -106,6 +111,15 @@ Orden
 
         .total-responsive {
             display: none;
+        }
+
+        .green-discount {
+            color: #5aa83a;
+            font-size: 0.8em;
+        }
+
+        .price_discount_class {
+            font-size: 28px;
         }
 
         @media (max-width: 576px) {
@@ -195,7 +209,7 @@ Orden
                     id="qp_phoenix_order_customer" value={{order.qp_phoenix_order_customer if
                     order.qp_phoenix_order_customer else "" }}>
             </div>
-            
+
             <div class="row shadow p-3 mb-5 bg-white rounded">
 
                 {% if order.status != 'Draft' %}
@@ -226,7 +240,7 @@ Orden
                     Comentarios
                 </div>
                 <textarea type="text" class="form-control " {{ 'disabled' if order.status !="Draft" else '' }}
-                    id="qp_phoenix_order_comment" > {{order.qp_phoenix_order_comment if
+                    id="qp_phoenix_order_comment"> {{order.qp_phoenix_order_comment if
                         order.qp_phoenix_order_comment else "" }}</textarea>
             </div>
         </div>
@@ -288,10 +302,25 @@ Orden
                     <div class=" col-md-12 subtitle">
                         Costo Total Antes de IVA
                     </div>
-                    <div class=" col-md-12 title" style="line-height: 48px;">
+                    <div class=" col-md-12 title"
+                        style="line-height: 48px;text-overflow: ellipsis;  white-space: nowrap;">
                         {{order.currency_symbol}} <span id="" class="price_total ">{{order.total_format | replace(",",
                             ".")}}</span>
                     </div>
+                    {% if order.status == 'Draft' %}
+
+                    <div class=" col-md-12 subtitle green-discount" id="green-discount" style="display: none;">
+
+
+                        Costo total con descuento <br>
+                        <div class="price_discount_class">
+                            {{order.currency_symbol}}
+                            <span id="" class="price_discount">{{order.total_format | replace(",",".")}}
+                        </div>
+
+                    </div>
+                    {%endif%}
+
                     <div class=" col-md-12 subtitle">
                         {{order.currency}}
                     </div>
@@ -350,9 +379,10 @@ Orden
 
                 <div class="row line row_select" data-price={{item.price }}
                     data-subtotal="{{item.price * item.cantidad}}" data-item="row-{{item.item_code}}"
-                    data-description="{{item.description}}" 
-                    data-code="{{item.code}}"id="row-{{item.item_code | replace(':','-')}}">
+                    data-description="{{item.description}}" data-code="{{item.code}}"
+                    id="row-{{item.item_code | replace(':','-')}}">
                     <input type="hidden" class="subtotal" value={{item.price * item.cantidad}}>
+                    <input type="hidden" class="subtotal_discount" value="{{item.auto_discount_percentage}}">
                     <div class="col-sm-2">
                         <img width="575px" height="575px" class="rounded" src="{{item.image}}" alt="">
                     </div>
@@ -370,22 +400,24 @@ Orden
                                             data-id="{{item.item_code | replace(':','-')}}"> {% endif %}
                                         {{item.item_name}}
                                     </div>
-                                    <div class="col-sm-6">
+                                    <div class="col-sm-8">
                                         {%if order.status !="Draft" %}
                                         <span
                                             style="font-size: 15px; color:{{item.qp_phoenix_status_color}}">{{item.qp_phoenix_status_title}}
                                             / Entrega: {{item.delivery_date}} </span>
                                         {% elif item.has_discount %}
 
-                                        <span style="color: #5aa83a; font-size: 0.8em;"
-                                            id="label-{{item.item_code | replace(':','-')}}">
+                                        <span class="green-discount" id="label-{{item.item_code | replace(':','-')}}">
                                             Producto con descuento</span>
                                         {% elif item.auto_discount %}
 
-                                        <span style="color: #5aa83a; font-size: 0.8em;text-shadow: 0.5px 0.5px #a6a6a6;"
-                                            id="label-{{item.item_code | replace(':','-')}}">
-                                            Producto aplicable a {{item.auto_discount}}% de descuento, al confirmar la orden el total será {{item.auto_discount_total}}</span>
-                                        {% endif %}
+                                        <span class="green-discount" id="label-{{item.item_code | replace(':','-')}}">
+                                            {{item.auto_qty | int}} UNIDADES APLICAN A {{item.auto_discount}}% DE DCTO
+                                            PARA
+                                            UN AHORRO TOTAL DE
+                                            {{order.currency_symbol}}{{item.auto_discount_percentage_format}}
+
+                                            {% endif %}
                                     </div>
                                 </div>
                                 </p>
@@ -432,7 +464,7 @@ Orden
                                     {%if order.status_code == 0%}
                                     <input type="number" class="form-control quantity" data-factor="{{item.inqt}}"
                                         data-value="{{item.cantidad | int}}" id="quantity"
-                                        value="{{item.cantidad | int}}">
+                                        value="{{item.cantidad | int}}" readonly>
                                     {%else%}
                                     {{item.cantidad | int}}
                                     {%endif%}

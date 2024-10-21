@@ -101,7 +101,7 @@ def set_order_data(context, order_id):
 
     context.order = order_response.get("order")
 
-    context.items_select = order_response.get("items")
+    context.items_select = sorted(order_response.get("items"), key=lambda x: x['idx'])
 
     order = frappe.get_doc("Sales Order", order_id)
     

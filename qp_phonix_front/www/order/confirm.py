@@ -15,7 +15,9 @@ from frappe.utils import get_url, getdate,today
 def get_context(context):
 
     is_guest()
-
+    
+    context.no_cache = 1
+    
     frappe.clear_cache()
         
     frappe.website.render.clear_cache()

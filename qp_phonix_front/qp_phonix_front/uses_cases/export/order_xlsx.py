@@ -24,7 +24,7 @@ def export_xlsx(order_id):
         
     ], order.get("items")))
 
-    print(items)
+    #print(items)
 
     xlsx_data = [
         [           

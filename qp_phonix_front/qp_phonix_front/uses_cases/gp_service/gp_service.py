@@ -92,7 +92,7 @@ def __prepare_petition(master_name, so_obj):
             {
                 "Id": item.item_code,
                 "Quantity": item.qty,
-                "Price": item.base_rate if so_obj.additional_discount_percentage > 0 else item.base_net_rate,
+                "Price": item.rate if so_obj.additional_discount_percentage > 0 else item.net_rate,
                 #"DiscountPercentage": item.discount_percentage, #valida
                 "DiscountPercentage": 0, #valida
                 "DiscountPrice": 0, #valida

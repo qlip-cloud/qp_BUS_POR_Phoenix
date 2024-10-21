@@ -7,6 +7,8 @@ from qp_phonix_front.qp_phonix_front.services.try_catch import handler as try_ca
 
 def get_context(context):
 
+    context.no_cache = 1
+    
     is_guest()
 
     frappe.clear_cache()

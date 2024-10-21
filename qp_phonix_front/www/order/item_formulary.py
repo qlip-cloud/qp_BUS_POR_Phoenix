@@ -8,11 +8,16 @@ from qp_phonix_front.qp_phonix_front.uses_cases.item_group.item_group_list impor
 #from qp_phonix_front.qp_phonix_front.uses_cases.item_list.item_list import vf_item_list, get_item_list
 #from qp_phonix_front.qp_phonix_front.uses_cases.item_list.item_list import get_product_class,get_product_sku
 from gp_phonix_integration.gp_phonix_integration.use_case.get_item_inventary import handler as get_item_inventary
+from qp_phonix_front.qp_phonix_front.uses_cases.item_list.item_list import paginator_item_list
+import copy
+
 import frappe
 
 
 def get_context(context):
-
+    
+    context.no_cache = 1
+    
     is_guest()
     
     frappe.clear_cache()
@@ -84,26 +89,9 @@ def setup_new(context):
     context.item_list = []
 
     context.class_list = get_product_class(context.idlevel)
+    
     context.item_group_select = context.item_groups[0].title
     
-
-    #context.sku_list =    get_product_sku(context.idlevel)
-    #print(context.sku_list)
-    #query_params = frappe.request.args
-
-    #item_group_select = query_params.get("item_group")
-    
-    
-    #shipping_method_select = query_params.get("shipping_type")
-    
-    #shipping_date_select = query_params.get("shipping_date")
-
-    #set_shipping_data(context, item_group_select, shipping_method_select, shipping_date_select)
-
-    #set_items_data(context, item_group_select, idlevel = context.idlevel)
-
-    #context.item_list = get_item_inventary(context.item_list)
-
 def get_item_group_select():
     
     item_types = vf_item_group_list()
@@ -138,10 +126,10 @@ def setup_order(context, order_id):
     set_order_data(context, order_id)
 
     item_code_list = get_item_code_by_order(context.items_select)
-
-    items_select = get_order_item_list(item_code_list)
-
-    add_qty_item_list(context.items_select, items_select)
+    
+    items_select = paginator_item_list(filter_text = item_code_list, has_limit = False, idlevel = context.idlevel)
+    
+    items_select = add_qty_item_list(context.items_select, items_select)
 
     return item_code_list, items_select
 
@@ -151,15 +139,22 @@ def get_item_code_by_order(items_select):
 
 def add_qty_item_list(items_select, item_list):
 
+    list_aux = []
+    
     for item_select in items_select:
 
         for item in item_list:
 
             if item_select.get("item_code") == item.get("name"):
 
-                item["cantidad"] =  item_select.get("cantidad")
-                item["code"] =  item_select.get("code")
-                item["code"] =  item_select.get("code")
+                item_pivot = copy.deepcopy(item)
+                
+                item_pivot["cantidad"] =  item_select.get("cantidad")
+                item_pivot["code"] =  item_select.get("code")
+                
+                list_aux.append(item_pivot)
+            
+    return list_aux
 
 def get_autosave_control():
 

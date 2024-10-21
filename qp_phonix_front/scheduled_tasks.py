@@ -6,7 +6,7 @@ from qp_phonix_front.qp_phonix_front.ball_integration.uses_cases.sales_order imp
 
 
 def call_get_status_method(adv_int_name):
-    print("***************se llamó*********************", adv_int_name)
+    #print("***************se llamó*********************", adv_int_name)
 
     title = "call_get_status_method {}".format(adv_int_name)
 
@@ -23,21 +23,21 @@ def call_get_status_method(adv_int_name):
             if adv_int_status:
                 if adv_int_status == "Completed":
                     # Enviar notificación a GP
-                    print("notificar")
+                    #print("notificar")
                     res = send_to_gp_sales_order_by_batch(adv_int_name)
                     break
                 elif adv_int_status == "Active" or adv_int_status == "Starting":
                     delay = 15 # 60
                     time.sleep(delay)
-                    print("esperar")
+                    #print("esperar")
                     continue
                 elif adv_int_status == "Failed":
                     res['msg'] = 'failed'
-                    print("romper bucle - failed")
+                    #print("romper bucle - failed")
                     break
             else:
                 res['msg'] = 'no_recordset'
-                print("romper bucle - no hay registro")
+                #print("romper bucle - no hay registro")
                 break
 
         except Exception as e:
@@ -47,5 +47,5 @@ def call_get_status_method(adv_int_name):
             pass
 
     save_process_status(adv_int_name, res.get('msg'))
-    print("call_get_status_method result ---->",res)
+    #print("call_get_status_method result ---->",res)
     return res

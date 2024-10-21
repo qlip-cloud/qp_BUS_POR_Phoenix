@@ -2,7 +2,7 @@
     {% set count = 4 %}
                     
     <tr data-item-name = "{{item.item_name}}" data-phonix-class = "{{item.qp_phonix_class if item.qp_phonix_class else ''}}" 
-    class="inventary-{{'SI' if item.quantity > 0 else 'NO'}} {{item.sku}} {{ 'auto_discount' if item.discountpercentage_coupon > 0 else ''}} {{item.class_title}} item-row item-row-base {{item.qp_phoenix_shortdescription}} {{item.name | replace(':','-')}} {{item.item_group}} {{item.initial}} {{'row_select' if item.cantidad else ''}} {{'filter' if disabled_off else ''}}" style="{{'display: none;' if not disabled_off else ''}}" data-id = "{{item.name}}" data-description = "{{item.description}}" data-code = "{{item.code}}">
+    class="inventary-{{'SI' if item.quantity > 0 else 'NO'}} {{item.sku}} {{ 'auto_discount' if item.discountpercentage_coupon and item.discountpercentage_coupon > 0 else ''}} {{item.class_title}} item-row item-row-base {{item.qp_phoenix_shortdescription}} {{item.name | replace(':','-')}} {{item.item_group}} {{item.initial}} {{'row_select' if item.cantidad else ''}} {{'filter' if disabled_off else ''}}" style="{{'display: none;' if not disabled_off else ''}}" data-id = "{{item.name}}" data-description = "{{item.description}}" data-code = "{{item.code}}">
         
 
         <input type="hidden" id = "item_id" value= "{{item.name}}" >
@@ -26,7 +26,7 @@
                 <div class="margin-left">
                 <p class="discount-style">{{item.discountpercentage}} %</p>
                 {% if item.discountpercentage_coupon %}
-                    <p class="discount-style green">+ {{item.discountpercentage_coupon}} %</p>
+                    <p class="discount-style green">+ Promo</p>
                 {%endif%}
 
             </div></td>

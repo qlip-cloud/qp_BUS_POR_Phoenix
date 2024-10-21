@@ -33,14 +33,14 @@ $(document).ready(function () {
 
 
         $("#table_content").on('focus', ".quantity", function () {
-                if (!$(this).val() || $(this).val() == "0"){
+                if (!$(this).val() || $(this).val() == "0") {
                         $(this).val("");
                 }
         })
         $("#table_content").on('blur', ".quantity", function () {
-                if ($(this).val()){
+                if ($(this).val()) {
                         und_factor($(this))
-                }else{
+                } else {
                         $(this).val(0)
                 }
         })
@@ -183,11 +183,6 @@ function und_factor($quantity) {
                         base_result = Number((max_value / factor).toFixed(2));
                         base_decimal = Number((base_result - parseInt(base_result)).toFixed(2));
                         base_mult_ue = Number((base_decimal * factor).toFixed(2));
-
-                        console.log(base_result,base_result)
-                        console.log(base_decimal,base_decimal)
-                        console.log(base_mult_ue,base_mult_ue)
-
                         result = Number((value / factor).toFixed(2));
                         decimal_value = Number((result - parseInt(result)).toFixed(2));
                         mult_ue = Number((decimal_value * factor).toFixed(2));
@@ -198,7 +193,7 @@ function und_factor($quantity) {
                         buy_no_sku = (up_value - down_value) >= mult_ue ? true : false;
 
                 }
-                
+
                 if (((value % factor != 0) && (!(buy_no_sku) && calc_incomplete_boxes))) {
 
                         result = parseInt(value / factor) + 1;
@@ -213,10 +208,14 @@ function und_factor($quantity) {
         }
         $inventory_quantity = $(`#table_content #inventory_quantity-${item_name}`);
 
-        if (quantity_format == "False" && max_value > 0) {
+        control_value = transit_value + max_value;
+
+        if (quantity_format == "False" && control_value > 0) {
+
 
                 if (parseInt(value) > parseInt(max_value)) {
-                        if ((transit_value + max_value) >= value)
+                        
+                        if (control_value >= value)
 
                                 $inventory_quantity.html("En tránsito");
                         else
@@ -341,22 +340,33 @@ function valid_change(redirect_url) {
 
 function total_update() {
 
-        const formato = new Intl.NumberFormat('en-US', {
-                maximumFractionDigits: 0,
-        });
 
         let total = 0
+        let discount = 0
+        let total_discount = 0
 
         $(".row_select .subtotal").each(function () {
 
-                subtotal = parseFloat($(this).val());
+                total += parseFloat($(this).val());
 
-                total += subtotal;
         })
 
         //total_str = formato.format(total)
 
-        $(".price_total").html(new Intl.NumberFormat('es-CO').format(total))
+        $(".price_total").html(new Intl.NumberFormat('es-CO', { maximumFractionDigits: 2 }).format(total))
+
+
+        $(".row_select .subtotal_discount").each(function () {
+
+                discount += parseFloat($(this).val());
+        })
+        if (discount > 0) {
+
+                total_discount = total - discount;
+
+                $(".price_discount").html(new Intl.NumberFormat('es-CO', { maximumFractionDigits: 2 }).format(total_discount))
+                $("#green-discount").show()
+        }
 }
 function update_modal(type, data_no = 0) {
 
@@ -428,8 +438,8 @@ function save_order(url, redirect_link, action = null, valid_empty = true, order
                 let quantity_dis = parseInt($(this).find("#quantity").attr("data-quantity_dis"))
                 let description = $(this).attr("data-description")
                 let code = $(this).attr("data-code")
-                let rate= $(this).find("#item_price").val()
-                let discount_percentage=  $(this).find("#item_discount").val()
+                let rate = $(this).find("#item_price").val()
+                let discount_percentage = $(this).find("#item_discount").val()
                 let item_code = $(this).find("#item_id").val()
                 if (qty > 0) {
 

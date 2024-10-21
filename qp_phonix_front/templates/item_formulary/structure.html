@@ -1,7 +1,8 @@
 {% extends "qp_phonix_front/templates/main.html" %}
 
 {% block alphas_js %}
-<script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js" integrity="sha256-hlKLmzaRlE8SCJC1Kw8zoUbU8BxA+8kR3gseuKfMjxA=" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js"
+    integrity="sha256-hlKLmzaRlE8SCJC1Kw8zoUbU8BxA+8kR3gseuKfMjxA=" crossorigin="anonymous"></script>
 <script src="/assets/qp_phonix_front/js/bootstrap-select.min.js"></script>
 <script src="/assets/qp_phonix_front/js/item_formulary.js"></script>
 <script src="/assets/qp_phonix_front/js/item_formulary_filter.js"></script>
@@ -18,170 +19,182 @@
 <link rel="stylesheet" href="/assets/qp_phonix_front/css/img_detail.css">
 <link rel="stylesheet" href="/assets/qp_phonix_front/css/loader.css">
 <link rel="stylesheet" href="/assets/qp_phonix_front/css/general.css">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+<link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 {% endblock %}
 
-{% block section_title %}                 
+{% block section_title %}
 
 {%for item_group in item_groups %}
 
-    <input type="hidden" id="qp_box_no_sku" value="{{qp_box_no_sku}}">
-    <input type="hidden" id="qp_box_sku" value="{{qp_box_sku}}">
-    <input type="hidden" id="qp_buy_no_sku" value="{{qp_buy_no_sku}}">
-    <input type="hidden" id="incomplete_boxes" value="{{incomplete_boxes}}">
-    <div class="">
-        <a  data-item-group = "{{item_group.title}}" class="item_group">{{item_group.title_pretty if item_group.title_pretty else item_group.title}} </a>
-    </div>
+<input type="hidden" id="qp_box_no_sku" value="{{qp_box_no_sku}}">
+<input type="hidden" id="qp_box_sku" value="{{qp_box_sku}}">
+<input type="hidden" id="qp_buy_no_sku" value="{{qp_buy_no_sku}}">
+<input type="hidden" id="incomplete_boxes" value="{{incomplete_boxes}}">
+<div class="">
+    <a data-item-group="{{item_group.title}}" class="item_group">{{item_group.title_pretty if item_group.title_pretty
+        else item_group.title}} </a>
+</div>
 {%endfor%}
-<input type="hidden" id="item_group_active" value = "{{item_group_select}}">
+<input type="hidden" id="item_group_active" value="{{item_group_select}}">
 
 {% endblock %}
 {% block button_title %}
 
 <style>
-
-
-    @media (max-width: 576px){
+    @media (max-width: 576px) {
         th {
             width: 1%;
             white-space: nowrap;
         }
-        .clear-container{
+
+        .clear-container {
             display: none;
         }
-        .clear-responsive{
+
+        .clear-responsive {
             display: block !important;
         }
-        .item_group{
-            font-size: 0.70em  !important;
-            
+
+        .item_group {
+            font-size: 0.70em !important;
+
         }
     }
-    table{
+
+    table {
         width: 100%;
         border: 0 !important;
     }
-    table.item_list  thead th {
+
+    table.item_list thead th {
         background-color: #1aa2aa;
         color: #FFFFFF;
         font: normal normal bold 14px/38px Montserrat;
         border: 1px solid #C8C8C8;
     }
 
-    table tbody td{
+    table tbody td {
         font: normal normal medium 14px/41px Montserrat;
         letter-spacing: 0px;
         color: #000;
         opacity: 1;
         border: 1px solid #C8C8C8;
     }
-    .lateralleft{
+
+    .lateralleft {
         border-left: 0 !important;
     }
-    .lateralright{
+
+    .lateralright {
         border-right: 0 !important;
     }
 
-    .button-new .btn{
+    .button-new .btn {
         background-color: #BCC6B8;
         color: #FFFFFF;
         font: normal normal medium 14px/24px Montserrat;
         width: 100%;
     }
-    .margin-left{
+
+    .margin-left {
         margin-left: 10px;
     }
 
-    .filter_label{
+    .filter_label {
         color: #858585 !important;
     }
 
-    .item_img{
-        width: 70px; 
+    .item_img {
+        width: 70px;
         height: 70px;
     }
 
-    .padding_list{
+    .padding_list {
         padding: 10px;
     }
 
-    .filter-option{
+    .filter-option {
         color: #FFFFFF;
         background-color: #1aa2aa !important;
     }
 
-    .item_select{
+    .item_select {
         color: #858585 !important;
     }
-    .bootstrap-select{
+
+    .bootstrap-select {
         width: 100% !important;
     }
-    .dropdown-menu{
+
+    .dropdown-menu {
         min-width: 100% !important;
     }
 
 
-    .btn.filter_style{
+    .btn.filter_style {
         background-color: #000 !important;
         color: #000 !important;
     }
 
-    .link_abc{
+    .link_abc {
         margin-right: 0.5em;
         text-decoration: underline !important;
         color: #000 !important;
         cursor: pointer;
-        }
-    
-    .link_abc.selected{
-        text-decoration: none !important;
-         
     }
 
-    .row-abc{
+    .link_abc.selected {
+        text-decoration: none !important;
+
+    }
+
+    .row-abc {
         padding-bottom: 30px;
         padding-top: 20px;
     }
 
-    .filter-abc{
+    .filter-abc {
 
         display: none;
 
     }
 
     #select_shipping_method {
-    margin: 0 auto;
-    display: block;
-}
-  
-.tooltip {
-    z-index: 2000;
-}
-
-button {
-    background: aqua;
-    padding:10px;
-  } 
-  
-  .tool-tip[title-new]:hover:after {
-      content: attr(title-new);
-      position: absolute;
-      border: #c0c0c0 1px dotted;
-      padding: 10px;
-      left: 300px;
-      display: block;
-      z-index: 1000000;
-      background-color: #000000;
-      color: #ffffff;
-      max-width: 600px;
-      width: 200px;
-      text-decoration: none;
-      text-align:left;
-      font-size: 10px;
+        margin: 0 auto;
+        display: block;
     }
-    #tool-tip-div{
+
+    .tooltip {
+        z-index: 2000;
+    }
+
+    button {
+        background: aqua;
+        padding: 10px;
+    }
+
+    .tool-tip[title-new]:hover:after {
+        content: attr(title-new);
+        position: absolute;
+        border: #c0c0c0 1px dotted;
+        padding: 10px;
+        left: 300px;
+        display: block;
+        z-index: 1000000;
+        background-color: #000000;
+        color: #ffffff;
+        max-width: 600px;
+        width: 200px;
+        text-decoration: none;
+        text-align: left;
+        font-size: 10px;
+    }
+
+    #tool-tip-div {
         position: fixed;
-        z-index: 100; /*Crea una capa nueva por encima, si tenemos una con valor 2 estará a una altura o por encima de una con 
+        z-index: 100;
+        /*Crea una capa nueva por encima, si tenemos una con valor 2 estará a una altura o por encima de una con 
                         valor 1*/
         /*margin-left:65%; /*Con este margen posicionamos el div donde queramos*/
         border: #c0c0c0 1px dotted;
@@ -193,161 +206,180 @@ button {
         color: rgba(255, 255, 255, 1);
         max-width: 400px;
         text-decoration: none;
-        text-align:left;
+        text-align: left;
         font-size: 12px;
 
     }
-    #tool-tip-div div{
+
+    #tool-tip-div div {
         color: #FFFFFF;
 
     }
-    #tool-tip-div ul{
+
+    #tool-tip-div ul {
         list-style: none;
         margin-left: -2em;
         color: #FFFFFF;
     }
+
     .button-master disabled,
-    .button-master[disabled]{
+    .button-master[disabled] {
         opacity: 0.65;
     }
-    input[type=checkbox]{
+
+    input[type=checkbox] {
         margin-left: 0px;
     }
-    .clear-responsive{
+
+    .clear-responsive {
         display: none;
     }
-    .discount-style{
+
+    .discount-style {
         margin: 0;
         padding: 0;
     }
-    .discount-style.green{
-        color:green;
+
+    .discount-style.green {
+        color: green;
     }
-    .search{
+
+    .search {
         padding: 0 10px;
     }
-    .material-symbols-outlined{
+
+    .material-symbols-outlined {
         line-height: 1.5;
     }
 
+
 </style>
-    <input type="hidden" id="order_id" value="{{order.so_name if order else ''}}">
-    <div class="row " style="padding-top: 20px;">
-       
-        
+<input type="hidden" id="order_id" value="{{order.so_name if order else ''}}">
+<div class="row " style="padding-top: 20px;">
+
+
+
+</div>
+<div class="row">
+    <div class="col-md-3">
+        <div class="form-group">
+            <select class="selectpicker filter_style" data-selected-text-format="count" id="select-SubCategoria"
+                multiple data-live-search="true">
+
+                {%for class in class_list %}
+
+                <option data-active-count="" {#SubCategoria.Categoria_ids|count#}
+                    value="{{class.title | replace(' ','--') }}" class="select-option {{class.class}} ">
+                    {{class.title if class.title else class.code}}</option>
+
+                {%endfor%}
+
+            </select>
+
+        </div>
 
     </div>
-    <div class="row">
-        <div class="col-md-3">
-            <div class="form-group">
-                <select class="selectpicker filter_style"   data-selected-text-format="count" id= "select-SubCategoria" multiple data-live-search="true">
-                    
-                    {%for class in class_list %}
-                    
-                    <option  data-active-count="" {#SubCategoria.Categoria_ids|count#} value="{{class.title | replace(' ','--') }}" class="select-option {{class.class}} ">
-                        {{class.title if class.title else class.code}}</option>
-                        
-                        {%endfor%}
-                        
-                </select>
-                
-            </div>
-            
+    <div class="col-md-4">
+        <div class="text-left row-inventary">
+            <input class="form-check-input" type="checkbox" id="with_list_price" data-id="with_list_price">
+            <label class="form-check-label" for="with_inventary" style="font-size: 14px;">
+                Mostrar referencias lista de precio
+            </label>
         </div>
-        <div class="col-md-4">
-            <div class="text-left row-inventary" >
-                <input class="form-check-input" type="checkbox" id="with_list_price" data-id="with_list_price">
-                <label class="form-check-label" for="with_inventary" style="font-size: 14px;">
-                    Mostrar referencias lista de precio
-                </label>
-            </div>
-            <div class="text-left" >
-                <input class="form-check-input" type="checkbox" id="sku_true" data-id = "sku_true">
-                
-                <label class="form-check-label" for="with_inventary" style="font-size: 14px;">
-                    Mostrar referencias SKU
-                </label>
-            </div>
-            <div class="text-left row-inventary" >
-                <input class="form-check-input" type="checkbox" id="with_inventary">
-                <label class="form-check-label" for="with_inventary" style="font-size: 14px;">
-                    Mostrar referencias con stock
-                </label>
-            </div>
-            <div class="text-left row-inventary" >
-                <input class="form-check-input" type="checkbox" id="only_discount">
-                <label class="form-check-label" for="only_discount" style="font-size: 14px;">
-                    Mostrar productos en oferta
-                </label>
-            </div>
+        <div class="text-left">
+            <input class="form-check-input" type="checkbox" id="sku_true" data-id="sku_true">
 
-
+            <label class="form-check-label" for="with_inventary" style="font-size: 14px;">
+                Mostrar referencias SKU
+            </label>
+        </div>
+        <div class="text-left row-inventary">
+            <input class="form-check-input" type="checkbox" id="with_inventary">
+            <label class="form-check-label" for="with_inventary" style="font-size: 14px;">
+                Mostrar referencias con stock
+            </label>
+        </div>
+        <div class="text-left row-inventary">
+            <input class="form-check-input" type="checkbox" id="only_discount">
+            <label class="form-check-label" for="only_discount" style="font-size: 14px;">
+                Mostrar productos en oferta
+            </label>
         </div>
 
-        <div class="col-md-2 text-left clear-container">
-            <div class="row" style="position: absolute; top:0px">
-                <!--a id="filter_clear">LIMPIAR FILTRO</a-->
-                <a id="filter_clear" onclick=location.reload()>LIMPIAR</a>
-            </div>
-            
+
+    </div>
+
+    <div class="col-md-2 text-left clear-container">
+        <div class="row" style="position: absolute; top:0px">
+            <!--a id="filter_clear">LIMPIAR FILTRO</a-->
+            <a id="filter_clear" onclick=location.reload()>LIMPIAR</a>
         </div>
 
-        <div class="col-md-1 button-new">
-            <!--button class="button-master button-default" disabled id= "save_draft" style="width: 100%;" >GUARDAR</button-->
-        </div>
-        <div class="col-md-2 button-new">
+    </div>
+
+    <div class="col-md-1 button-new">
+        <!--button class="button-master button-default" disabled id= "save_draft" style="width: 100%;" >GUARDAR</button-->
+    </div>
+    <div class="col-md-2 button-new">
         {% if permission.button_confirm %}
-         
-            <button id="confirm_draft"  class="button-master button-default" style="width: 100%; " >Ir al Carrito</button>
+
+        <button id="confirm_draft" class="button-master button-default" style="width: 100%; ">Ir al Carrito</button>
         {%endif%}
 
-        </div>
     </div>
-    
-    <div class="row">
-        
-    </div>
-    <input type="hidden" id="is_filter_abc" value="{{is_filter_abc}}">
-    <input type="hidden" id="idlevel" value="{{idlevel}}">
-    <div class="row " >
-        <div class="col-sm-12 col-md-5 text-left row-abc">
-            <input type="text" id = "filter_text" class="form-control" name="" id="" placeholder="Buscar por Código de ítems">
-        </div>
-        <div class="col-sm-12 col-md-5 text-left row-abc">
-            <button class="button-master button-default search" id = "search_text">
-                <span class="material-symbols-outlined">
-                    search
-                    </span>
-            </button>
-            
 </div>
+
+<div class="row">
+
+</div>
+<input type="hidden" id="is_filter_abc" value="{{is_filter_abc}}">
+<input type="hidden" id="idlevel" value="{{idlevel}}">
+<div class="row ">
+    <div class="col-sm-12 col-md-5 text-left row-abc">
+        <input type="text" id="filter_text" class="form-control" name="" id="" placeholder="Buscar por Código de ítems">
     </div>
-    <div class="row ">
-        <div class="clear-responsive">
+    <div class="col-sm-12 col-md-1 text-left row-abc">
+        <button class="button-master button-default search" id="search_text">
+            <span class="material-symbols-outlined">
+                search
+            </span>
+        </button>
 
-            <div class="col text-left ">
-                <!--a id="filter_clear">LIMPIAR FILTRO</a-->
-                <a id="filter_clear" onclick=location.reload()>LIMPIAR</a>
+    </div>
+    <div class="col-sm-12 col-md-6 text-left row-abc" >
+        <button class="button-master button-default reconcile" id="reconcile" style="padding: 7px;">
+            Consolidar referencias repetidas
 
-                
-            </div>
+        </button>
+
+    </div>
+</div>
+<div class="row ">
+    <div class="clear-responsive">
+
+        <div class="col text-left ">
+            <!--a id="filter_clear">LIMPIAR FILTRO</a-->
+            <a id="filter_clear" onclick=location.reload()>LIMPIAR</a>
+
+
         </div>
-
     </div>
-    <!--p>hover on the button below to check the results</p>
+
+</div>
+<!--p>hover on the button below to check the results</p>
     <button class="tool-tip">Here I am</button-->
 {% endblock %}
 {% block principal_content %}
-    <div class="alert alert-danger connection-alert" style="display: none;" role="alert">
-        Fallo conexion a internet
-    </div>
+<div class="alert alert-danger connection-alert" style="display: none;" role="alert">
+    Fallo conexion a internet
+</div>
 
-    <div id="table_content" style="overflow:hidden">
-        <input type="hidden" data-time = "{{autosave_control}}" value = "0" id = "save_control">
-        <div id="" style="overflow:auto">
+<div id="table_content" style="overflow:hidden">
+    <input type="hidden" data-time="{{autosave_control}}" value="0" id="save_control">
+    <div id="" style="overflow:auto">
 
-        {% include "qp_phonix_front/templates/item_formulary/table.html" %}    
-            
+        {% include "qp_phonix_front/templates/item_formulary/table.html" %}
+
     </div>
 </div>
 
@@ -357,15 +389,15 @@ button {
 
     <!-- The Close Button -->
     <span class="close_mymodal">&times;</span>
-        <img class="modal-content-img" id="img01" alt="Esta es una imagen de referencia, el producto podria variar">
-        
-    <div id="caption" >Esta es una imagen de referencia, el producto podria variar</div>
+    <img class="modal-content-img" id="img01" alt="Esta es una imagen de referencia, el producto podria variar">
+
+    <div id="caption">Esta es una imagen de referencia, el producto podria variar</div>
 
     <!-- Modal Content (The Image) -->
-  
+
     <!-- Modal Caption (Image Text) -->
 
-  </div>
+</div>
 
 
 {% endblock %}

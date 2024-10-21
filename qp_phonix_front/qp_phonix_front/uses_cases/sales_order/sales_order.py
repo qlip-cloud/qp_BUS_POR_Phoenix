@@ -139,6 +139,7 @@ def get_sales_order(sales_order):
                 FORMAT(so.net_total,2) as total_format,
                 currency.name as currency,
                 currency.symbol as currency_symbol
+                
             from `tabSales Order` as so
             inner join `tabSales Order Item` as so_items on so.name = so_items.parent
             inner join tabItem as item on item.name = so_items.item_code
@@ -155,46 +156,94 @@ def get_sales_order(sales_order):
 
         if so_obj:
 
-            sql_so_items_obj = """
-                Select 
-                    so_items.name as code,
-                    so_items.item_code,item.item_group,qp_phoenix_order_customer,
-                    so_items.item_name,
-                    IF(so_items.image IS NULL or so_items.image = '', '%s', so_items.image) as image,
-                    so_items.net_rate as price,
-                    FORMAT(so_items.net_rate,2) as price_format,
-                    so.qp_phoenix_order_comment,
-                    so_items.qty as cantidad,
-                    so_items.stock_uom,
-                    so_items.amount,
-                    so_items.delivery_date,
-                    so_items.qp_phoenix_status_title,
-                    so_items.qp_phoenix_status,
-                    so_items.qp_phoenix_status_color,
-                    so_items.line_number,
-                    so_items.delivery_date_visible,
-                    ROUND(net_amount,2) as total,
-                    FORMAT(net_amount,2) as total_format,
-                    so_items.description,
-                    currency.name as currency,
-                    currency.symbol as currency_symbol,
-                    IFNULL(coupon.percentage, 0) as auto_discount,
-                    FORMAT((price_list_rate * so_items.qty ) - ((price_list_rate * so_items.qty )    * (IFNULL(coupon.percentage, 0) + so_items.discount_percentage) / 100) ,2) as auto_discount_total
-                from `tabSales Order` as so
-                inner join `tabSales Order Item` as so_items on so.name = so_items.parent
-                inner join tabItem as item on item.name = so_items.item_code
-                inner join `tabPrice List` as price_list on so.selling_price_list = price_list.name
-                inner join `tabCurrency` as currency on price_list.currency = currency.name
-                left join `tabqp_pf_CouponItems` as coupon_item
-                on (so_items.item_code = coupon_item.item and coupon_item.count > 0)
-                left join `tabqp_pf_Coupon` as coupon
-                on (coupon.name = coupon_item.parent and coupon.is_automatic = 1)
-                where so.customer = '%s' and so.name = '%s'
-                order by so_items.qp_phoenix_status asc , so_items.delivery_date desc,so_items.item_code, so_items.description, so_items.delivery_date desc
-            """ % (URL_IMG_EMPTY, customer.name, sales_order)
-
+            sql_so_items_obj = """          
+                SELECT
+                    *,
+                    format(auto_discount_total,2) as auto_discount_total_format,
+                    format(auto_diference_total,2) as auto_difference_total_format,
+                    format(auto_discount_total + auto_diference_total,2) as auto_total_format,
+                    format(amount - (auto_discount_total + auto_diference_total),2) as auto_discount_percentage_format,
+                    IFNULL(amount - (auto_discount_total + auto_diference_total),0) as auto_discount_percentage
+                from (
+                    
+                    Select 
+                        so_items.name as code,
+                        so_items.item_code,item.item_group,qp_phoenix_order_customer,
+                        so_items.item_name,
+                        IF(so_items.image IS NULL or so_items.image = '', '%s', so_items.image) as image,
+                        so_items.net_rate as price,
+                        FORMAT(so_items.net_rate,2) as price_format,
+                        so.qp_phoenix_order_comment,
+                        so_items.qty as cantidad,
+                        so_items.stock_uom,
+                        so_items.amount,
+                        so_items.delivery_date,
+                        so_items.qp_phoenix_status_title,
+                        so_items.qp_phoenix_status,
+                        so_items.qp_phoenix_status_color,
+                        so_items.line_number,
+                        so_items.idx,
+                        so_items.delivery_date_visible,
+                        ROUND(net_amount,2) as total,
+                        FORMAT(net_amount,2) as total_format,
+                        so_items.description,
+                        currency.name as currency,
+                        currency.symbol as currency_symbol,
+                        IFNULL(coupon.percentage, 0) as auto_discount,
+                        IFNULL(coupon_item.count, 0) as auto_count,
+                        case
+                            when 
+                                so_items.qty > IFNULL(coupon_item.count, 0)
+                            then
+                                IFNULL(coupon_item.count, 0)
+                            else
+                                so_items.qty
+                                
+                        end as auto_qty,
+                        
+                        case
+                            when 
+                                so_items.qty > IFNULL(coupon_item.count, 0)
+                            then
+                                so_items.qty - IFNULL(coupon_item.count, 0)
+                            else
+                                so_items.qty
+                                
+                        end as auto_diference,
+                        
+                        case
+                            when 
+                                so_items.qty > IFNULL(coupon_item.count, 0)
+                            then
+                                (so_items.qty - IFNULL(coupon_item.count, 0)) * so_items.rate
+                            else
+                                0
+                                
+                        end as auto_diference_total,                    
+                        case
+                            when 
+                                so_items.qty > IFNULL(coupon_item.count, 0)
+                            then
+                                (IFNULL(coupon_item.count, 0) * so_items.rate) - ((IFNULL(coupon_item.count, 0) * so_items.rate)* (IFNULL(coupon.percentage, 0)) / 100)
+                            else
+                                amount - (amount * (IFNULL(coupon.percentage, 0)) / 100)
+                                
+                        end as auto_discount_total
+                        
+                    from `tabSales Order` as so
+                    inner join `tabSales Order Item` as so_items on so.name = so_items.parent
+                    inner join tabItem as item on item.name = so_items.item_code
+                    inner join `tabPrice List` as price_list on so.selling_price_list = price_list.name
+                    inner join `tabCurrency` as currency on price_list.currency = currency.name
+                    left join `tabqp_pf_CouponItems` as coupon_item
+                    on (so_items.item_code = coupon_item.item and coupon_item.count > 0)
+                    left join `tabqp_pf_Coupon` as coupon
+                    on (coupon.name = coupon_item.parent and coupon.is_automatic = 1)
+                    where so.customer = '%s' and so.name = '%s'
+                    order by so_items.qp_phoenix_status asc , so_items.delivery_date desc,so_items.item_code, so_items.description, so_items.delivery_date desc
+                ) AS subquery""" % (URL_IMG_EMPTY, customer.name, sales_order)
             so_items_obj = frappe.db.sql(sql_so_items_obj, as_dict=1)
-
+            
             for item in so_items_obj:
 
                 attr_list = get_attrs_filters_item_group(item.item_group)
@@ -222,6 +271,8 @@ def get_sales_order(sales_order):
                 item['qp_phoenix_status_color'] = item.qp_phoenix_status_color
 
                 item['line_number'] = item.line_number
+                item['idx'] = item.idx
+                item['name'] = item.code
                 
             so_obj = so_obj[0]
 
@@ -262,9 +313,12 @@ def create_sales_order(order_json):
 
         sale_order =  frappe.get_doc(string_obj)
         
-        search_automatic_discount(sale_order)
+        #search_automatic_discount(sale_order)
         
         sale_order.insert()
+        
+        set_qp_subtotal(sale_order)
+        sale_order.save()
 
         rec_result['name'] = sale_order.name
 
@@ -284,9 +338,7 @@ def create_sales_order(order_json):
 
     return rec_result
 
-def search_automatic_discount(sale_order):
-    for item in  sale_order.items:
-        print(item)
+
 
 @frappe.whitelist()
 def sales_order_update(order_json):
@@ -404,7 +456,10 @@ def __confirm_sales_order(order_json, sales_order):
         
         sales_order.save()
         
+        
         __send_sales_order(sales_order)
+        
+        set_qp_subtotal(sales_order)
         
         sales_order.submit()
         
@@ -726,7 +781,7 @@ def __get_body(json_data):
 
     obj_data = {
         "customer": customer.name,
-        
+        "currency": customer.default_currency,  
         "delivery_date": today(),
         "items": json_data.get('items'),
         "selling_price_list": price_list,
@@ -830,7 +885,12 @@ def checkout_rec_log(res_checkout_det):
 
     return res
 
-
+def set_qp_subtotal(sale_order):
+    
+    sale_order.qp_phoenix_order_subtotal = sum(map(lambda item: item.price_list_rate * item.qty, sale_order.items))
+    
+    sale_order.qp_phoenix_order_discount = sale_order.qp_phoenix_order_subtotal - sale_order.total
+    
 class vf_SaleOrderConfirmError(Exception):
 
     def __init__(self, message = _("Error Sales Order API Confirm"), so_name = None, so_json = None, so_respose = None ):

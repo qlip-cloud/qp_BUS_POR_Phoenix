@@ -18,11 +18,14 @@ def paginator(order_id = None, item_group = None, item_Categoria = None, item_Su
     
     has_filter_text = False
     
+    order_filter_text = []
+    
     if filter_text:
             
-            filter_text = filter_text.split(" ")
+            order_filter_text = filter_text.split(" ")
             
-            filter_text = __get_filter_text(item_code_list, filter_text)
+            
+            filter_text = __get_filter_text(item_code_list, order_filter_text)
             
             has_filter_text = True
             
@@ -43,7 +46,7 @@ def paginator(order_id = None, item_group = None, item_Categoria = None, item_Su
             
             
             
-            item_list = __get_item_list(filter_text, paginator_item)
+            item_list = __get_item_list(order_filter_text, paginator_item)
 
             list(map(lambda x: x.update({"initial": x.item_name[0].upper()}), item_list))
 
@@ -68,24 +71,18 @@ def paginator(order_id = None, item_group = None, item_Categoria = None, item_Su
 
     return response(callback, origin, error_msg)
 
-def __get_item_list(filter_array, paginator_item):
+def __get_item_list(order_filter_text, paginator_item):
     
-    if filter_array:
+    if order_filter_text:
         
+        #count_dict = {item: order_filter_text.count(item) for item in order_filter_text}
 
-        
-        count_dict = {item: filter_array.count(item) for item in filter_array}
-
-        # Filtrar y contar los elementos de list2 cuyos valores de 'name' están en list1
         result = []
         
-        for item in paginator_item:
+        for item_code in order_filter_text:
             
-            name = item["name"]
-            
-            if name in count_dict:
-                
-                result.extend([item] * count_dict[name])
+            result += list(filter(lambda item: item["name"] == item_code, paginator_item))
+        
                 
         return result
     

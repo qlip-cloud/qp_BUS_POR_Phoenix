@@ -28,7 +28,7 @@ def clear_default(login_manager):
 @frappe.whitelist()
 def set_global_default(ball_company="", ball_customer_id="", ball_customer_name=""):
 
-    print("***************set_global_default****************")
+    #print("***************set_global_default****************")
 
     if show_global_parameters():
         if hasattr(frappe.local, "cookie_manager"):

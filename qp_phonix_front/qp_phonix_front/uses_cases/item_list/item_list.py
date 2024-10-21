@@ -5,6 +5,7 @@ from gp_phonix_integration.gp_phonix_integration.constant.api_setup import QUANT
 from gp_phonix_integration.gp_phonix_integration.service.connection import execute_send
 from qp_phonix_front.qp_phonix_front.uses_cases.shipping_method.shipping_method_list import __get_customer
 from gp_phonix_integration.gp_phonix_integration.service.utils import get_price_list
+import copy
 
 URL_IMG_EMPTY = "/assets/qlip_bussines_theme/images/company_default_logo.jpg"
 
@@ -13,7 +14,7 @@ URL_IMG_EMPTY = "/assets/qlip_bussines_theme/images/company_default_logo.jpg"
 @frappe.whitelist()
 def paginator_item_list(item_group = None, item_Categoria = None, item_SubCategoria = None, item_code_list = None,
                 letter_filter = None, filter_text = None, idlevel = None, has_inventary = None, item_with_inventary = [], 
-                with_list_price = False, has_auto_coupon = False):
+                with_list_price = False, has_auto_coupon = False, has_limit = True):
 
     item_Categoria = json.loads(item_Categoria) if item_Categoria else None
     
@@ -24,7 +25,7 @@ def paginator_item_list(item_group = None, item_Categoria = None, item_SubCatego
     #setup = get_table_and_condition(item_group, item_Categoria, item_SubCategoria, item_code_list = item_code_list, idlevel = idlevel)
     
     return callback_get_inventary(item_group, item_Categoria, item_SubCategoria, letter_filter, filter_text, 
-    idlevel, has_inventary,item_code_list, [], with_list_price, has_auto_coupon)
+    idlevel, has_inventary,item_code_list, [], with_list_price, has_auto_coupon, has_limit)
     
     
     
@@ -52,7 +53,7 @@ def paginator_item_list(item_group = None, item_Categoria = None, item_SubCatego
     return response"""
 
 def callback_get_inventary(item_group = None, item_Categoria= None, item_SubCategoria= None, letter_filter= None, filter_text= None, 
-    idlevel = None, has_inventary = False,item_code_list = [], item_with_inventary = [], with_list_price = False, has_auto_coupon = False):
+    idlevel = None, has_inventary = False,item_code_list = [], item_with_inventary = [], with_list_price = False, has_auto_coupon = False, has_limit = True):
 
     if has_inventary:
         
@@ -62,11 +63,13 @@ def callback_get_inventary(item_group = None, item_Categoria= None, item_SubCate
                                     item_code_list = item_code_list, idlevel = idlevel, has_inventary = has_inventary, with_list_price = with_list_price, 
                                     has_auto_coupon = has_auto_coupon)
     
-    result =  __get_product_list(setup.get("tbl_product_list"), setup.get("cond_c"), setup.get("cond_t"), has_limit=True)
+    result =  __get_product_list(setup.get("tbl_product_list"), setup.get("cond_c"), setup.get("cond_t"), has_limit=has_limit, filter_text = filter_text)
 
     if not has_inventary:
 
         return get_item_inventary(result)
+    
+    
     
     return result
     
@@ -702,10 +705,22 @@ def __get_cond(attribute, item_value):
 
 
 #def __get_product_list(tbl_product_list, tlb_product_attr_select, tlb_product_attr_body, cond_c, cond_t, has_limit = True ):
-def __get_product_list(tbl_product_list, cond_c, cond_t, has_limit = True ):
+def __get_product_list(tbl_product_list, cond_c, cond_t, has_limit = True, filter_text   = [] ):
 
     limit = "LIMIT 0, 10" if has_limit else ""
-
+    
+    order_by = "order by prod.item_name"
+    
+    if len(filter_text) > 1:
+        
+        items_code = copy.deepcopy(filter_text)
+        
+        items_code.insert(0, {})
+        
+        tuple_filter = str(tuple(items_code)).format("prod.item_code")
+        
+        order_by = "order by FIELD%s" % tuple_filter
+    
     #select_attr_base = __get_select_attr_base()
     #print("select_attr_base:", select_attr_base,"tbl_product_list:", tbl_product_list,"cond_c: ", cond_c,"cond_t: ", cond_t,"limit", limit)  
     #print("cond_c: ", cond_c,"cond_t: ", cond_t,"limit", limit)  
@@ -713,15 +728,16 @@ def __get_product_list(tbl_product_list, cond_c, cond_t, has_limit = True ):
         %s
         and %s
         and %s
-        order by prod.item_name
+        %s
         %s
         
 
-    """ % (tbl_product_list, cond_c, cond_t, limit)  
+    """ % (tbl_product_list, cond_c, cond_t, order_by, limit)  
     #print(sql_product_list)
     
-    print(sql_product_list)
     product_list = frappe.db.sql(sql_product_list, as_dict=1)
+    #print(product_list)
+    
     for item in product_list:
         
         uom_list = __get_uom_list(item.name)
