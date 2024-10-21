@@ -139,6 +139,7 @@ def get_sales_order(sales_order):
                 FORMAT(so.net_total,2) as total_format,
                 currency.name as currency,
                 currency.symbol as currency_symbol
+                
             from `tabSales Order` as so
             inner join `tabSales Order Item` as so_items on so.name = so_items.parent
             inner join tabItem as item on item.name = so_items.item_code
@@ -181,6 +182,7 @@ def get_sales_order(sales_order):
                         so_items.qp_phoenix_status,
                         so_items.qp_phoenix_status_color,
                         so_items.line_number,
+                        so_items.idx,
                         so_items.delivery_date_visible,
                         ROUND(net_amount,2) as total,
                         FORMAT(net_amount,2) as total_format,
@@ -241,7 +243,7 @@ def get_sales_order(sales_order):
                     order by so_items.qp_phoenix_status asc , so_items.delivery_date desc,so_items.item_code, so_items.description, so_items.delivery_date desc
                 ) AS subquery""" % (URL_IMG_EMPTY, customer.name, sales_order)
             so_items_obj = frappe.db.sql(sql_so_items_obj, as_dict=1)
-
+            
             for item in so_items_obj:
 
                 attr_list = get_attrs_filters_item_group(item.item_group)
@@ -269,6 +271,8 @@ def get_sales_order(sales_order):
                 item['qp_phoenix_status_color'] = item.qp_phoenix_status_color
 
                 item['line_number'] = item.line_number
+                item['idx'] = item.idx
+                item['name'] = item.code
                 
             so_obj = so_obj[0]
 
