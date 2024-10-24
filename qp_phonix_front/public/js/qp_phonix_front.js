@@ -180,15 +180,14 @@ function und_factor($quantity) {
 
                 if (qp_buy_no_sku && sku == "NO" || qp_prioritize_unit_package == "1") {
 
-                        base_result = Number((max_value / factor).toFixed(2));
-                        base_decimal = Number((base_result - parseInt(base_result)).toFixed(2));
-                        base_mult_ue = Number((base_decimal * factor).toFixed(2));
-                        result = Number((value / factor).toFixed(2));
-                        decimal_value = Number((result - parseInt(result)).toFixed(2));
-                        mult_ue = Number((decimal_value * factor).toFixed(2));
-
-                        down_value = Number((parseInt(result) * factor).toFixed(2));
-                        up_value = Number((down_value + base_mult_ue).toFixed(2));
+                        base_result = Number((max_value / factor).toFixed(10));
+                        base_decimal = Number((base_result - parseInt(base_result)).toFixed(10));
+                        base_mult_ue = Number((base_decimal * factor).toFixed(10));
+                        result = Number((value / factor).toFixed(10));
+                        decimal_value = Number((result - parseInt(result)).toFixed(10));
+                        mult_ue = Number((decimal_value * factor).toFixed(10));
+                        down_value = Number((parseInt(result) * factor).toFixed(10));
+                        up_value = Number((down_value + base_mult_ue).toFixed(10));
 
                         buy_no_sku = (up_value - down_value) >= mult_ue ? true : false;
 
