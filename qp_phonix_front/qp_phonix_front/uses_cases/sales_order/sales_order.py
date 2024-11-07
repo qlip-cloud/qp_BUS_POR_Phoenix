@@ -132,6 +132,7 @@ def get_sales_order(sales_order):
                 addr.city, 
                 addr.pincode, 
                 addr.phone,
+                price_list.qp_without_discount as price_list_without_discount,
                 IF(so.qp_shipping_type IS NULL or so.qp_shipping_type = '', '%s',  so.qp_shipping_type) as shipping_type,
                 IF(shipping_type.description IS NULL or shipping_type.description = '', shipping_type.name,  shipping_type.description) as shipping_description,
                 DATE_FORMAT(so.delivery_date, '%s') as shipping_date, DATE_FORMAT(so.delivery_date, '%s') as shipping_date_format,
@@ -451,11 +452,10 @@ def __confirm_sales_order(order_json, sales_order):
     if order_json.get('action') == "confirm":
 
         __send_check_out_so(sales_order)
-        
+
         __set_auto_discount(sales_order)
         
         sales_order.save()
-        
         
         __send_sales_order(sales_order)
         
@@ -469,50 +469,54 @@ def __confirm_sales_order(order_json, sales_order):
 
 def __set_auto_discount(sales_order):
     
-    sql ="""
-        select 
-            coupon.percentage as percentage,
-            coupon_item.count as count,
-            coupon.code as code
-        from
-            `tabqp_pf_Coupon` as coupon
-        inner join
-            `tabqp_pf_CouponItems` as coupon_item
-            on (coupon.name = coupon_item.parent)
-        where coupon.is_automatic = 1 and coupon_item.count > 0 and coupon_item.item = %(item)s
-    """
-  
-    coupon_control = {}
+    price_list = frappe.get_doc("Price List", sales_order.selling_price_list)
     
-    items = copy.deepcopy(sales_order.items)
-    
-    for key, item in enumerate(items):
-    
-        result = frappe.db.sql(sql, values = {"item": item.item_code}, as_dict = 1)
+    if not price_list.qp_without_discount:
         
-        if result:
+        sql ="""
+            select 
+                coupon.percentage as percentage,
+                coupon_item.count as count,
+                coupon.code as code
+            from
+                `tabqp_pf_Coupon` as coupon
+            inner join
+                `tabqp_pf_CouponItems` as coupon_item
+                on (coupon.name = coupon_item.parent)
+            where coupon.is_automatic = 1 and coupon_item.count > 0 and coupon_item.item = %(item)s
+        """
+    
+        coupon_control = {}
+        
+        items = copy.deepcopy(sales_order.items)
+        
+        for key, item in enumerate(items):
+        
+            result = frappe.db.sql(sql, values = {"item": item.item_code}, as_dict = 1)
             
-            code = result[0].get("code")
-            
-            __init_coupon_control(code, coupon_control,sales_order.name)
-            
-            coupon = coupon_control[code]["coupon"]
-            
-            coupon_log = coupon_control[code]["coupon_log"]
-            
-            if result[0].get("count") < item.qty:
+            if result:
                 
-                item.qty = result[0].get("count")
+                code = result[0].get("code")
+                
+                __init_coupon_control(code, coupon_control,sales_order.name)
+                
+                coupon = coupon_control[code]["coupon"]
+                
+                coupon_log = coupon_control[code]["coupon_log"]
+                
+                if result[0].get("count") < item.qty:
+                    
+                    item.qty = result[0].get("count")
+                                
+                set_coupont_items_log(coupon_log, item, coupon)
+                
+                set_coupon_order(sales_order, item, coupon)
+                
+                __update_coupon_item_count(coupon, item, coupon_control, code)
+                
+                __update_order_items(sales_order, item)           
                             
-            set_coupont_items_log(coupon_log, item, coupon)
-            
-            set_coupon_order(sales_order, item, coupon)
-            
-            __update_coupon_item_count(coupon, item, coupon_control, code)
-            
-            __update_order_items(sales_order, item)           
-                        
-    __save_coupon(coupon_control)            
+        __save_coupon(coupon_control)            
 
 def __update_order_items(sales_order, item):
     

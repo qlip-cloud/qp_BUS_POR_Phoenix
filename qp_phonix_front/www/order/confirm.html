@@ -307,7 +307,7 @@ Orden
                         {{order.currency_symbol}} <span id="" class="price_total ">{{order.total_format | replace(",",
                             ".")}}</span>
                     </div>
-                    {% if order.status == 'Draft' %}
+                    {% if order.status == 'Draft' and not order.price_list_without_discount %}
 
                     <div class=" col-md-12 subtitle green-discount" id="green-discount" style="display: none;">
 
@@ -405,19 +405,23 @@ Orden
                                         <span
                                             style="font-size: 15px; color:{{item.qp_phoenix_status_color}}">{{item.qp_phoenix_status_title}}
                                             / Entrega: {{item.delivery_date}} </span>
-                                        {% elif item.has_discount %}
+                                        {% elif not order.price_list_without_discount %}
+                                            {% if item.has_discount %}
 
-                                        <span class="green-discount" id="label-{{item.item_code | replace(':','-')}}">
-                                            Producto con descuento</span>
-                                        {% elif item.auto_discount %}
 
-                                        <span class="green-discount" id="label-{{item.item_code | replace(':','-')}}">
-                                            {{item.auto_qty | int}} UNIDADES APLICAN A {{item.auto_discount}}% DE DCTO
-                                            PARA
-                                            UN AHORRO TOTAL DE
-                                            {{order.currency_symbol}}{{item.auto_discount_percentage_format}}
+                                            <span class="green-discount" id="label-{{item.item_code | replace(':','-')}}">
+                                                Producto con descuento</span>
+                                            {% elif item.auto_discount %}
 
-                                            {% endif %}
+                                            <span class="green-discount" id="label-{{item.item_code | replace(':','-')}}">
+                                                {{item.auto_qty | int}} UNIDADES APLICAN A {{item.auto_discount}}% DE DCTO
+                                                PARA
+                                                UN AHORRO TOTAL DE
+                                                {{order.currency_symbol}}{{item.auto_discount_percentage_format}}
+
+                                                {% endif %}
+                                        {% endif %}
+
                                     </div>
                                 </div>
                                 </p>

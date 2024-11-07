@@ -609,6 +609,7 @@ def get_tbl_product_list(item_group, from_base, where_base, item_code_list = Non
             prod.item_name as item_name,
             IF(prod.image IS NULL or prod.image = '', '%s', prod.image) as image,
             price.price_list_rate as price,
+            price_list.qp_without_discount as price_list_without_discount,
             format(price.price_list_rate,2) as price_format,
             currency.name as currency,
             currency.symbol as currency_symbol,
