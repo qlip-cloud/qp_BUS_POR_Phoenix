@@ -556,7 +556,7 @@ def get_from_base(idlevel, cond_t = None, has_inventary = False, has_auto_coupon
         {coupon_inner} join `tabqp_pf_CouponItems` as coupon_item
         on (prod.name = coupon_item.item and coupon_item.count > 0)
         {coupon_inner} join `tabqp_pf_Coupon` as coupon
-        on (coupon.name = coupon_item.parent and coupon.is_automatic = 1)
+        on (coupon.name = coupon_item.parent)
     """.format(item_quantity_inner,class_condition, idlevel, coupon_inner = coupon_inner)
 
 def get_where_base():
@@ -567,6 +567,7 @@ def get_where_base():
     return """
                 prod.disabled = 0
                 and price.price_list = '%s'
+                and coupon.is_automatic = 1
             """ % (price_list)
 
 def get_condition_by_list(list_data, field, is_equal = False, operator = "AND"):
@@ -609,7 +610,6 @@ def get_tbl_product_list(item_group, from_base, where_base, item_code_list = Non
             prod.item_name as item_name,
             IF(prod.image IS NULL or prod.image = '', '%s', prod.image) as image,
             price.price_list_rate as price,
-            price_list.qp_without_discount as price_list_without_discount,
             format(price.price_list_rate,2) as price_format,
             currency.name as currency,
             currency.symbol as currency_symbol,
@@ -734,7 +734,7 @@ def __get_product_list(tbl_product_list, cond_c, cond_t, has_limit = True, filte
         
 
     """ % (tbl_product_list, cond_c, cond_t, order_by, limit)  
-    #print(sql_product_list)
+    print(sql_product_list)
     
     product_list = frappe.db.sql(sql_product_list, as_dict=1)
     #print(product_list)

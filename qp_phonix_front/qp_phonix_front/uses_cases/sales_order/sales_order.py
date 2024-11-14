@@ -239,8 +239,8 @@ def get_sales_order(sales_order):
                     left join `tabqp_pf_CouponItems` as coupon_item
                     on (so_items.item_code = coupon_item.item and coupon_item.count > 0)
                     left join `tabqp_pf_Coupon` as coupon
-                    on (coupon.name = coupon_item.parent and coupon.is_automatic = 1)
-                    where so.customer = '%s' and so.name = '%s'
+                    on (coupon.name = coupon_item.parent)
+                    where so.customer = '%s' and so.name = '%s' and coupon.is_automatic = 1
                     order by so_items.qp_phoenix_status asc , so_items.delivery_date desc,so_items.item_code, so_items.description, so_items.delivery_date desc
                 ) AS subquery""" % (URL_IMG_EMPTY, customer.name, sales_order)
             so_items_obj = frappe.db.sql(sql_so_items_obj, as_dict=1)

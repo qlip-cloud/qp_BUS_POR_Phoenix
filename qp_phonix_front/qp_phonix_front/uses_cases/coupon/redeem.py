@@ -117,7 +117,7 @@ def setup_coupon_log(coupon, order, coupon_log, callback):
 
         is_redeemable = callback(item)
 
-        if is_redeemable:
+        if is_redeemable and item.price_list_rate:
             
             set_coupont_items_log(coupon_log, item, coupon)
 
