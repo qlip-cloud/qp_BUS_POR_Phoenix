@@ -1,9 +1,13 @@
 {% extends "qp_phonix_front/templates/main.html" %}
 
 {% block section_title %}
-{%if is_valid%}
-Orden
-{%endif%}
+    {%if is_valid%}
+        Orden
+    {%endif%}
+    
+{% endblock %}
+{% block section_title_left %}
+<input type="checkbox" id="term_condition" > <strong><a style="text-decoration: underline;color:#000" href="/private/files/Condiciones%20Comerciales%20en%20la%20Oferta%206NOV2024.pdf">Acepto condiciones comerciales</a></strong>
 {% endblock %}
 
 {% block button_title %}
@@ -34,7 +38,7 @@ Orden
 
     {%if has_sync and permission.confirm %}
 
-    <a id="btn_confirm_order" class="btn button-master button-default">
+    <a id="btn_confirm_order" class="btn button-master button-default disabled">
         {{ _("CONFIRMAR ORDEN") }}
     </a>
     {%endif%}

@@ -1,5 +1,12 @@
 $(document).ready(function() {
     
+    $("#term_condition").on("change", function(){
+        if ($(this).prop("checked")) {
+            $("#btn_confirm_order").removeClass("disabled")
+        } else {
+            $("#btn_confirm_order").addClass("disabled")
+        }
+        })
     $("#enable_sales_persons").on("click", function(){
         
         $("#sales_persons").prop("disabled", !$(this).is(":checked"))

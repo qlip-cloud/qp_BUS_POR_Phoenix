@@ -191,12 +191,12 @@ def get_sales_order(sales_order):
                         currency.name as currency,
                         currency.symbol as currency_symbol,
                         IFNULL(coupon.percentage, 0) as auto_discount,
-                        IFNULL(coupon_item.count, 0) as auto_count,
+                        IFNULL(coupon.count, 0) as auto_count,
                         case
                             when 
-                                so_items.qty > IFNULL(coupon_item.count, 0)
+                                so_items.qty > IFNULL(coupon.count, 0)
                             then
-                                IFNULL(coupon_item.count, 0)
+                                IFNULL(coupon.count, 0)
                             else
                                 so_items.qty
                                 
@@ -204,9 +204,9 @@ def get_sales_order(sales_order):
                         
                         case
                             when 
-                                so_items.qty > IFNULL(coupon_item.count, 0)
+                                so_items.qty > IFNULL(coupon.count, 0)
                             then
-                                so_items.qty - IFNULL(coupon_item.count, 0)
+                                so_items.qty - IFNULL(coupon.count, 0)
                             else
                                 so_items.qty
                                 
@@ -214,18 +214,18 @@ def get_sales_order(sales_order):
                         
                         case
                             when 
-                                so_items.qty > IFNULL(coupon_item.count, 0)
+                                so_items.qty > IFNULL(coupon.count, 0)
                             then
-                                (so_items.qty - IFNULL(coupon_item.count, 0)) * so_items.rate
+                                (so_items.qty - IFNULL(coupon.count, 0)) * so_items.rate
                             else
                                 0
                                 
                         end as auto_diference_total,                    
                         case
                             when 
-                                so_items.qty > IFNULL(coupon_item.count, 0)
+                                so_items.qty > IFNULL(coupon.count, 0)
                             then
-                                (IFNULL(coupon_item.count, 0) * so_items.rate) - ((IFNULL(coupon_item.count, 0) * so_items.rate)* (IFNULL(coupon.percentage, 0)) / 100)
+                                (IFNULL(coupon.count, 0) * so_items.rate) - ((IFNULL(coupon.count, 0) * so_items.rate)* (IFNULL(coupon.percentage, 0)) / 100)
                             else
                                 amount - (amount * (IFNULL(coupon.percentage, 0)) / 100)
                                 
@@ -236,11 +236,25 @@ def get_sales_order(sales_order):
                     inner join tabItem as item on item.name = so_items.item_code
                     inner join `tabPrice List` as price_list on so.selling_price_list = price_list.name
                     inner join `tabCurrency` as currency on price_list.currency = currency.name
-                    left join `tabqp_pf_CouponItems` as coupon_item
-                    on (so_items.item_code = coupon_item.item and coupon_item.count > 0)
-                    left join `tabqp_pf_Coupon` as coupon
-                    on (coupon.name = coupon_item.parent)
-                    where so.customer = '%s' and so.name = '%s' and coupon.is_automatic = 1
+                    left join (
+                        select 
+                            coupon.percentage,
+                            coupon_item.item,
+                            coupon_item.count
+                        from
+                            `tabqp_pf_Coupon` as coupon
+                        inner join
+                            `tabqp_pf_CouponItems` as coupon_item
+                            on (coupon.name = coupon_item.parent and coupon_item.count > 0)
+                        where
+                            coupon.is_automatic = 1
+                            AND coupon.is_active = 1
+                            AND coupon.start_date <= NOW() 
+                            AND coupon.end_date >= NOW() 
+                            
+
+                    ) as coupon on (so_items.item_code = coupon.item)
+                    where so.customer = '%s' and so.name = '%s'
                     order by so_items.qp_phoenix_status asc , so_items.delivery_date desc,so_items.item_code, so_items.description, so_items.delivery_date desc
                 ) AS subquery""" % (URL_IMG_EMPTY, customer.name, sales_order)
             so_items_obj = frappe.db.sql(sql_so_items_obj, as_dict=1)

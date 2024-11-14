@@ -553,10 +553,23 @@ def get_from_base(idlevel, cond_t = None, has_inventary = False, has_auto_coupon
         INNER JOIN `tabCurrency` as currency ON currency.name = price_list.currency
         {}
         left join `tabqp_GP_Level` as gp_level on (prod.qp_price_group = gp_level.group_type and gp_level.idlevel = '{}')
-        {coupon_inner} join `tabqp_pf_CouponItems` as coupon_item
-        on (prod.name = coupon_item.item and coupon_item.count > 0)
-        {coupon_inner} join `tabqp_pf_Coupon` as coupon
-        on (coupon.name = coupon_item.parent)
+        {coupon_inner} join (
+            select 
+                coupon.percentage,
+                coupon_item.item
+            from
+                `tabqp_pf_Coupon` as coupon
+            inner join
+                `tabqp_pf_CouponItems` as coupon_item
+                on (coupon.name = coupon_item.parent and coupon_item.count > 0)
+            where
+                coupon.is_automatic = 1
+                AND coupon.is_active = 1
+                AND coupon.start_date <= NOW() 
+                AND coupon.end_date >= NOW() 
+
+        ) as coupon on (prod.name = coupon.item)
+       
     """.format(item_quantity_inner,class_condition, idlevel, coupon_inner = coupon_inner)
 
 def get_where_base():
@@ -567,7 +580,6 @@ def get_where_base():
     return """
                 prod.disabled = 0
                 and price.price_list = '%s'
-                and coupon.is_automatic = 1
             """ % (price_list)
 
 def get_condition_by_list(list_data, field, is_equal = False, operator = "AND"):
@@ -734,7 +746,7 @@ def __get_product_list(tbl_product_list, cond_c, cond_t, has_limit = True, filte
         
 
     """ % (tbl_product_list, cond_c, cond_t, order_by, limit)  
-    print(sql_product_list)
+    #print(sql_product_list)
     
     product_list = frappe.db.sql(sql_product_list, as_dict=1)
     #print(product_list)

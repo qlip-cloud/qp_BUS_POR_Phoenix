@@ -55,8 +55,11 @@ $(document).ready(function () {
         })
 
         $("#btn_confirm_order").on("click", () => {
-
-                update_modal(2, 1)
+                if ($("#term_condition").prop("checked")){
+                        update_modal(2, 1)
+                }else{
+                        frappe.throw("Debe aceptar las condiciones comerciales")
+                }
 
         })
 
