@@ -398,9 +398,10 @@ def sales_order_update(order_json):
 
         __set_order_data(sales_order, order_json)
 
-        __update_items(order_item_json, sales_order, item_update_list, item_insert_list)
+        #__update_items(order_item_json, sales_order, item_update_list, item_insert_list)
                 
         __delete_items(sales_order, item_delete_list)
+        sales_order = __get_sales_order(order_id)
                 
         is_confirm = __confirm_sales_order(order_json, sales_order)
             
@@ -628,12 +629,12 @@ def __send_check_out_so(sales_order):
 
 def __delete_items(sales_order, item_delete_list):
 
-    for so_item_doc in sales_order.items:
+    for key, so_item_doc in enumerate(sales_order.items):
 
-        if so_item_doc.get('code') in item_delete_list:
+        if so_item_doc.name in item_delete_list:
 
             so_item_doc.delete()
-                
+                                        
 def __update_items(order_item_json, sales_order, item_update_list, item_insert_list):
     
     for item in order_item_json:
