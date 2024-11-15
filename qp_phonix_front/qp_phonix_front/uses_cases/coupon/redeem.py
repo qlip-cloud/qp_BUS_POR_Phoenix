@@ -3,6 +3,7 @@ from datetime import datetime
 from qp_phonix_front.qp_phonix_front.uses_cases.shipping_method.shipping_method_list import __get_customer
 import traceback
 import json
+import copy
 
 @frappe.whitelist()
 def handler(code, order_id):
@@ -17,6 +18,8 @@ def handler(code, order_id):
 
         order =  get_order(order_id)
         
+        item_row_copy = copy.deepcopy(order.items)
+
         coupon = get_coupon(code)
 
         assert_coupon_is_active(coupon)
@@ -38,6 +41,8 @@ def handler(code, order_id):
         coupon_log.insert()
         
         order.save()
+        
+        update_name_item(item_row_copy, order.items)      
 
         return {
             "status": 200,
@@ -95,21 +100,33 @@ def redeem_coupon_subtotal(coupon, order):
     order.additional_discount_percentage += coupon.percentage
 
 def redeem_coupon_level_group(coupon, order, coupon_log):
-
+    
+    
     def callback(item):
 
         return any(filter(lambda x: item.qp_phonix_class ==  x.level_group, coupon.levels_group))
 
-    setup_coupon_log(coupon, order, coupon_log, callback)      
 
+    setup_coupon_log(coupon, order, coupon_log, callback)
+    
+
+def update_name_item(item_row_copy, items):
+    
+    for key, item in enumerate(items):
+        
+        search_item = list(filter(lambda x: x.idx==item.idx, item_row_copy))
+        
+        if search_item[0].name != item.name:
+            
+            frappe.db.set_value('Sales Order Item', item.name, 'name', search_item[0].name)
+        
 def redeem_coupon_items(coupon, order, coupon_log):
 
     def callback(item):
 
         return any(filter(lambda x: item.item_code ==  x.item, coupon.items))
-
-    setup_coupon_log(coupon, order, coupon_log, callback)               
-
+    
+    setup_coupon_log(coupon, order, coupon_log, callback)         
 
 def setup_coupon_log(coupon, order, coupon_log, callback):
 
@@ -130,6 +147,7 @@ def set_coupon_order(order, item, coupon):
     order.append('items', {
             'item_code': item.get('item_code'),
             'qty': item.get('qty'),
+            'idx': item.get('idx'),
             'discount_percentage': __get_discount_total_with_auto_discount(item, coupon)
             
         })

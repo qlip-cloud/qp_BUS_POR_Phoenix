@@ -398,9 +398,7 @@ def sales_order_update(order_json):
 
         __set_order_data(sales_order, order_json)
 
-        if order_json.get('action') != "confirm":
-            
-            __update_items(order_item_json, sales_order, item_update_list, item_insert_list)
+        __update_items(order_item_json, sales_order, item_update_list, item_insert_list)
                 
         __delete_items(sales_order, item_delete_list)
         
