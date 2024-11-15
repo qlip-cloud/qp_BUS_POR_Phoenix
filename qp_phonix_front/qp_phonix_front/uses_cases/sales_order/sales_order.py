@@ -398,14 +398,16 @@ def sales_order_update(order_json):
 
         __set_order_data(sales_order, order_json)
 
-        #__update_items(order_item_json, sales_order, item_update_list, item_insert_list)
+        if order_json.get('action') != "confirm":
+            
+            __update_items(order_item_json, sales_order, item_update_list, item_insert_list)
                 
         __delete_items(sales_order, item_delete_list)
+        
         sales_order = __get_sales_order(order_id)
                 
         is_confirm = __confirm_sales_order(order_json, sales_order)
             
-        
         if not is_confirm:
             
             sales_order.save()
@@ -662,6 +664,8 @@ def __update_items(order_item_json, sales_order, item_update_list, item_insert_l
                 'rate': item.get('rate')
                 
             })
+            
+    sales_order.save()
                 
 def __set_order_data(sales_order, order_json):
     
