@@ -29,17 +29,17 @@ $(document).ready(function() {
                     description = `${coupon.percentage}% `
 
                     if (coupon_items.length > 0){
-
+                        description += "Descuento aplicado al precio de cada productos de la promoción"
+                        
                         items.forEach((item) => {
 
                             coupon_item = coupon_items.find(coupon_item => coupon_item.item_code == item.item_code);
-                            console.log(coupon_item)
+                            
 
                             if (coupon_item){
                                 item_code = item.item_code.replace(":","-")
                                 update_list_price(item_code, item)
                             }
-                            description += "Descuento aplicado al precio de cada productos de la promoción"
                         
                         });
                     }else{
