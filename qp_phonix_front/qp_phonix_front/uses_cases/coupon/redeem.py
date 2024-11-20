@@ -22,6 +22,8 @@ def handler(code, order_id):
 
         coupon = get_coupon(code)
 
+        assert_not_is_automatic(coupon)
+        
         assert_coupon_is_active(coupon)
 
         assert_coupon_has_min_amount(coupon, order)
@@ -271,7 +273,13 @@ def assert_coupon_has_limit_valid(coupon):
         if not coupon.limit > limit_count[0]:
 
             raise CouponLimitNotValid()
+        
+def assert_not_is_automatic(coupon):
 
+    if coupon.is_automatic:
+
+        raise CodenNotValid()
+    
 def assert_code_is_valid(code):
 
     if not code:
