@@ -14,6 +14,10 @@ from qp_phonix_front.qp_phonix_front.uses_cases.item_list.item_list import __get
 from gp_phonix_integration.gp_phonix_integration.service.utils import get_price_list
 from qp_phonix_front.qp_phonix_front.uses_cases.coupon.redeem import get_coupon, create_coupon, set_coupont_items_log,set_coupon_order
 from datetime import datetime
+from datetime import datetime, timedelta
+
+from gp_phonix_integration.gp_phonix_integration.use_case.get_item_inventary import get_item_order as get_item_inventary
+
 SHIPPING_DEFAULT = 'N/S'
 
 DATE_DELIVERY_FORMAT_FIELD = "%Y-%m-%d"
@@ -466,15 +470,16 @@ def __confirm_sales_order(order_json, sales_order):
 
     if order_json.get('action') == "confirm":
 
-        #__send_check_out_so(sales_order)
+        __send_check_out_so(sales_order)
 
         __set_auto_discount(sales_order)
         
         sales_order.save()
         
-        #__send_sales_order(sales_order)
+        __send_sales_order(sales_order)
         
         set_qp_subtotal(sales_order)
+        set_delivery_date(sales_order)
         
         sales_order.submit()
         
@@ -482,6 +487,30 @@ def __confirm_sales_order(order_json, sales_order):
     
     return False
 
+def set_delivery_date(sales_order):
+    
+    #buscar el inventario comparar y cambiar las fechas de entrega
+    
+    sales_order_dict = sales_order.as_dict()
+    
+    item_list = get_item_inventary(sales_order_dict.get("items"))
+    
+    for item in sales_order.items:
+        
+        item_dict = list(filter(lambda item_i: item_i.get("item_code") == item.item_code, item_list))
+        
+        param = {"days": 4} if item_dict[0].get("quantity") > 0 else {"weeks": 4}
+            
+        item.delivery_date = get_delivery_future(param)
+        item.delivery_date_visible = True
+    
+    
+def get_delivery_future(param):
+    
+    fecha_inicial = datetime.now()
+    
+    return fecha_inicial + timedelta(**param)
+    
 def __set_auto_discount(sales_order):
     
     price_list = frappe.get_doc("Price List", sales_order.selling_price_list)
