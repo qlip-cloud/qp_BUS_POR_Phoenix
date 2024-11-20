@@ -38,6 +38,8 @@ def handler(code, order_id):
 
         redeem_coupon(coupon, order, coupon_log)
 
+        assert_has_coupon_item(coupon_log)
+        
         coupon_log.insert()
         
         order.save()
@@ -65,7 +67,7 @@ def handler(code, order_id):
             "order": None,
             "coupon_log": None
         }
-        
+  
 def get_order(order_id):
 
     assert_sales_order_exist(order_id)
@@ -132,15 +134,17 @@ def setup_coupon_log(coupon, order, coupon_log, callback):
 
     for key, item in enumerate(order.items):
 
-        is_redeemable = callback(item)
+        if not_is_auto_discount(item.item_code):
+        
+            is_redeemable = callback(item)
 
-        if is_redeemable and item.price_list_rate:
-            
-            set_coupont_items_log(coupon_log, item, coupon)
+            if is_redeemable and item.price_list_rate:
+                
+                set_coupont_items_log(coupon_log, item, coupon)
 
-            set_coupon_order(order, item, coupon)
-            
-            del order.items[key]
+                set_coupon_order(order, item, coupon)
+                
+                del order.items[key]
 
 def set_coupon_order(order, item, coupon):
     
@@ -152,6 +156,25 @@ def set_coupon_order(order, item, coupon):
             
         })
 
+def not_is_auto_discount(item_code):
+        
+    sql ="""
+        select 
+            coupon.percentage as percentage,
+            coupon_item.count as count,
+            coupon.code as code
+        from
+            `tabqp_pf_Coupon` as coupon
+        inner join
+            `tabqp_pf_CouponItems` as coupon_item
+            on (coupon.name = coupon_item.parent)
+        where coupon.is_active = 1 and coupon.is_automatic = 1 and (now() between coupon.start_date and coupon.end_date) and coupon_item.count > 0 and coupon_item.item = %(item)s
+    """
+    
+    result =  not frappe.db.sql(sql, values = {"item": item_code}, as_dict = 1)
+    
+    return result
+    
 def __get_discount_total_with_auto_discount(item, coupon):
     
         final_price = item.price_list_rate * (1 - item.discount_percentage / 100) * (1 - coupon.percentage / 100)
@@ -159,7 +182,7 @@ def __get_discount_total_with_auto_discount(item, coupon):
         return (1 - final_price / item.price_list_rate) * 100
 
 def set_coupont_items_log(coupon_log, item, coupon):
-    
+        
     coupon_log.append("coupon_items", {
                     "item_code": item.get('item_code'),
                     "discount_old": item.discount_percentage,
@@ -264,6 +287,13 @@ def assert_coupon_has_customer_valid(coupon, customer):
         if not search_customer:
 
             raise CouponCustomerNotValid()
+        
+def assert_has_coupon_item(coupon_log):
+    
+    if not hasattr(coupon_log, "coupon_items"):
+        
+        raise CouponItemNotValid()
+        
 
 def assert_coupon_isnot_customer_repeat(coupon, customer):
 
@@ -337,6 +367,14 @@ class CouponCustomerNotValid(Exception):
 class CouponCustomerRepeat(Exception):
 
     def __init__(self, message="Cliente ya reclamo este cupón"):
+
+        self.message = message
+
+        super().__init__(self.message)
+        
+class CouponItemNotValid(Exception):
+
+    def __init__(self, message="El producto de este coupon ya esta en oferta"):
 
         self.message = message
 

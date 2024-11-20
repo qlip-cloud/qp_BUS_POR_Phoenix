@@ -466,13 +466,13 @@ def __confirm_sales_order(order_json, sales_order):
 
     if order_json.get('action') == "confirm":
 
-        __send_check_out_so(sales_order)
+        #__send_check_out_so(sales_order)
 
         __set_auto_discount(sales_order)
         
         sales_order.save()
         
-        __send_sales_order(sales_order)
+        #__send_sales_order(sales_order)
         
         set_qp_subtotal(sales_order)
         
@@ -498,7 +498,7 @@ def __set_auto_discount(sales_order):
             inner join
                 `tabqp_pf_CouponItems` as coupon_item
                 on (coupon.name = coupon_item.parent)
-            where coupon.is_automatic = 1 and coupon_item.count > 0 and coupon_item.item = %(item)s
+            where coupon.is_active = 1 and coupon.is_automatic = 1 and (now() between coupon.start_date and coupon.end_date) and coupon_item.count > 0 and coupon_item.item = %(item)s
         """
     
         coupon_control = {}

@@ -362,9 +362,11 @@ function total_update() {
 
                 discount += parseFloat($(this).val());
         })
+        console.log(discount)
         if (discount > 0) {
 
                 total_discount = total - discount;
+                console.log(total_discount)
 
                 $(".price_discount").html(new Intl.NumberFormat('es-CO', { maximumFractionDigits: 2 }).format(total_discount))
                 $("#green-discount").show()

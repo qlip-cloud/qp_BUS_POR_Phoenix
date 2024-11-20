@@ -50,7 +50,7 @@ $(document).ready(function() {
                     $(".coupon_name").append(`<li>${coupon.title}</li>`)
                     $(".section-coupon").hide()
                     $(".section-redeem").show()
-                    $(".price_total").html(new Intl.NumberFormat('es-CO').format(order.net_total))
+                    total_update()
                     
                     break;
 

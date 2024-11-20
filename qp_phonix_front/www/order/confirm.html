@@ -284,24 +284,43 @@
                                 Cupon Canjeado
                             </div>
                         </div>
-                        <div class="row">
-                            <div class=" col-md-12 label coupon_legend">
+                        {% if coupon_list %}
+                            {% for coupon in coupon_list%}
+                            <div class="row">
+                                <div class=" col-md-12 label coupon_legend">
 
-                                {{coupon_description}}
+                                    {{coupon.description}}
 
+                                </div>
                             </div>
-                        </div>
-                        <div class="row label">
-                            <div class="col-md-4">
-                                <ul class="coupon_name">
-                                    {% if has_coupon %}
-                                    <li>
-                                        {{coupon_title}}
-                                    </li>
-                                    {% endif %}
-                                </ul>
+                            <div class="row label">
+                                <div class="col-md-12">
+                                    <ul class="coupon_name">
+                                        {% if has_coupon %}
+                                        <li>
+                                            {{coupon.title}}
+                                        </li>
+                                        {% endif %}
+                                    </ul>
+                                </div>
                             </div>
-                        </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="row">
+                                <div class=" col-md-12 label coupon_legend">
+
+
+                                </div>
+                            </div>
+                            <div class="row label">
+                                <div class="col-md-12">
+                                    <ul class="coupon_name">
+                                        
+                                    </ul>
+                                </div>
+                            </div>
+                        {% endif %}
+                        
                     </div>
 
                 </div>
@@ -558,6 +577,7 @@
                         <div class="col sm-12 modal-message">
                             <p>Aqui puedes ver la confirmacion de tu pedido</p>
                             <p>Estas fechas están sujetas a cambios por parte de casa matriz</p>
+                            <p>Si se requiere modificar y/o cancelar la orden de compra debe contactarse con el asesor comercial en un plazo de 24 horas máximo una vez generada la orden de compra</p>
                         </div>
                     </div>
                     <div class="row">

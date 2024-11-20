@@ -565,8 +565,7 @@ def get_from_base(idlevel, cond_t = None, has_inventary = False, has_auto_coupon
             where
                 coupon.is_automatic = 1
                 AND coupon.is_active = 1
-                AND coupon.start_date <= NOW() 
-                AND coupon.end_date >= NOW() 
+                AND (now() between coupon.start_date and coupon.end_date)
 
         ) as coupon on (prod.name = coupon.item)
        
