@@ -470,7 +470,7 @@ def __confirm_sales_order(order_json, sales_order):
 
     if order_json.get('action') == "confirm":
 
-        __send_check_out_so(sales_order)
+        #__send_check_out_so(sales_order)
 
         __set_auto_discount(sales_order)
         
@@ -637,7 +637,7 @@ def __set_sales_order_response(sales_order, reference, response):
     
     sales_order.qp_phonix_reference = reference
     
-    __get_sales_order_items_response(sales_order.items, response.get("ReturnJson"))
+    sales_order.items = __get_sales_order_items_response(sales_order.items, response.get("ReturnJson"))
     
 def __get_sales_order_items_response(items, returnJson):
     
@@ -645,11 +645,11 @@ def __get_sales_order_items_response(items, returnJson):
 
     for item in items:
         
-        for line in returnJson.get("Lines"):
-            
-            if line.get("Id") == item.item_code and not line.get("merge"):
-                
-                get_line(line, item)    
+        lines += [ get_line(line, item) for line in returnJson.get("Lines") if line.get("Id") == item.item_code and not line.get("merge")]
+    
+        item.delete()
+
+    return lines    
     
 def __send_check_out_so(sales_order):
         
@@ -754,15 +754,24 @@ def setup_order_json(order_json):
         order_json = json.loads(order_json)
             
 def get_line(line, item):
-    
-    frappe.db.set_value("Sales Order Item", item.name,{
-        "line_number":line.get("LineNumber"),
-        "qty": line.get("Quantity"),
-        "delivery_date": line.get("RequestDate") if line.get("RequestDate") != '1900-01-01' else today(),
-        "delivery_date_visible": True if line.get("RequestDate") != '1900-01-01' else False,
-        "qp_phoenix_status": line.get("Status") 
-    })
 
+    line_new = copy.copy(item)
+
+    line_new.name = None
+
+    line_new.line_number = line.get("LineNumber")
+
+    line_new.qty = line.get("Quantity")
+
+    line_new.delivery_date = line.get("RequestDate") if line.get("RequestDate") != '1900-01-01' else today()
+
+    line_new.delivery_date_visible = True if line.get("RequestDate") != '1900-01-01' else False
+
+    line_new.qp_phoenix_status = line.get("Status")
+
+    line_new.insert()
+    line.setdefault("merge", True)
+    return line_new
 
 def __get_item_attr(item_code, attr):
 
