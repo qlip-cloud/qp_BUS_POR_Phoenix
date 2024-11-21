@@ -472,7 +472,7 @@ def __confirm_sales_order(order_json, sales_order):
 
         __send_check_out_so(sales_order)
 
-        #__set_auto_discount(sales_order)
+        __set_auto_discount(sales_order)
         
         sales_order.save()
         
@@ -625,7 +625,7 @@ def __send_sales_order(sales_order):
     
     res = send_sales_order(sales_order, vf_SaleOrderConfirmError)
 
-    #__set_sales_order_response(sales_order, res.get("reference"), res.get("response"))
+    __set_sales_order_response(sales_order, res.get("reference"), res.get("response"))
             
     frappe.log_error(message=res.get("body_data"), title="GP Send Confirm")
 
