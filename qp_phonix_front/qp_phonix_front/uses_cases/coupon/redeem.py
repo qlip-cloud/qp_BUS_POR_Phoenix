@@ -39,8 +39,6 @@ def handler(code, order_id):
         coupon_log = create_coupon(coupon, customer, user,now, order_id)
 
         redeem_coupon(coupon, order, coupon_log)
-
-        assert_has_coupon_item(coupon_log)
         
         coupon_log.insert()
         
@@ -147,7 +145,9 @@ def setup_coupon_log(coupon, order, coupon_log, callback):
                 set_coupon_order(order, item, coupon)
                 
                 del order.items[key]
-
+                
+    assert_has_coupon_item(coupon_log)
+    
 def set_coupon_order(order, item, coupon):
     
     order.append('items', {
