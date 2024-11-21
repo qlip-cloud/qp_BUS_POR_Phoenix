@@ -42,15 +42,18 @@ $(document).ready(function() {
                             }
                         
                         });
+                        total_update()
+
                     }else{
                         description += "Descuento aplicado al subtotal de la factura"
+                        console.log(order.net_total)
+                        $(".price_total").html(new Intl.NumberFormat('es-CO').format(order.net_total))
                     }
 
                     $(".coupon_legend").html(description)
                     $(".coupon_name").append(`<li>${coupon.title}</li>`)
                     $(".section-coupon").hide()
                     $(".section-redeem").show()
-                    total_update()
                     
                     break;
 
