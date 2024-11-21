@@ -479,6 +479,7 @@ def __confirm_sales_order(order_json, sales_order):
         __send_sales_order(sales_order)
         
         set_qp_subtotal(sales_order)
+        
         set_delivery_date(sales_order)
         
         sales_order.submit()
@@ -767,9 +768,15 @@ def get_line(line, item):
     line_new.delivery_date_visible = True if line.get("RequestDate") != '1900-01-01' else False
 
     line_new.qp_phoenix_status = line.get("Status")
-
+    
+    line_new.idx = item.idx
+    
+    line_new.discount_percentage = item.discount_percentage
+    
     line_new.insert()
+    
     line.setdefault("merge", True)
+    
     return line_new
 
 def __get_item_attr(item_code, attr):
