@@ -414,7 +414,6 @@ def sales_order_update(order_json):
             
             sales_order.save()
             
-
         frappe.db.commit()
 
         rec_result['result'] = 200

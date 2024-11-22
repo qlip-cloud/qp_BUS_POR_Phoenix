@@ -38,11 +38,13 @@ def handler(code, order_id):
         
         coupon_log = create_coupon(coupon, customer, user,now, order_id)
 
-        redeem_coupon(coupon, order, coupon_log)
+        redeem_coupon(coupon, order, coupon_log, item_row_copy)
         
         coupon_log.insert()
         
         order.save()
+        
+        frappe.db.commit()
         
         update_name_item(item_row_copy, order.items)      
 
@@ -50,7 +52,7 @@ def handler(code, order_id):
             "status": 200,
             "msg": "Canje exitoso",
             "coupon": coupon,
-            "order": order,
+            "order": frappe.get_doc("Sales Order", order.name),
             "coupon_log": coupon_log
         }
           
@@ -82,7 +84,7 @@ def get_coupon(code):
     
     return frappe.get_doc("qp_pf_Coupon", code)
 
-def redeem_coupon(coupon, order, coupon_log):
+def redeem_coupon(coupon, order, coupon_log, item_row_copy):
 
     if coupon.levels_group:
 
@@ -90,7 +92,7 @@ def redeem_coupon(coupon, order, coupon_log):
 
     if coupon.items:
 
-        return redeem_coupon_items(coupon, order, coupon_log)
+        return redeem_coupon_items(coupon, order, coupon_log, item_row_copy)
 
     redeem_coupon_subtotal(coupon, order)
 
@@ -120,19 +122,24 @@ def update_name_item(item_row_copy, items):
         
         if search_item[0].name != item.name:
             
-            frappe.db.set_value('Sales Order Item', item.name, 'name', search_item[0].name)
+            sql = """
+                UPDATE `tabSales Order Item` set name = '{name_old}' where name = '{name_new}'
+            """.format(name_new = item.name, name_old = search_item[0].name)
+            frappe.db.sql(sql)
+            
+    frappe.db.commit()
         
-def redeem_coupon_items(coupon, order, coupon_log):
+def redeem_coupon_items(coupon, order, coupon_log, item_row_copy):
 
     def callback(item):
 
         return any(filter(lambda x: item.item_code ==  x.item, coupon.items))
     
-    setup_coupon_log(coupon, order, coupon_log, callback)         
+    setup_coupon_log(coupon, order, coupon_log, item_row_copy, callback)         
 
-def setup_coupon_log(coupon, order, coupon_log, callback):
+def setup_coupon_log(coupon, order, coupon_log, item_row_copy, callback):
 
-    for key, item in enumerate(order.items):
+    for key, item in enumerate(item_row_copy):
 
         if not_is_auto_discount(item.item_code):
         
