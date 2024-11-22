@@ -16,6 +16,8 @@ def handler(code, order_id):
 
     try:
 
+        assert_customer_without_discount(customer)
+        
         order =  get_order(order_id)
         
         item_row_copy = copy.deepcopy(order.items)
@@ -281,6 +283,14 @@ def assert_coupon_has_limit_valid(coupon):
 
             raise CouponLimitNotValid()
         
+def assert_customer_without_discount(customer):
+    
+    price_list = frappe.get_doc("Price List", customer.default_price_list)
+
+    if price_list.qp_without_discount:
+    
+            raise CustomerPriceListWithOutDiscount()
+        
 def assert_not_is_automatic(coupon):
 
     if coupon.is_automatic:
@@ -390,6 +400,14 @@ class CouponCustomerRepeat(Exception):
 class CouponItemNotValid(Exception):
 
     def __init__(self, message="El producto de este coupon ya esta en oferta"):
+
+        self.message = message
+
+        super().__init__(self.message)
+        
+class CustomerPriceListWithOutDiscount(Exception):
+
+    def __init__(self, message="Este cliente no aplica para descuentos"):
 
         self.message = message
 
