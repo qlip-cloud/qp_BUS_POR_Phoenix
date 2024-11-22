@@ -4,7 +4,7 @@ from frappe.utils import get_url, getdate,today
 import requests
 import json
 import copy
-from datetime import datetime
+from datetime import datetime, date, timedelta
 from qp_phonix_front.qp_phonix_front.uses_cases.shipping_method.shipping_method_list import __get_customer as get_customer_party
 from qp_phonix_front.qp_phonix_front.uses_cases.item_list.item_list import URL_IMG_EMPTY
 from qp_phonix_front.qp_phonix_front.uses_cases.item_list.item_list import get_attrs_filters_item_group
@@ -13,8 +13,7 @@ from qp_phonix_front.qp_phonix_front.uses_cases.gp_service.gp_service import sen
 from qp_phonix_front.qp_phonix_front.uses_cases.item_list.item_list import __get_uom_list
 from gp_phonix_integration.gp_phonix_integration.service.utils import get_price_list
 from qp_phonix_front.qp_phonix_front.uses_cases.coupon.redeem import get_coupon, create_coupon, set_coupont_items_log,set_coupon_order
-from datetime import datetime
-from datetime import datetime, timedelta
+
 
 from gp_phonix_integration.gp_phonix_integration.use_case.get_item_inventary import get_item_order as get_item_inventary
 
@@ -337,6 +336,7 @@ def create_sales_order(order_json):
         sale_order.insert()
         
         set_qp_subtotal(sale_order)
+        
         sale_order.save()
 
         rec_result['name'] = sale_order.name
@@ -472,9 +472,7 @@ def __confirm_sales_order(order_json, sales_order):
         __send_check_out_so(sales_order)
 
         __set_auto_discount(sales_order)
-        
-        sales_order.save()
-        
+                
         __send_sales_order(sales_order)
         
         set_qp_subtotal(sales_order)
@@ -502,6 +500,7 @@ def set_delivery_date(sales_order):
         param = {"days": 4} if item_dict[0].get("quantity") > 0 else {"weeks": 4}
             
         item.delivery_date = get_delivery_future(param)
+        
         item.delivery_date_visible = True
     
     
@@ -560,8 +559,10 @@ def __set_auto_discount(sales_order):
                 
                 __update_order_items(sales_order, item)        
                             
-        __save_coupon(coupon_control)            
-
+        __save_coupon(coupon_control)
+    
+    sales_order.save()
+             
 def __update_order_items(sales_order, item):
     
     order_is_found = False
@@ -636,19 +637,28 @@ def __set_sales_order_response(sales_order, reference, response):
     
     sales_order.qp_phonix_reference = reference
     
-    sales_order.items = __get_sales_order_items_response(sales_order.items, response.get("ReturnJson"))
+    __get_sales_order_items_response(sales_order, response.get("ReturnJson"))
     
-def __get_sales_order_items_response(items, returnJson):
+def __get_sales_order_items_response(sales_order, returnJson):
     
     lines = []
 
-    for item in items:
-        
-        lines += [ get_line(line, item) for line in returnJson.get("Lines") if line.get("Id") == item.item_code and not line.get("merge")]
+    sales_order.items = sorted(sales_order.items, key=lambda x: x.idx)
     
-        item.delete()
+    items = copy.deepcopy(sales_order.items)
 
-    return lines    
+
+    lines = returnJson.get("Lines")
+    
+    for key, item in enumerate(items):
+        
+        line = get_line(lines[key], copy.deepcopy(sales_order.items[key]))
+        
+        sales_order.append("items",line)
+        
+        sales_order.items[key].delete()
+
+    sales_order.save()
     
 def __send_check_out_so(sales_order):
         
@@ -754,23 +764,20 @@ def setup_order_json(order_json):
             
 def get_line(line, item):
 
-    line_new = copy.copy(item)
+    item.name = None
+    item.creation = None
+    item.modified = None
+    item.modified_by = None
 
-    line_new.name = None
+    item.qty = line.get("Quantity")
 
-    line_new.line_number = line.get("LineNumber")
+    item.delivery_date = datetime.strptime(line.get("RequestDate") , "%Y-%m-%d").date() if line.get("RequestDate") != '1900-01-01' else date.today()
 
-    line_new.qty = line.get("Quantity")
+    item.delivery_date_visible = True if line.get("RequestDate") != '1900-01-01' else False
 
-    line_new.delivery_date = line.get("RequestDate") if line.get("RequestDate") != '1900-01-01' else today()
-
-    line_new.delivery_date_visible = True if line.get("RequestDate") != '1900-01-01' else False
-
-    line_new.qp_phoenix_status = line.get("Status")
-
-    line_new.insert()
-    line.setdefault("merge", True)
-    return line_new
+    item.qp_phoenix_status = line.get("Status")
+  
+    return item.as_dict()
 
 def __get_item_attr(item_code, attr):
 
