@@ -44,16 +44,20 @@ def update_delivery_data(sale_order):
                     
                     if line.get("Id") == item.item_code and line.get("LineNumber") == item.line_number and (item.delivery_date != getdate(line.get("RequestDate")) or item.qp_phoenix_status != getdate(line.get("Status"))):
 
-                        item.delivery_date = getdate(line.get("RequestDate")) if line.get("RequestDate") != '1900-01-01' else datetime.strptime(today(), "%Y-%m-%d").date()
+                        if line.get("RequestDate") != '1900-01-01':
+                            
+                            item.delivery_date = getdate(line.get("RequestDate"))
                         
-                        item.qp_phoenix_status = line.get("Status")
+                            item.qp_phoenix_status = line.get("Status")
 
-                        item.delivery_date_visible = True if line.get("RequestDate") != '1900-01-01' else False
+                            item.delivery_date_visible = True
 
-                        item.save()
+                            item.save()
                         
                         if sale_order.delivery_date < item.delivery_date:
+                            
                             is_change = True
+                            
                             sale_order.delivery_date = item.delivery_date
             
             if is_change:

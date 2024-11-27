@@ -4,7 +4,7 @@ from frappe.utils import get_url, getdate,today
 import requests
 import json
 import copy
-from datetime import datetime
+from datetime import datetime, date, timedelta
 from qp_phonix_front.qp_phonix_front.uses_cases.shipping_method.shipping_method_list import __get_customer as get_customer_party
 from qp_phonix_front.qp_phonix_front.uses_cases.item_list.item_list import URL_IMG_EMPTY
 from qp_phonix_front.qp_phonix_front.uses_cases.item_list.item_list import get_attrs_filters_item_group
@@ -13,7 +13,10 @@ from qp_phonix_front.qp_phonix_front.uses_cases.gp_service.gp_service import sen
 from qp_phonix_front.qp_phonix_front.uses_cases.item_list.item_list import __get_uom_list
 from gp_phonix_integration.gp_phonix_integration.service.utils import get_price_list
 from qp_phonix_front.qp_phonix_front.uses_cases.coupon.redeem import get_coupon, create_coupon, set_coupont_items_log,set_coupon_order
-from datetime import datetime
+
+
+from gp_phonix_integration.gp_phonix_integration.use_case.get_item_inventary import get_item_order as get_item_inventary
+
 SHIPPING_DEFAULT = 'N/S'
 
 DATE_DELIVERY_FORMAT_FIELD = "%Y-%m-%d"
@@ -132,6 +135,7 @@ def get_sales_order(sales_order):
                 addr.city, 
                 addr.pincode, 
                 addr.phone,
+                price_list.qp_without_discount as price_list_without_discount,
                 IF(so.qp_shipping_type IS NULL or so.qp_shipping_type = '', '%s',  so.qp_shipping_type) as shipping_type,
                 IF(shipping_type.description IS NULL or shipping_type.description = '', shipping_type.name,  shipping_type.description) as shipping_description,
                 DATE_FORMAT(so.delivery_date, '%s') as shipping_date, DATE_FORMAT(so.delivery_date, '%s') as shipping_date_format,
@@ -190,12 +194,12 @@ def get_sales_order(sales_order):
                         currency.name as currency,
                         currency.symbol as currency_symbol,
                         IFNULL(coupon.percentage, 0) as auto_discount,
-                        IFNULL(coupon_item.count, 0) as auto_count,
+                        IFNULL(coupon.count, 0) as auto_count,
                         case
                             when 
-                                so_items.qty > IFNULL(coupon_item.count, 0)
+                                so_items.qty > IFNULL(coupon.count, 0)
                             then
-                                IFNULL(coupon_item.count, 0)
+                                IFNULL(coupon.count, 0)
                             else
                                 so_items.qty
                                 
@@ -203,9 +207,9 @@ def get_sales_order(sales_order):
                         
                         case
                             when 
-                                so_items.qty > IFNULL(coupon_item.count, 0)
+                                so_items.qty > IFNULL(coupon.count, 0)
                             then
-                                so_items.qty - IFNULL(coupon_item.count, 0)
+                                so_items.qty - IFNULL(coupon.count, 0)
                             else
                                 so_items.qty
                                 
@@ -213,18 +217,18 @@ def get_sales_order(sales_order):
                         
                         case
                             when 
-                                so_items.qty > IFNULL(coupon_item.count, 0)
+                                so_items.qty > IFNULL(coupon.count, 0)
                             then
-                                (so_items.qty - IFNULL(coupon_item.count, 0)) * so_items.rate
+                                (so_items.qty - IFNULL(coupon.count, 0)) * so_items.rate
                             else
                                 0
                                 
                         end as auto_diference_total,                    
                         case
                             when 
-                                so_items.qty > IFNULL(coupon_item.count, 0)
+                                so_items.qty > IFNULL(coupon.count, 0)
                             then
-                                (IFNULL(coupon_item.count, 0) * so_items.rate) - ((IFNULL(coupon_item.count, 0) * so_items.rate)* (IFNULL(coupon.percentage, 0)) / 100)
+                                (IFNULL(coupon.count, 0) * so_items.rate) - ((IFNULL(coupon.count, 0) * so_items.rate)* (IFNULL(coupon.percentage, 0)) / 100)
                             else
                                 amount - (amount * (IFNULL(coupon.percentage, 0)) / 100)
                                 
@@ -235,10 +239,24 @@ def get_sales_order(sales_order):
                     inner join tabItem as item on item.name = so_items.item_code
                     inner join `tabPrice List` as price_list on so.selling_price_list = price_list.name
                     inner join `tabCurrency` as currency on price_list.currency = currency.name
-                    left join `tabqp_pf_CouponItems` as coupon_item
-                    on (so_items.item_code = coupon_item.item and coupon_item.count > 0)
-                    left join `tabqp_pf_Coupon` as coupon
-                    on (coupon.name = coupon_item.parent and coupon.is_automatic = 1)
+                    left join (
+                        select 
+                            coupon.percentage,
+                            coupon_item.item,
+                            coupon_item.count
+                        from
+                            `tabqp_pf_Coupon` as coupon
+                        inner join
+                            `tabqp_pf_CouponItems` as coupon_item
+                            on (coupon.name = coupon_item.parent and coupon_item.count > 0)
+                        where
+                            coupon.is_automatic = 1
+                            AND coupon.is_active = 1
+                            AND coupon.start_date <= NOW() 
+                            AND coupon.end_date >= NOW() 
+                            
+
+                    ) as coupon on (so_items.item_code = coupon.item)
                     where so.customer = '%s' and so.name = '%s'
                     order by so_items.qp_phoenix_status asc , so_items.delivery_date desc,so_items.item_code, so_items.description, so_items.delivery_date desc
                 ) AS subquery""" % (URL_IMG_EMPTY, customer.name, sales_order)
@@ -318,6 +336,7 @@ def create_sales_order(order_json):
         sale_order.insert()
         
         set_qp_subtotal(sale_order)
+        
         sale_order.save()
 
         rec_result['name'] = sale_order.name
@@ -386,15 +405,15 @@ def sales_order_update(order_json):
         __update_items(order_item_json, sales_order, item_update_list, item_insert_list)
                 
         __delete_items(sales_order, item_delete_list)
+        
+        sales_order = __get_sales_order(order_id)
                 
         is_confirm = __confirm_sales_order(order_json, sales_order)
             
-        
         if not is_confirm:
             
             sales_order.save()
             
-
         frappe.db.commit()
 
         rec_result['result'] = 200
@@ -451,15 +470,14 @@ def __confirm_sales_order(order_json, sales_order):
     if order_json.get('action') == "confirm":
 
         __send_check_out_so(sales_order)
-        
+
         __set_auto_discount(sales_order)
-        
-        sales_order.save()
-        
-        
+                
         __send_sales_order(sales_order)
         
         set_qp_subtotal(sales_order)
+        
+        set_delivery_date(sales_order)
         
         sales_order.submit()
         
@@ -467,53 +485,84 @@ def __confirm_sales_order(order_json, sales_order):
     
     return False
 
+def set_delivery_date(sales_order):
+    
+    #buscar el inventario comparar y cambiar las fechas de entrega
+    
+    sales_order_dict = sales_order.as_dict()
+    
+    item_list = get_item_inventary(sales_order_dict.get("items"))
+    
+    for item in sales_order.items:
+        
+        item_dict = list(filter(lambda item_i: item_i.get("item_code") == item.item_code, item_list))
+        
+        param = {"days": 4} if item_dict[0].get("quantity") > 0 else {"weeks": 4}
+            
+        item.delivery_date = get_delivery_future(param)
+        
+        item.delivery_date_visible = True
+    
+    
+def get_delivery_future(param):
+    
+    fecha_inicial = datetime.now()
+    
+    return fecha_inicial + timedelta(**param)
+    
 def __set_auto_discount(sales_order):
     
-    sql ="""
-        select 
-            coupon.percentage as percentage,
-            coupon_item.count as count,
-            coupon.code as code
-        from
-            `tabqp_pf_Coupon` as coupon
-        inner join
-            `tabqp_pf_CouponItems` as coupon_item
-            on (coupon.name = coupon_item.parent)
-        where coupon.is_automatic = 1 and coupon_item.count > 0 and coupon_item.item = %(item)s
-    """
-  
-    coupon_control = {}
+    price_list = frappe.get_doc("Price List", sales_order.selling_price_list)
     
-    items = copy.deepcopy(sales_order.items)
-    
-    for key, item in enumerate(items):
-    
-        result = frappe.db.sql(sql, values = {"item": item.item_code}, as_dict = 1)
+    if not price_list.qp_without_discount:
         
-        if result:
+        sql ="""
+            select 
+                coupon.percentage as percentage,
+                coupon_item.count as count,
+                coupon.code as code
+            from
+                `tabqp_pf_Coupon` as coupon
+            inner join
+                `tabqp_pf_CouponItems` as coupon_item
+                on (coupon.name = coupon_item.parent)
+            where coupon.is_active = 1 and coupon.is_automatic = 1 and (now() between coupon.start_date and coupon.end_date) and coupon_item.count > 0 and coupon_item.item = %(item)s
+        """
+    
+        coupon_control = {}
+        
+        items = copy.deepcopy(sales_order.items)
+        
+        for key, item in enumerate(items):
+        
+            result = frappe.db.sql(sql, values = {"item": item.item_code}, as_dict = 1)
             
-            code = result[0].get("code")
-            
-            __init_coupon_control(code, coupon_control,sales_order.name)
-            
-            coupon = coupon_control[code]["coupon"]
-            
-            coupon_log = coupon_control[code]["coupon_log"]
-            
-            if result[0].get("count") < item.qty:
+            if result:
                 
-                item.qty = result[0].get("count")
+                code = result[0].get("code")
+                
+                __init_coupon_control(code, coupon_control,sales_order.name)
+                
+                coupon = coupon_control[code]["coupon"]
+                
+                coupon_log = coupon_control[code]["coupon_log"]
+                
+                if result[0].get("count") < item.qty:
+                    
+                    item.qty = result[0].get("count")
+                                
+                set_coupont_items_log(coupon_log, item, coupon)
+                
+                set_coupon_order(sales_order, item, coupon)
+                
+                __update_coupon_item_count(coupon, item, coupon_control, code)
+                
+                __update_order_items(sales_order, item)        
                             
-            set_coupont_items_log(coupon_log, item, coupon)
-            
-            set_coupon_order(sales_order, item, coupon)
-            
-            __update_coupon_item_count(coupon, item, coupon_control, code)
-            
-            __update_order_items(sales_order, item)           
-                        
-    __save_coupon(coupon_control)            
-
+        __save_coupon(coupon_control)
+    
+    sales_order.save()
+             
 def __update_order_items(sales_order, item):
     
     order_is_found = False
@@ -588,19 +637,28 @@ def __set_sales_order_response(sales_order, reference, response):
     
     sales_order.qp_phonix_reference = reference
     
-    sales_order.items = __get_sales_order_items_response(sales_order.items, response.get("ReturnJson"))
+    __get_sales_order_items_response(sales_order, response.get("ReturnJson"))
     
-def __get_sales_order_items_response(items, returnJson):
+def __get_sales_order_items_response(sales_order, returnJson):
     
     lines = []
 
-    for item in items:
-        
-        lines += [ get_line(line, item) for line in returnJson.get("Lines") if line.get("Id") == item.item_code and not line.get("merge")]
+    sales_order.items = sorted(sales_order.items, key=lambda x: x.idx)
     
-        item.delete()
+    items = copy.deepcopy(sales_order.items)
 
-    return lines    
+
+    lines = returnJson.get("Lines")
+    
+    for key, item in enumerate(items):
+        
+        line = get_line(lines[key], copy.deepcopy(sales_order.items[key]))
+        
+        sales_order.append("items",line)
+        
+        sales_order.items[key].delete()
+
+    sales_order.save()
     
 def __send_check_out_so(sales_order):
         
@@ -610,12 +668,12 @@ def __send_check_out_so(sales_order):
 
 def __delete_items(sales_order, item_delete_list):
 
-    for so_item_doc in sales_order.items:
+    for key, so_item_doc in enumerate(sales_order.items):
 
-        if so_item_doc.get('code') in item_delete_list:
+        if so_item_doc.name in item_delete_list:
 
             so_item_doc.delete()
-                
+                                        
 def __update_items(order_item_json, sales_order, item_update_list, item_insert_list):
     
     for item in order_item_json:
@@ -643,6 +701,8 @@ def __update_items(order_item_json, sales_order, item_update_list, item_insert_l
                 'rate': item.get('rate')
                 
             })
+            
+    sales_order.save()
                 
 def __set_order_data(sales_order, order_json):
     
@@ -704,23 +764,20 @@ def setup_order_json(order_json):
             
 def get_line(line, item):
 
-    line_new = copy.copy(item)
+    item.name = None
+    item.creation = None
+    item.modified = None
+    item.modified_by = None
 
-    line_new.name = None
+    item.qty = line.get("Quantity")
 
-    line_new.line_number = line.get("LineNumber")
+    item.delivery_date = datetime.strptime(line.get("RequestDate") , "%Y-%m-%d").date() if line.get("RequestDate") != '1900-01-01' else date.today()
 
-    line_new.qty = line.get("Quantity")
+    item.delivery_date_visible = True if line.get("RequestDate") != '1900-01-01' else False
 
-    line_new.delivery_date = line.get("RequestDate") if line.get("RequestDate") != '1900-01-01' else today()
-
-    line_new.delivery_date_visible = True if line.get("RequestDate") != '1900-01-01' else False
-
-    line_new.qp_phoenix_status = line.get("Status")
-
-    line_new.insert()
-    line.setdefault("merge", True)
-    return line_new
+    item.qp_phoenix_status = line.get("Status")
+  
+    return item.as_dict()
 
 def __get_item_attr(item_code, attr):
 

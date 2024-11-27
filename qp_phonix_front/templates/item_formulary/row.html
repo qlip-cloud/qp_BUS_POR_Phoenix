@@ -1,98 +1,121 @@
-{%for  item in item_list %}
-    {% set count = 4 %}
-                    
-    <tr data-item-name = "{{item.item_name}}" data-phonix-class = "{{item.qp_phonix_class if item.qp_phonix_class else ''}}" 
-    class="inventary-{{'SI' if item.quantity > 0 else 'NO'}} {{item.sku}} {{ 'auto_discount' if item.discountpercentage_coupon and item.discountpercentage_coupon > 0 else ''}} {{item.class_title}} item-row item-row-base {{item.qp_phoenix_shortdescription}} {{item.name | replace(':','-')}} {{item.item_group}} {{item.initial}} {{'row_select' if item.cantidad else ''}} {{'filter' if disabled_off else ''}}" style="{{'display: none;' if not disabled_off else ''}}" data-id = "{{item.name}}" data-description = "{{item.description}}" data-code = "{{item.code}}">
-        
+{%for item in item_list %}
+{% set count = 4 %}
 
-        <input type="hidden" id = "item_id" value= "{{item.name}}" >
-        <input type="hidden" id = "item_discount" value= "{{item.discountpercentage}}" >
-        
-        <td rowspan="{{ 2 if item.description_full else 1}}" class="lateralleft padding_list {{'row_select' if item.cantidad else ''}}"><img src="{{item.image}}" class="rounded float-left item_img " onerror="this.src='/assets/qlip_bussines_theme/images/company_default_logo.jpg'" /> 
-        
-        <td class="{{'item_select' if item.cantidad else ''}} item-name" ><div class="margin-left">{{item.item_name}}</div></td>
-        <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">{{item.name}}</div></td>
-        
+<tr data-item-name="{{item.item_name}}" data-phonix-class="{{item.qp_phonix_class if item.qp_phonix_class else ''}}"
+    class="inventary-{{'SI' if item.quantity > 0 else 'NO'}} {{item.sku}} {{ 'auto_discount' if item.discountpercentage_coupon and item.discountpercentage_coupon > 0 else ''}} {{item.class_title}} item-row item-row-base {{item.qp_phoenix_shortdescription}} {{item.name | replace(':','-')}} {{item.item_group}} {{item.initial}} {{'row_select' if item.cantidad else ''}} {{'filter' if disabled_off else ''}}"
+    style="{{'display: none;' if not disabled_off else ''}}" data-id="{{item.name}}"
+    data-description="{{item.description}}" data-code="{{item.code}}">
 
-        {% if permission.price_format %}
-            {% set count = count + 1 %}
-            <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">{{item.currency_symbol}} {{item.price_format | replace(",",".")}} {{item.currency}}</div></td>
-        {%endif%}
 
-        {% if permission.discountpercentage %}
-            {% set count = count + 1 %}
+    <input type="hidden" id="item_id" value="{{item.name}}">
+    <input type="hidden" id="item_discount" value="{{item.discountpercentage if not item.price_list_without_discount else 0}}">
 
-            <td class="{{'item_select' if item.cantidad else ''}}" style="text-align: center;">
-                <div class="margin-left">
+    <td rowspan="{{ 2 if item.description_full else 1}}"
+        class="lateralleft padding_list {{'row_select' if item.cantidad else ''}}"><img src="{{item.image}}"
+            class="rounded float-left item_img "
+            onerror="this.src='/assets/qlip_bussines_theme/images/company_default_logo.jpg'" />
+
+    <td class="{{'item_select' if item.cantidad else ''}} item-name">
+        <div class="margin-left">{{item.item_name}}</div>
+    </td>
+    <td class="{{'item_select' if item.cantidad else ''}}">
+        <div class="margin-left">{{item.name}}</div>
+    </td>
+
+
+    {% if permission.price_format %}
+    {% set count = count + 1 %}
+    <td class="{{'item_select' if item.cantidad else ''}}">
+        <div class="margin-left">{{item.currency_symbol}} {{item.price_format | replace(",",".")}} {{item.currency}}
+        </div>
+    </td>
+    {%endif%}
+
+    {% if permission.discountpercentage %}
+    {% set count = count + 1 %}
+
+    <td class="{{'item_select' if item.cantidad else ''}}" style="text-align: center;">
+        <div class="margin-left">
+            {% if item.price_list_without_discount %}
+                No Aplica
+            {%else %}
                 <p class="discount-style">{{item.discountpercentage}} %</p>
                 {% if item.discountpercentage_coupon %}
-                    <p class="discount-style green">+ Promo</p>
+                <p class="discount-style green">+ Promo</p>
                 {%endif%}
+            {%endif%}
 
-            </div></td>
-        {%endif%}
+        </div>
+    </td>
+    {%endif%}
 
-        {% if permission.price_discount_format %}
-            {% set count = count + 1 %}
+    {% if permission.price_discount_format %}
+    {% set count = count + 1 %}
 
-            <td class="{{'item_select' if item.cantidad else ''}}"><div class="margin-left">{{item.currency_symbol}} {{item.price_discount_format | replace(",",".")}} {{item.currency}}</div></td>
+    <td class="{{'item_select' if item.cantidad else ''}}">
+        <div class="margin-left">{{item.currency_symbol}} {{item.price_discount_format | replace(",",".") if not item.price_list_without_discount else item.price_format | replace(",",".")}}
+            {{item.currency}}</div>
+    </td>
 
-        {%endif%}
+    {%endif%}
 
-        
-        <td class="{{'item_select' if item.cantidad else ''}}">
-            <div class="margin-left" id = "inventory_quantity-{{item.name | replace(':','-')}}">
-                {% if permission.quantity_format %}
-                    {{item.quantity|int}} [{{item.quantity_dis|int}}]
-                {%else%}
-                    {{'Si' if item.quantity > 0 else 'No'}}
-                {%endif%}
-            </div>
-        </td>
-        {% if permission.quantity %}
-            {% set count = count + 1 %}
 
-            <td class="padding_list {{'item_select' if item.cantidad else ''}}">
-                <input type="number" class="form-control quantity "  id="quantity" value={{item.cantidad}} 
-                    min = 0 
-                    data-quantity = "{{item.quantity}}" 
-                    data-value = {{item.cantidad}} 
-                    data-factor = "{{item.inqt}}" 
-                    data-select= "{{item.name | replace(':','-')}}" 
-                    data-sku= "{{item.sku}}"
-                    data-qp_prioritize_unit_package= "{{item.qp_prioritize_unit_package}}"
-                    data-quantity_dis= "{{item.quantity_dis}}"
-                    data-quantity_format = {{permission.quantity_format}}
-                    data-next = {{key}}
-                    data-code = {{item.code}}
-                     >
-            </td>
-        {%endif%}
-        {% if permission.inqt %}
-            {% set count = count + 1 %}
-        
-            <td class="lateralright {{'item_select' if item.cantidad else ''}}"><div class="margin-left ">Unidad <br> x {{item.inqt}}</div></td>
-        {%endif%}
-        
-        {% if permission.stock_uom %}
-        {% set count = count + 1 %}
+    <td class="{{'item_select' if item.cantidad else ''}}">
+        <div class="margin-left" id="inventory_quantity-{{item.name | replace(':','-')}}">
+            {% if permission.quantity_format %}
+            {{item.quantity|int}} [{{item.quantity_dis|int}}]
+            {%else%}
+            {{'Si' if item.quantity > 0 else 'No'}}
+            {%endif%}
+        </div>
+    </td>
+    {% if permission.quantity %}
+    {% set count = count + 1 %}
 
-            <td class="lateralright {{'item_select' if item.cantidad else ''}}"><div class="margin-left">{{item.stock_uom}}</div></td>
-        {%endif%}
-        
-        {% if permission.sku %}
-            {% set count = count + 1 %}
+    <td class="padding_list {{'item_select' if item.cantidad else ''}}">
+        <input type="number" class="form-control quantity " id="quantity" value={{item.cantidad}} min=0
+            data-quantity="{{item.quantity}}" data-value={{item.cantidad}} data-factor="{{item.inqt}}"
+            data-select="{{item.name | replace(':','-')}}" data-sku="{{item.sku}}"
+            data-qp_prioritize_unit_package="{{item.qp_prioritize_unit_package}}"
+            data-quantity_dis="{{item.quantity_dis}}" 
+            data-quantity_format={{permission.quantity_format}}
+            data-next={{key}} data-code={{item.code}}>
+    </td>
+    {%endif%}
+    {% if permission.inqt %}
+    {% set count = count + 1 %}
 
-            <td class="lateralright {{'item_select' if item.cantidad else ''}}"><div class="margin-left">{{item.sku}}</div></td>
-        {%endif%}
-    </tr>
-    {% if item.description_full %}
-    <tr data-item-name = "{{item.item_name}}" 
-        class="inventary-{{'SI' if item.quantity > 0 else 'NO'}} 
-        {{item.sku}}  {{ 'auto_discount' if item.discountpercentage_coupon > 0 else ''}} {{item.class_title}} item-row {{item.name | replace(':','-')}} {{item.item_group}} {{item.initial}} {{'row_select' if item.cantidad else ''}} {{'filter' if disabled_off else ''}}" 
-        style="{{'display: none;' if not disabled_off else ''}}" data-id = "{{item.name}}">
-        <td colspan="{{count}}" class="lateralright {{'item_select' if item.cantidad else ''}}" style="color: #747474;font-size: 13px;"><div class="margin-left">{{item.description_full}}</div></td>
-        
-    </tr>
-    {% endif %}
+    <td class="lateralright {{'item_select' if item.cantidad else ''}}">
+        <div class="margin-left ">Unidad <br> x {{item.inqt}}</div>
+    </td>
+    {%endif%}
+
+    {% if permission.stock_uom %}
+    {% set count = count + 1 %}
+
+    <td class="lateralright {{'item_select' if item.cantidad else ''}}">
+        <div class="margin-left">{{item.stock_uom}}</div>
+    </td>
+    {%endif%}
+
+    {% if permission.sku %}
+    {% set count = count + 1 %}
+
+    <td class="lateralright {{'item_select' if item.cantidad else ''}}">
+        <div class="margin-left">{{item.sku}}</div>
+    </td>
+    {%endif%}
+</tr>
+{% if item.description_full %}
+<tr data-item-name="{{item.item_name}}"
+    class="inventary-{{'SI' if item.quantity > 0 else 'NO'}} 
+        {{item.sku}}  {{ 'auto_discount' if item.discountpercentage_coupon > 0 else ''}} {{item.class_title}} item-row {{item.name | replace(':','-')}} {{item.item_group}} {{item.initial}} {{'row_select' if item.cantidad else ''}} {{'filter' if disabled_off else ''}}"
+    style="{{'display: none;' if not disabled_off else ''}}" data-id="{{item.name}}">
+    <td colspan="{{count}}" class="lateralright {{'item_select' if item.cantidad else ''}}"
+        style="color: #747474;font-size: 13px;">
+        <div class="margin-left">{{item.description_full}}</div>
+    </td>
+
+</tr>
+{% endif %}
 {%endfor%}

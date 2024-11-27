@@ -553,10 +553,22 @@ def get_from_base(idlevel, cond_t = None, has_inventary = False, has_auto_coupon
         INNER JOIN `tabCurrency` as currency ON currency.name = price_list.currency
         {}
         left join `tabqp_GP_Level` as gp_level on (prod.qp_price_group = gp_level.group_type and gp_level.idlevel = '{}')
-        {coupon_inner} join `tabqp_pf_CouponItems` as coupon_item
-        on (prod.name = coupon_item.item and coupon_item.count > 0)
-        {coupon_inner} join `tabqp_pf_Coupon` as coupon
-        on (coupon.name = coupon_item.parent and coupon.is_automatic = 1)
+        {coupon_inner} join (
+            select 
+                coupon.percentage,
+                coupon_item.item
+            from
+                `tabqp_pf_Coupon` as coupon
+            inner join
+                `tabqp_pf_CouponItems` as coupon_item
+                on (coupon.name = coupon_item.parent and coupon_item.count > 0)
+            where
+                coupon.is_automatic = 1
+                AND coupon.is_active = 1
+                AND (now() between coupon.start_date and coupon.end_date)
+
+        ) as coupon on (prod.name = coupon.item)
+       
     """.format(item_quantity_inner,class_condition, idlevel, coupon_inner = coupon_inner)
 
 def get_where_base():
@@ -610,6 +622,7 @@ def get_tbl_product_list(item_group, from_base, where_base, item_code_list = Non
             IF(prod.image IS NULL or prod.image = '', '%s', prod.image) as image,
             price.price_list_rate as price,
             format(price.price_list_rate,2) as price_format,
+            price_list.qp_without_discount as price_list_without_discount,
             currency.name as currency,
             currency.symbol as currency_symbol,
             0 as cantidad,

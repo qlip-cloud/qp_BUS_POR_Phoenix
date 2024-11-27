@@ -1,9 +1,16 @@
 {% extends "qp_phonix_front/templates/main.html" %}
 
 {% block section_title %}
-{%if is_valid%}
-Orden
+    {%if is_valid%}
+        Orden
+    {%endif%}
+    
+{% endblock %}
+{% block section_title_left %}
+{%if order.status == "Draft"%}
+    <input type="checkbox" id="term_condition" > <strong><a target="_blank" style="text-decoration: underline;color:#000" href="/files/Condiciones%20Comerciales%20en%20la%20Oferta%206NOV2024.pdf">Acepto condiciones comerciales</a></strong>
 {%endif%}
+
 {% endblock %}
 
 {% block button_title %}
@@ -34,7 +41,7 @@ Orden
 
     {%if has_sync and permission.confirm %}
 
-    <a id="btn_confirm_order" class="btn button-master button-default">
+    <a id="btn_confirm_order" class="btn button-master button-default disabled">
         {{ _("CONFIRMAR ORDEN") }}
     </a>
     {%endif%}
@@ -277,24 +284,43 @@ Orden
                                 Cupon Canjeado
                             </div>
                         </div>
-                        <div class="row">
-                            <div class=" col-md-12 label coupon_legend">
+                        {% if coupon_list %}
+                            {% for coupon in coupon_list%}
+                            <div class="row">
+                                <div class=" col-md-12 label coupon_legend">
 
-                                {{coupon_description}}
+                                    {{coupon.description}}
 
+                                </div>
                             </div>
-                        </div>
-                        <div class="row label">
-                            <div class="col-md-4">
-                                <ul class="coupon_name">
-                                    {% if has_coupon %}
-                                    <li>
-                                        {{coupon_title}}
-                                    </li>
-                                    {% endif %}
-                                </ul>
+                            <div class="row label">
+                                <div class="col-md-12">
+                                    <ul class="coupon_name">
+                                        {% if has_coupon %}
+                                        <li>
+                                            {{coupon.title}}
+                                        </li>
+                                        {% endif %}
+                                    </ul>
+                                </div>
                             </div>
-                        </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="row">
+                                <div class=" col-md-12 label coupon_legend">
+
+
+                                </div>
+                            </div>
+                            <div class="row label">
+                                <div class="col-md-12">
+                                    <ul class="coupon_name">
+                                        
+                                    </ul>
+                                </div>
+                            </div>
+                        {% endif %}
+                        
                     </div>
 
                 </div>
@@ -307,7 +333,7 @@ Orden
                         {{order.currency_symbol}} <span id="" class="price_total ">{{order.total_format | replace(",",
                             ".")}}</span>
                     </div>
-                    {% if order.status == 'Draft' %}
+                    {% if order.status == 'Draft' and not order.price_list_without_discount %}
 
                     <div class=" col-md-12 subtitle green-discount" id="green-discount" style="display: none;">
 
@@ -405,19 +431,23 @@ Orden
                                         <span
                                             style="font-size: 15px; color:{{item.qp_phoenix_status_color}}">{{item.qp_phoenix_status_title}}
                                             / Entrega: {{item.delivery_date}} </span>
-                                        {% elif item.has_discount %}
+                                        {% elif not order.price_list_without_discount %}
+                                            {% if item.has_discount %}
 
-                                        <span class="green-discount" id="label-{{item.item_code | replace(':','-')}}">
-                                            Producto con descuento</span>
-                                        {% elif item.auto_discount %}
 
-                                        <span class="green-discount" id="label-{{item.item_code | replace(':','-')}}">
-                                            {{item.auto_qty | int}} UNIDADES APLICAN A {{item.auto_discount}}% DE DCTO
-                                            PARA
-                                            UN AHORRO TOTAL DE
-                                            {{order.currency_symbol}}{{item.auto_discount_percentage_format}}
+                                            <span class="green-discount" id="label-{{item.item_code | replace(':','-')}}">
+                                                Producto con descuento</span>
+                                            {% elif item.auto_discount %}
 
-                                            {% endif %}
+                                            <span class="green-discount" id="label-{{item.item_code | replace(':','-')}}">
+                                                {{item.auto_qty | int}} UNIDADES APLICAN A {{item.auto_discount}}% DE DCTO
+                                                PARA
+                                                UN AHORRO TOTAL DE
+                                                {{order.currency_symbol}}{{item.auto_discount_percentage_format}}
+
+                                                {% endif %}
+                                        {% endif %}
+
                                     </div>
                                 </div>
                                 </p>
@@ -545,8 +575,9 @@ Orden
                             <p>Gracias Por su orden</p>
                         </div>
                         <div class="col sm-12 modal-message">
-                            <p>Aqui puedes ver la confirmacion de tu pedido</p>
-                            <p>Estas fechas están sujetas a cambios por parte de casa matriz</p>
+                            <p>Aquí puedes ver la confirmación de tu pedido.</p>
+                            <p>Estas fechas están sujetas a cambios por parte de Casa Matriz.</p>
+                            <p>Si se requiere modificar y/o cancelar la orden de compra, debe contactarse con el asesor comercial en un plazo de 24 horas máximo una vez generada la orden de compra.</p>
                         </div>
                     </div>
                     <div class="row">

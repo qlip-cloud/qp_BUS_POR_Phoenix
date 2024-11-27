@@ -3,6 +3,7 @@ from datetime import datetime
 from qp_phonix_front.qp_phonix_front.uses_cases.shipping_method.shipping_method_list import __get_customer
 import traceback
 import json
+import copy
 
 @frappe.whitelist()
 def handler(code, order_id):
@@ -15,10 +16,16 @@ def handler(code, order_id):
 
     try:
 
+        assert_customer_without_discount(customer)
+        
         order =  get_order(order_id)
         
+        item_row_copy = copy.deepcopy(order.items)
+
         coupon = get_coupon(code)
 
+        assert_not_is_automatic(coupon)
+        
         assert_coupon_is_active(coupon)
 
         assert_coupon_has_min_amount(coupon, order)
@@ -33,17 +40,21 @@ def handler(code, order_id):
         
         coupon_log = create_coupon(coupon, customer, user,now, order_id)
 
-        redeem_coupon(coupon, order, coupon_log)
-
+        redeem_coupon(coupon, order, coupon_log, item_row_copy)
+        
         coupon_log.insert()
         
         order.save()
+        
+        frappe.db.commit()
+        
+        update_name_item(item_row_copy, order.items)      
 
         return {
             "status": 200,
             "msg": "Canje exitoso",
             "coupon": coupon,
-            "order": order,
+            "order": frappe.get_doc("Sales Order", order.name),
             "coupon_log": coupon_log
         }
           
@@ -60,7 +71,7 @@ def handler(code, order_id):
             "order": None,
             "coupon_log": None
         }
-        
+  
 def get_order(order_id):
 
     assert_sales_order_exist(order_id)
@@ -75,7 +86,7 @@ def get_coupon(code):
     
     return frappe.get_doc("qp_pf_Coupon", code)
 
-def redeem_coupon(coupon, order, coupon_log):
+def redeem_coupon(coupon, order, coupon_log, item_row_copy):
 
     if coupon.levels_group:
 
@@ -83,7 +94,7 @@ def redeem_coupon(coupon, order, coupon_log):
 
     if coupon.items:
 
-        return redeem_coupon_items(coupon, order, coupon_log)
+        return redeem_coupon_items(coupon, order, coupon_log, item_row_copy)
 
     redeem_coupon_subtotal(coupon, order)
 
@@ -95,45 +106,86 @@ def redeem_coupon_subtotal(coupon, order):
     order.additional_discount_percentage += coupon.percentage
 
 def redeem_coupon_level_group(coupon, order, coupon_log):
-
+    
+    
     def callback(item):
 
         return any(filter(lambda x: item.qp_phonix_class ==  x.level_group, coupon.levels_group))
 
-    setup_coupon_log(coupon, order, coupon_log, callback)      
 
-def redeem_coupon_items(coupon, order, coupon_log):
+    setup_coupon_log(coupon, order, coupon_log, callback)
+    
+
+def update_name_item(item_row_copy, items):
+    
+    for key, item in enumerate(items):
+        
+        search_item = list(filter(lambda x: x.idx==item.idx, item_row_copy))
+        
+        if search_item[0].name != item.name:
+            
+            sql = """
+                UPDATE `tabSales Order Item` set name = '{name_old}' where name = '{name_new}'
+            """.format(name_new = item.name, name_old = search_item[0].name)
+            frappe.db.sql(sql)
+            
+    frappe.db.commit()
+        
+def redeem_coupon_items(coupon, order, coupon_log, item_row_copy):
 
     def callback(item):
 
         return any(filter(lambda x: item.item_code ==  x.item, coupon.items))
+    
+    setup_coupon_log(coupon, order, coupon_log, item_row_copy, callback)         
 
-    setup_coupon_log(coupon, order, coupon_log, callback)               
+def setup_coupon_log(coupon, order, coupon_log, item_row_copy, callback):
 
+    for key, item in enumerate(item_row_copy):
 
-def setup_coupon_log(coupon, order, coupon_log, callback):
+        if not_is_auto_discount(item.item_code):
+        
+            is_redeemable = callback(item)
 
-    for key, item in enumerate(order.items):
+            if is_redeemable and item.price_list_rate:
+                
+                set_coupont_items_log(coupon_log, item, coupon)
 
-        is_redeemable = callback(item)
-
-        if is_redeemable:
-            
-            set_coupont_items_log(coupon_log, item, coupon)
-
-            set_coupon_order(order, item, coupon)
-            
-            del order.items[key]
-
+                set_coupon_order(order, item, coupon)
+                
+                del order.items[key]
+                
+    assert_has_coupon_item(coupon_log)
+    
 def set_coupon_order(order, item, coupon):
     
     order.append('items', {
             'item_code': item.get('item_code'),
             'qty': item.get('qty'),
+            'idx': item.get('idx'),
             'discount_percentage': __get_discount_total_with_auto_discount(item, coupon)
             
         })
 
+def not_is_auto_discount(item_code):
+        
+    sql ="""
+        select 
+            coupon.percentage as percentage,
+            coupon_item.count as count,
+            coupon.code as code
+        from
+            `tabqp_pf_Coupon` as coupon
+        inner join
+            `tabqp_pf_CouponItems` as coupon_item
+            on (coupon.name = coupon_item.parent)
+        where coupon.is_active = 1 and coupon.is_automatic = 1 and (now() between coupon.start_date and coupon.end_date) and coupon_item.count > 0 and coupon_item.item = %(item)s
+    """
+    
+    result =  not frappe.db.sql(sql, values = {"item": item_code}, as_dict = 1)
+    
+    return result
+    
 def __get_discount_total_with_auto_discount(item, coupon):
     
         final_price = item.price_list_rate * (1 - item.discount_percentage / 100) * (1 - coupon.percentage / 100)
@@ -141,7 +193,7 @@ def __get_discount_total_with_auto_discount(item, coupon):
         return (1 - final_price / item.price_list_rate) * 100
 
 def set_coupont_items_log(coupon_log, item, coupon):
-    
+        
     coupon_log.append("coupon_items", {
                     "item_code": item.get('item_code'),
                     "discount_old": item.discount_percentage,
@@ -230,7 +282,21 @@ def assert_coupon_has_limit_valid(coupon):
         if not coupon.limit > limit_count[0]:
 
             raise CouponLimitNotValid()
+        
+def assert_customer_without_discount(customer):
+    
+    price_list = frappe.get_doc("Price List", customer.default_price_list)
 
+    if price_list.qp_without_discount:
+    
+            raise CustomerPriceListWithOutDiscount()
+        
+def assert_not_is_automatic(coupon):
+
+    if coupon.is_automatic:
+
+        raise CodenNotValid()
+    
 def assert_code_is_valid(code):
 
     if not code:
@@ -246,6 +312,13 @@ def assert_coupon_has_customer_valid(coupon, customer):
         if not search_customer:
 
             raise CouponCustomerNotValid()
+        
+def assert_has_coupon_item(coupon_log):
+    
+    if not hasattr(coupon_log, "coupon_items"):
+        
+        raise CouponItemNotValid()
+        
 
 def assert_coupon_isnot_customer_repeat(coupon, customer):
 
@@ -319,6 +392,22 @@ class CouponCustomerNotValid(Exception):
 class CouponCustomerRepeat(Exception):
 
     def __init__(self, message="Cliente ya reclamo este cupón"):
+
+        self.message = message
+
+        super().__init__(self.message)
+        
+class CouponItemNotValid(Exception):
+
+    def __init__(self, message="El producto de este coupon ya esta en oferta"):
+
+        self.message = message
+
+        super().__init__(self.message)
+        
+class CustomerPriceListWithOutDiscount(Exception):
+
+    def __init__(self, message="Este cliente no aplica para descuentos"):
 
         self.message = message
 

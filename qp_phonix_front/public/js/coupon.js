@@ -29,28 +29,31 @@ $(document).ready(function() {
                     description = `${coupon.percentage}% `
 
                     if (coupon_items.length > 0){
-
+                        description += "Descuento aplicado al precio de cada productos de la promoción"
+                        
                         items.forEach((item) => {
 
                             coupon_item = coupon_items.find(coupon_item => coupon_item.item_code == item.item_code);
-                            console.log(coupon_item)
+                            
 
                             if (coupon_item){
                                 item_code = item.item_code.replace(":","-")
                                 update_list_price(item_code, item)
                             }
-                            description += "Descuento aplicado al precio de cada productos de la promoción"
                         
                         });
+                        total_update()
+
                     }else{
                         description += "Descuento aplicado al subtotal de la factura"
+                        console.log(order.net_total)
+                        $(".price_total").html(new Intl.NumberFormat('es-CO').format(order.net_total))
                     }
 
                     $(".coupon_legend").html(description)
                     $(".coupon_name").append(`<li>${coupon.title}</li>`)
                     $(".section-coupon").hide()
                     $(".section-redeem").show()
-                    $(".price_total").html(new Intl.NumberFormat('es-CO').format(order.net_total))
                     
                     break;
 
