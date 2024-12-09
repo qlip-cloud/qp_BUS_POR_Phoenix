@@ -469,7 +469,7 @@ def __confirm_sales_order(order_json, sales_order):
 
     if order_json.get('action') == "confirm":
 
-        __send_check_out_so(sales_order)
+        #__send_check_out_so(sales_order)
 
         __set_auto_discount(sales_order)
                 
@@ -537,7 +537,7 @@ def __set_auto_discount(sales_order):
         
             result = frappe.db.sql(sql, values = {"item": item.item_code}, as_dict = 1)
             
-            if result:
+            if result and (not coupon_control or is_coupon_count(coupon_control, result[0].get("code"), item.item_code)):
                 
                 code = result[0].get("code")
                 
@@ -571,7 +571,7 @@ def __update_order_items(sales_order, item):
     
     while order_is_found == False and len(sales_order.items) > key:
         
-        if sales_order.items[key].item_code == item.item_code and sales_order.items[key].stock_qty:
+        if sales_order.items[key].item_code == item.item_code and sales_order.items[key].idx == item.idx:
             
             order_is_found = True
             
@@ -601,7 +601,13 @@ def __update_coupon_item_count(coupon, item, coupon_control, code):
         if coupon_item.item == item.get('item_code'):
             
             coupon_control[code]["coupon"].items[coupon_key].count -= item.qty
-                    
+            
+def is_coupon_count(coupon_control, code, item_code):
+    
+    item_count = [item.count for item in coupon_control[code]["coupon"].items if item.item == item_code]
+    
+    return item_count and item_count[0] > 0
+
 def __init_coupon_control(code, coupon_control,sales_order_name):
     
     if code not in coupon_control:
@@ -642,24 +648,35 @@ def __set_sales_order_response(sales_order, reference, response):
 def __get_sales_order_items_response(sales_order, returnJson):
     
     lines = []
-
-    sales_order.items = sorted(sales_order.items, key=lambda x: x.idx)
     
     items = copy.deepcopy(sales_order.items)
 
-
     lines = returnJson.get("Lines")
     
-    for key, item in enumerate(items):
-        
-        line = get_line(lines[key], copy.deepcopy(sales_order.items[key]))
-        
-        sales_order.append("items",line)
-        
-        sales_order.items[key].delete()
-
-    sales_order.save()
+    key_order = 0
     
+    qty_control = sales_order.items[0].qty
+    
+    for line in lines:
+                
+        new_line = get_line(line, copy.deepcopy(items[key_order]))
+        
+        sales_order.append("items",new_line)
+        
+        qty_control -= line.get("Quantity")
+        
+        if qty_control <= 0: 
+                        
+            sales_order.items[key_order].delete()
+                        
+            key_order += 1
+            
+            if key_order < len(items):
+                
+                qty_control = items[key_order].qty
+            
+    sales_order.save()
+
 def __send_check_out_so(sales_order):
         
     if __validate_product_inventory():
