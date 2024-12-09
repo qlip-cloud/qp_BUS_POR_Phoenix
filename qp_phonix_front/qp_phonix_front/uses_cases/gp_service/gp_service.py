@@ -80,14 +80,7 @@ def __prepare_petition(master_name, so_obj):
     item_list = []
 
     for item in so_obj.items:
-        """
-        "Id": item.item_code,
-                "Cant": item.qty,
-                "Precio": item.base_price_list_rate,
-                "Bdga_linea": item.item_group,
-                "shipping_method": so_obj.qp_shipping_type,
-                "shipping_date": so_obj.delivery_date.strftime("%Y-%m-%d")
-        """
+
         item_list.append(
             {
                 "Id": item.item_code,

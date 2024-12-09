@@ -163,6 +163,7 @@ def set_coupon_order(order, item, coupon):
             'item_code': item.get('item_code'),
             'qty': item.get('qty'),
             'idx': item.get('idx'),
+            'description': item.get('description'),
             'discount_percentage': __get_discount_total_with_auto_discount(item, coupon)
             
         })
