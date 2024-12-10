@@ -476,9 +476,7 @@ def __confirm_sales_order(order_json, sales_order):
         __send_sales_order(sales_order)
         
         set_qp_subtotal(sales_order)
-        
-        set_delivery_date(sales_order)
-        
+                
         sales_order.submit()
         
         return True
@@ -653,15 +651,17 @@ def __get_sales_order_items_response(sales_order, returnJson):
 
     lines = returnJson.get("Lines")
     
+    sales_order_aux = frappe.new_doc("Sales Order")
+    
     key_order = 0
     
     qty_control = sales_order.items[0].qty
-    
+        
     for line in lines:
                 
         new_line = get_line(line, copy.deepcopy(items[key_order]))
         
-        sales_order.append("items",new_line)
+        sales_order_aux.append("items",new_line)
         
         qty_control -= line.get("Quantity")
         
@@ -674,7 +674,9 @@ def __get_sales_order_items_response(sales_order, returnJson):
             if key_order < len(items):
                 
                 qty_control = items[key_order].qty
-            
+                
+    sales_order.items = sales_order_aux.items
+    
     sales_order.save()
 
 def __send_check_out_so(sales_order):
@@ -787,10 +789,12 @@ def get_line(line, item):
     item.modified_by = None
 
     item.qty = line.get("Quantity")
-
-    item.delivery_date = datetime.strptime(line.get("RequestDate") , "%Y-%m-%d").date() if line.get("RequestDate") != '1900-01-01' else date.today()
-
-    item.delivery_date_visible = True if line.get("RequestDate") != '1900-01-01' else False
+        
+    param = {"days": 4} if line.get("Status") == "1" else {"weeks": 4}
+        
+    item.delivery_date = get_delivery_future(param)
+    
+    item.delivery_date_visible = True
 
     item.qp_phoenix_status = line.get("Status")
   
