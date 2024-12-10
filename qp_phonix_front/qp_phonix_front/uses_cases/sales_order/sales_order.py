@@ -653,15 +653,17 @@ def __get_sales_order_items_response(sales_order, returnJson):
 
     lines = returnJson.get("Lines")
     
+    sales_order_aux = frappe.new_doc("Sales Order")
+    
     key_order = 0
     
     qty_control = sales_order.items[0].qty
-    
+        
     for line in lines:
                 
         new_line = get_line(line, copy.deepcopy(items[key_order]))
         
-        sales_order.append("items",new_line)
+        sales_order_aux.append("items",new_line)
         
         qty_control -= line.get("Quantity")
         
@@ -674,7 +676,9 @@ def __get_sales_order_items_response(sales_order, returnJson):
             if key_order < len(items):
                 
                 qty_control = items[key_order].qty
-            
+                
+    sales_order.items = sales_order_aux.items
+    
     sales_order.save()
 
 def __send_check_out_so(sales_order):
