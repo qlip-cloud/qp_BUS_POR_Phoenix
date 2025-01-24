@@ -36,7 +36,7 @@ def handler(code, order_id):
 
         assert_coupon_has_customer_valid(coupon, customer)
 
-        assert_coupon_isnot_customer_repeat(coupon, customer)
+        #assert_coupon_isnot_customer_repeat(coupon, customer)
         
         coupon_log = create_coupon(coupon, customer, user,now, order_id)
 
@@ -153,7 +153,7 @@ def setup_coupon_log(coupon, order, coupon_log, item_row_copy, callback):
 
                 set_coupon_order(order, item, coupon)
                 
-                del order.items[key]
+                order.items = [order_item for order_item in order.items if not (item.name == order_item.name and item.idx == order_item.idx)]
                 
     assert_has_coupon_item(coupon_log)
     
@@ -286,11 +286,13 @@ def assert_coupon_has_limit_valid(coupon):
         
 def assert_customer_without_discount(customer):
     
-    price_list = frappe.get_doc("Price List", customer.default_price_list)
-
-    if price_list.qp_without_discount:
+    if frappe.db.exists("Price List", customer.default_price_list):
     
-            raise CustomerPriceListWithOutDiscount()
+        price_list = frappe.get_doc("Price List", customer.default_price_list)
+
+        if price_list.qp_without_discount:
+        
+                raise CustomerPriceListWithOutDiscount()
         
 def assert_not_is_automatic(coupon):
 
