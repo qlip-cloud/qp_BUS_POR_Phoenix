@@ -29,6 +29,7 @@ $(document).ready(function() {
                     description = `${coupon.percentage}% `
 
                     if (coupon_items.length > 0){
+                        
                         description += "Descuento aplicado al precio de cada productos de la promoción"
                         
                         items.forEach((item) => {
@@ -45,9 +46,10 @@ $(document).ready(function() {
                         total_update()
 
                     }else{
+
                         description += "Descuento aplicado al subtotal de la factura"
-                        console.log(order.net_total)
-                        $(".price_total").html(new Intl.NumberFormat('es-CO').format(order.net_total))
+                        
+                        $(".price_total").html(new Intl.NumberFormat('es-CO', { maximumFractionDigits: 2 }).format(order.net_total))
                     }
 
                     $(".coupon_legend").html(description)
