@@ -469,6 +469,7 @@ def __confirm_sales_order(order_json, sales_order):
 
     if order_json.get('action') == "confirm":
 
+        
         __send_check_out_so(sales_order)
 
         __set_auto_discount(sales_order)
@@ -724,7 +725,12 @@ def __update_items(order_item_json, sales_order, item_update_list, item_insert_l
     sales_order.save()
                 
 def __set_order_data(sales_order, order_json):
+    qp_phoenix_order_customer = order_json.get("qp_phoenix_order_customer")
     
+    if not qp_phoenix_order_customer.strip():
+        
+        raise Exception(_('La orden del cliente es obligatorio'))
+        
     sales_order.qp_phoenix_order_customer = order_json.get("qp_phoenix_order_customer")
         
     sales_order.qp_phoenix_order_comment = order_json.get("qp_phoenix_order_comment")
