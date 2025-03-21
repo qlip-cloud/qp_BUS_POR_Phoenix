@@ -1,64 +1,83 @@
-$(document).ready(function() {
-    
-    $("#term_condition").on("change", function(){
+$(document).ready(function () {
+
+    $('#address').on("change", function () {
+        
+        let city = "";
+        let pincode = "";
+        let phone = "";
+
+        if ($(this).val() != '0') {
+
+            var selectedOption = $(this).find('option:selected');
+            city = selectedOption.data('city');
+            pincode = selectedOption.data('pincode');
+            phone = selectedOption.data('phone');            
+        }
+
+        $('#city-label').html(city);
+        $('#pincode-label').html(pincode);
+        $('#pincode-phone').html(phone);
+    });
+
+    $("#term_condition").on("change", function () {
         if ($(this).prop("checked")) {
             $("#btn_confirm_order").removeClass("disabled")
         } else {
             $("#btn_confirm_order").addClass("disabled")
         }
-        })
-    $("#enable_sales_persons").on("click", function(){
-        
-        $("#sales_persons").prop("disabled", !$(this).is(":checked"))
-        
     })
-    
+    $("#enable_sales_persons").on("click", function () {
+
+        $("#sales_persons").prop("disabled", !$(this).is(":checked"))
+
+    })
+
     sessionStorage.removeItem("order_id")
 
     $(".delecte_group").prop('checked', false);
 
     $(".quantity").bind('blur mouseup', function () {
-        
+
         value = $(this).val()
 
-        if (value == 0){
+        if (value == 0) {
 
             $line = $(this).parents(".line")
 
             delete_line_modal($line.attr("id"))
-            
+
         }
     })
 
-    $("#btn_edit_order").click(function(){
+    $("#btn_edit_order").click(function () {
 
         order_id = $("#order_id").val()
 
-        redirect_link=`/order/item_formulary?order_id=${order_id}`
+        redirect_link = `/order/item_formulary?order_id=${order_id}`
 
         redirect(redirect_link)
 
     })
-    
-    $("#selected_delete").click( function(){
-        
+
+    $("#selected_delete").click(function () {
+
         delete_line_modal(1)
 
     })
-    $(".trash").click( function(){
+    $(".trash").click(function () {
 
         $line = $(this).parents(".line")
 
         delete_line_modal($line.attr("id"))
     })
 
-    
+
 })
-$(".delecte_group").on("click", function(){
+$(".delecte_group").on("click", function () {
     show_deleted_button()
 })
-$(".select_all").on("click", function(){
-    
+$(".select_all").on("click", function () {
+
     action = $(this).data("action")
 
     checked = action == "1" ? true : false;
@@ -69,30 +88,30 @@ $(".select_all").on("click", function(){
 
 
 
-function show_deleted_button(){
+function show_deleted_button() {
     select = false;
     visible = false
 
-    $(".delecte_group").each(function(){
-        if ($(this).prop("checked")){
+    $(".delecte_group").each(function () {
+        if ($(this).prop("checked")) {
             select = true
 
         }
-        if ($(this).is(":visible")){
+        if ($(this).is(":visible")) {
             visible = true
 
         }
 
     })
 
-    if (select){
+    if (select) {
         $("#selected_delete").show()
         $("#select_all").hide()
         $("#deselect_all").show()
     }
-    else{
+    else {
         $("#selected_delete").hide()
-        if (visible){
+        if (visible) {
             $("#select_all").show()
         }
         $("#deselect_all").hide()
@@ -100,10 +119,10 @@ function show_deleted_button(){
     }
 }
 
-function deleted_rows(){
+function deleted_rows() {
 
-    $(".delecte_group").each(function(){
-        if ($(this).prop("checked")){
+    $(".delecte_group").each(function () {
+        if ($(this).prop("checked")) {
 
             $line = $(this).parents(".line")
 
@@ -118,7 +137,7 @@ function deleted_rows(){
 }
 
 
-function delete_line_modal(line_id){
+function delete_line_modal(line_id) {
 
     $("#button_yes").addClass("trash_SubCategoria")
     $("#warn-modal #type").val(0)

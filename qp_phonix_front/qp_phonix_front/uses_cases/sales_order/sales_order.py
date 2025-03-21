@@ -130,11 +130,6 @@ def get_sales_order(sales_order):
                 so.qp_phoenix_order_comment, 
                 item.item_group,
                 so.customer_name, 
-                addr.address_line1, 
-                addr.address_line1, 
-                addr.city, 
-                addr.pincode, 
-                addr.phone,
                 price_list.qp_without_discount as price_list_without_discount,
                 IF(so.qp_shipping_type IS NULL or so.qp_shipping_type = '', '%s',  so.qp_shipping_type) as shipping_type,
                 IF(shipping_type.description IS NULL or shipping_type.description = '', shipping_type.name,  shipping_type.description) as shipping_description,
@@ -147,7 +142,6 @@ def get_sales_order(sales_order):
             from `tabSales Order` as so
             inner join `tabSales Order Item` as so_items on so.name = so_items.parent
             inner join tabItem as item on item.name = so_items.item_code
-            inner join tabAddress as addr on so.customer_address = addr.name
             inner join `tabPrice List` as price_list on so.selling_price_list = price_list.name
             inner join `tabCurrency` as currency on price_list.currency = currency.name
             left join tabqp_GP_ShippingType as shipping_type on shipping_type.name = so.qp_shipping_type
@@ -399,6 +393,8 @@ def sales_order_update(order_json):
         item_delete_list = list(set(items_so).difference(set(items_upd)))
 
         __set_sales_team(order_json, sales_order)
+        
+        __set_ship_to(order_json, sales_order)
 
         __set_order_data(sales_order, order_json)
 
@@ -725,9 +721,10 @@ def __update_items(order_item_json, sales_order, item_update_list, item_insert_l
     sales_order.save()
                 
 def __set_order_data(sales_order, order_json):
+    
     qp_phoenix_order_customer = order_json.get("qp_phoenix_order_customer")
     
-    if not qp_phoenix_order_customer.strip():
+    if not qp_phoenix_order_customer.strip() and order_json.get('action') == "confirm":
         
         raise Exception(_('La orden del cliente es obligatorio'))
         
@@ -747,6 +744,12 @@ def __set_sales_team(order_json, sales_order):
             
         })
         
+def __set_ship_to(order_json, sales_order):
+    
+    if (order_json.get("address")):
+
+        sales_order.customer_address = order_json.get("address")
+        
 def __validate_customer(sales_order):
         
     customer = get_customer_party()
@@ -762,7 +765,9 @@ def __get_sales_order(order_id):
     if qdoc.docstatus != 0:
         
         raise Exception(_('The Sales Order is confirmed'))
-        
+    
+    qdoc.contact_email = frappe.session.user
+    
     return qdoc
         
 def __get_order_item_json(order_json):

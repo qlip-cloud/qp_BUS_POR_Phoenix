@@ -1,6 +1,8 @@
 URL_CREATE_SALES_ORDER = "create_sales_order";
 
 $(document).ready(function () {
+        
+        $("#term_condition").prop("checked", false)
 
         $(".dropdown-menu.dropdown-menu-right").children().first().remove()
 
@@ -433,10 +435,12 @@ function update_order(redirect_link = null, valid_empty = false, action = "updat
 
         sales_persons = $("#sales_persons").val()
 
-        save_order(url, redirect_link, action, valid_empty, order_id, is_return, is_async, sales_persons)
+        address = $("#address").val()
+
+        save_order(url, redirect_link, action, valid_empty, order_id, is_return, is_async, sales_persons, address)
 }
 
-function save_order(url, redirect_link, action = null, valid_empty = true, order_id = null, is_return = false, is_async = false, sales_person = null) {
+function save_order(url, redirect_link, action = null, valid_empty = true, order_id = null, is_return = false, is_async = false, sales_person = null, address = null) {
 
         let base_url = "qp_phonix_front.qp_phonix_front.uses_cases.sales_order.sales_order"
 
@@ -520,6 +524,7 @@ function save_order(url, redirect_link, action = null, valid_empty = true, order
                         , order_id
                         , action
                         , sales_person
+                        , address
                         , "qp_phoenix_order_comment": $("#qp_phoenix_order_comment").val()
                 }
         }

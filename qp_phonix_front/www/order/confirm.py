@@ -30,7 +30,9 @@ def get_context(context):
 
         order_id = query_params.get("order_id")
         
-        get_delivery_update(order_id)
+        sale_order = frappe.get_doc("Sales Order", order_id)
+        
+        get_delivery_update(sale_order)
 
         count_item = get_count_update(context, order_id)
 
@@ -46,6 +48,7 @@ def get_context(context):
         set_has_sync(context)
 
         set_sales_persons(context)
+        set_sales_address(context, sale_order.customer)
         
         cache = frappe.cache()
         
@@ -55,9 +58,8 @@ def get_context(context):
             
     try_catch(callback, context)
 
-def get_delivery_update(order_id):
+def get_delivery_update(sale_order):
 
-    sale_order = frappe.get_doc("Sales Order", order_id)
 
     if sale_order.status != "Draft":
 
@@ -99,6 +101,11 @@ def set_sales_persons(context):
     
     context.sales_persons = frappe.get_list("Sales Person", filters = {"is_group": False, "enabled": True}, fields = ["name", "sales_person_name", "gp_code"])
 
+def set_sales_address(context, customer_id):
+    customer = frappe.get_doc("Customer", customer_id)
+    
+    context.addresses = get_dynamic_link(customer, "Address")
+
 def set_coupon_data(context, order_id):
 
     context.has_coupon = False
@@ -138,3 +145,13 @@ def set_coupon_data(context, order_id):
         context.coupon_list = coupon_list
         context.has_coupon = True
         
+def get_dynamic_link(doc, doctype):
+    
+    
+    filters = [
+		["Dynamic Link", "link_doctype", "=", doc.doctype],
+		["Dynamic Link", "link_name", "=", doc.name],
+		["Dynamic Link", "parenttype", "=", doctype]
+	]
+    
+    return frappe.get_all(doctype, filters=filters, fields=["*"])

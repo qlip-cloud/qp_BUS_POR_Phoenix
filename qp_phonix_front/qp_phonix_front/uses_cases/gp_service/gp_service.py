@@ -53,7 +53,6 @@ def send_sales_order(sales_order, vf_SaleOrderConfirmError):
 
     return res
 
-
 def __get_master_setup(company):
 
     master_name = frappe.db.get_list('qp_GP_MasterSetup',
