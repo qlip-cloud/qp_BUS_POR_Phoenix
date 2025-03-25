@@ -748,7 +748,9 @@ def __set_ship_to(order_json, sales_order):
     
     if (not "address" in order_json or not order_json.get("address") or order_json.get("address") == "0"):
         
-        frappe.throw(order_json.get("Debe seleccionar una direccion \n si el cliente no tiene una direccion registrada \n comuniquese con el administrador del sistema"))
+        frappe.throw("""<p>Debe seleccionar una dirección.</p>
+                    <p>Si el cliente no tiene una opción disponible,
+                    por favor comuníquese con el administrador del sistema.</p>""")
 
     sales_order.customer_address = order_json.get("address")
         
