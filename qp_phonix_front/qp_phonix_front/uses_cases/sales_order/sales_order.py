@@ -748,7 +748,7 @@ def __set_ship_to(order_json, sales_order):
     
     if (order_json.get("address")):
 
-        sales_order.customer_address = order_json.get("address")
+        sales_order.customer_address = order_json.get("address") if order_json.get("address") != "0" else None
         
 def __validate_customer(sales_order):
         

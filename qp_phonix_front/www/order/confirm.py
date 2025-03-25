@@ -48,7 +48,10 @@ def get_context(context):
         set_has_sync(context)
 
         set_sales_persons(context)
+        
         set_sales_address(context, sale_order.customer)
+        
+        set_address_seleted(context, sale_order.customer_address)
         
         cache = frappe.cache()
         
@@ -105,7 +108,17 @@ def set_sales_address(context, customer_id):
     customer = frappe.get_doc("Customer", customer_id)
     
     context.addresses = get_dynamic_link(customer, "Address")
-
+    
+def set_address_seleted(context, customer_address):
+    
+    address_selectd = None
+    
+    if customer_address:
+        
+        address_selectd = frappe.get_doc("Address", customer_address)
+        
+    context.address_selectd = address_selectd
+    
 def set_coupon_data(context, order_id):
 
     context.has_coupon = False

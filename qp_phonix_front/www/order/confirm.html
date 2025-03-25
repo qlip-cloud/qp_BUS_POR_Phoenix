@@ -190,13 +190,12 @@
                     Dirección
                 </div>
                 <div class="col-md-12 info background-info information_label">
-                    {% set selected_address = addresses | selectattr('name', 'equalto', order.customer_address) | first %}
 
                     <select name="" id="address" class="form-control" >
                         <option value="0">Seleccione la direccion de envio</option>
                         {% for address in addresses%}
-                        <option value="{{address.name}}" {{ 'selected' if
-                        address.name==order.customer_address else false }} data-city = "{{address.city}}"
+                        <option value="{{address.name}}" {{ 'selected' if address_selectd and 
+                        address.name==address_selectd.name else false }} data-city = "{{address.city}}"
                         data-pincode="{{address.pincode}}" data-phone="{{address.phone}}">
                             {{address.address_line1}} - {{address.city}}
                         </option>
@@ -208,19 +207,19 @@
                     Ciudad
                 </div>
                 <div class="col-md-12 info background-info information_label" id="city-label">
-                    {{ selected_address.city if selected_address else '' }}
+                    {{ address_selectd.city if address_selectd else '' }}
                 </div>
                 <div class="col-md-12 label" >
                     Código Postal
                 </div>
                 <div class="col-md-12 info background-info information_label" id="pincode-label">
-                    {{ selected_address.pincode if selected_address else '' }}
+                    {{ address_selectd.pincode if address_selectd else '' }}
                 </div>
                 <div class="col-md-12 label">
                     Número de contacto
                 </div>
                 <div class="col-md-12 info background-info information_label" id="pincode-phone">
-                    {{ selected_address.phone if selected_address else '' }}
+                    {{ address_selectd.phone if address_selectd else '' }}
                 </div>
             </div>
             <div class="row shadow p-3 mb-5 bg-white rounded">
