@@ -746,9 +746,11 @@ def __set_sales_team(order_json, sales_order):
         
 def __set_ship_to(order_json, sales_order):
     
-    if (order_json.get("address")):
+    if (not "address" in order_json or not order_json.get("address") or order_json.get("address") == "0"):
+        
+        frappe.throw(order_json.get("Debe seleccionar una direccion \n si el cliente no tiene una direccion registrada \n comuniquese con el administrador del sistema"))
 
-        sales_order.customer_address = order_json.get("address") if order_json.get("address") != "0" else None
+    sales_order.customer_address = order_json.get("address")
         
 def __validate_customer(sales_order):
         
