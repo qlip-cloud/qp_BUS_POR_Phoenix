@@ -49,7 +49,7 @@ $(document).ready(function() {
 
                         description += "Descuento aplicado al subtotal de la factura"
                         
-                        $(".price_total").html(new Intl.NumberFormat('es-CO', { maximumFractionDigits: 2 }).format(order.net_total))
+                        $(".price_total").html(currency_format(order.net_total))
                     }
 
                     $(".coupon_legend").html(description)
@@ -78,7 +78,7 @@ function update_list_price(item_code, item){
     $(`#row-${item_code}`).attr('data-price', item.net_rate);
     $(`#row-${item_code}`).attr('data-subtotal', item.net_amount);
     $(`#row-${item_code} > .subtotal`).val(item.net_amount)
-    $(`#price-${item_code}`).html(item.net_rate);
-    $(`#total-${item_code}`).html(item.net_amount);
+    $(`#price-${item_code}`).html(currency_format(item.net_rate));
+    $(`#total-${item_code}`).html(currency_format(item.net_amount));
     $(`#label-${item_code}`).show();
 }

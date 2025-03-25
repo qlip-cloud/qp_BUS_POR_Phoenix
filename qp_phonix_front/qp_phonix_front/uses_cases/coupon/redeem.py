@@ -90,7 +90,7 @@ def redeem_coupon(coupon, order, coupon_log, item_row_copy):
 
     if coupon.levels_group:
 
-        return redeem_coupon_level_group(coupon, order, coupon_log)
+        return redeem_coupon_level_group(coupon, order, coupon_log, item_row_copy)
 
     if coupon.items:
 
@@ -105,16 +105,29 @@ def redeem_coupon_subtotal(coupon, order):
 
     order.additional_discount_percentage += coupon.percentage
 
-def redeem_coupon_level_group(coupon, order, coupon_log):
+def redeem_coupon_level_group(coupon, order, coupon_log, item_row_copy):
     
+    items_class = get_item_class(item_row_copy)
     
     def callback(item):
 
-        return any(filter(lambda x: item.qp_phonix_class ==  x.level_group, coupon.levels_group))
+        return any(filter(lambda x: items_class[item.item_code] ==  x.level_group, coupon.levels_group))
 
+    setup_coupon_log(coupon, order, coupon_log, item_row_copy, callback)
 
-    setup_coupon_log(coupon, order, coupon_log, callback)
+def get_item_class(item_row_copy):
     
+    items_code = list(map(lambda x: x.item_code, item_row_copy))
+    
+    items = frappe.get_list("Item", filters = {"name": ["in", items_code]}, fields = ["name", "qp_phonix_class"])
+    
+    class_items = {}
+    
+    for item in items:
+        
+        class_items[item.name] = item.qp_phonix_class
+        
+    return class_items
 
 def update_name_item(item_row_copy, items):
     
@@ -144,7 +157,7 @@ def setup_coupon_log(coupon, order, coupon_log, item_row_copy, callback):
     for key, item in enumerate(item_row_copy):
 
         if not_is_auto_discount(item.item_code):
-        
+            
             is_redeemable = callback(item)
 
             if is_redeemable and item.price_list_rate:
@@ -401,8 +414,9 @@ class CouponCustomerRepeat(Exception):
         super().__init__(self.message)
         
 class CouponItemNotValid(Exception):
-
-    def __init__(self, message="El producto de este coupon ya esta en oferta"):
+    #El producto de este coupon ya esta en oferta
+    
+    def __init__(self, message="No hay productos que cumplan las condiciones de este cupón"):
 
         self.message = message
 

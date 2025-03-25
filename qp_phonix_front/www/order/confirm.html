@@ -50,7 +50,7 @@
     {% endblock %}
 
     {% block principal_content %}
-
+        <input type="hidden" id="currency" value="{{order.currency}}">
     <style>
         .total-content>.subtitle {
             font-size: 0.7vw !important;
@@ -344,8 +344,7 @@
                     </div>
                     <div class=" col-md-12 title"
                         style="line-height: 48px;text-overflow: ellipsis;  white-space: nowrap;">
-                        {{order.currency_symbol}} <span id="" class="price_total ">{{order.total_format | replace(",",
-                            ".")}}</span>
+                        {{order.currency_symbol}} <span id="" class="price_total ">{{order.total_format}}</span>
                     </div>
                     {% if order.status == 'Draft' and not order.price_list_without_discount %}
 
@@ -355,7 +354,7 @@
                         Costo total con descuento <br>
                         <div class="price_discount_class">
                             {{order.currency_symbol}}
-                            <span id="" class="price_discount">{{order.total_format | replace(",",".")}}
+                            <span id="" class="price_discount">{{order.total_format }}
                         </div>
 
                     </div>
@@ -524,16 +523,14 @@
                                 <div class="description-label">Precio</div>
                                 <div class="background-info information_label ">
                                     {{order.currency_symbol}} <span
-                                        id="price-{{item.item_code | replace(':','-')}}">{{item.price_format |
-                                        replace(",", ".")}}</span>
+                                        id="price-{{item.item_code | replace(':','-')}}">{{item.price_format}}</span>
                                 </div>
                             </div>
                             <div class="col-sm-2">
                                 <div class="description-label">Total</div>
                                 <div class="background-info information_label ">
                                     {{order.currency_symbol}} <span
-                                        id="total-{{item.item_code | replace(':','-')}}">{{item.total_format |
-                                        replace(",", ".")}}</span>
+                                        id="total-{{item.item_code | replace(':','-')}}">{{item.total_format}}</span>
                                 </div>
                             </div>
                         </div>
@@ -553,7 +550,7 @@
                             Costo Total Antes de IVA
                         </div>
                         <div class=" col-md-12 title" style="line-height: 48px;">
-                            $ <span id="" class="price_total">{{order.total_format | replace(",", ".")}}</span>
+                            <span id="" class="price_total">{{order.total_format }}</span>
                         </div>
                         <div class=" col-md-12 subtitle">
                             COP

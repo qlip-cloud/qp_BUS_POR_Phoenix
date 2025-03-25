@@ -372,7 +372,7 @@ function total_update() {
 
         //total_str = formato.format(total)
 
-        $(".price_total").html(new Intl.NumberFormat('es-CO', { maximumFractionDigits: 2 }).format(total))
+        $(".price_total").html(currency_format(total, 0))
 
 
         $(".row_select .subtotal_discount").each(function () {
@@ -385,7 +385,7 @@ function total_update() {
                 total_discount = total - discount;
                 
 
-                $(".price_discount").html(new Intl.NumberFormat('es-CO', { maximumFractionDigits: 2 }).format(total_discount))
+                $(".price_discount").html(currency_format(total_discount, 0))
                 $("#green-discount").show()
         }
 }
@@ -727,3 +727,19 @@ function disabled_block() {
         $("#loader").hide()
 
 }
+
+function currency_format(value , decimal = 2){
+
+        currency = $("#currency").val()
+
+        formatoMoneda = {
+                "COP": "es-CO",
+                "USD": "en-US",
+                "EUR": "es-ES"
+
+        }
+
+        formatoMoneda = value.toLocaleString(formatoMoneda[currency], { style: 'currency', currency: 'COP', minimumFractionDigits: decimal, maximumFractionDigits: decimal });
+        
+        return formatoMoneda.replace(/[^\d.,]/g, ''); // Elimina cualquier símbolo no numérico
+    }
