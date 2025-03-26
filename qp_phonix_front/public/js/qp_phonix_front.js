@@ -1,6 +1,8 @@
 URL_CREATE_SALES_ORDER = "create_sales_order";
 
 $(document).ready(function () {
+        
+        $("#term_condition").prop("checked", false)
 
         $(".dropdown-menu.dropdown-menu-right").children().first().remove()
 
@@ -370,7 +372,7 @@ function total_update() {
 
         //total_str = formato.format(total)
 
-        $(".price_total").html(new Intl.NumberFormat('es-CO', { maximumFractionDigits: 2 }).format(total))
+        $(".price_total").html(currency_format(total, 0))
 
 
         $(".row_select .subtotal_discount").each(function () {
@@ -383,7 +385,7 @@ function total_update() {
                 total_discount = total - discount;
                 
 
-                $(".price_discount").html(new Intl.NumberFormat('es-CO', { maximumFractionDigits: 2 }).format(total_discount))
+                $(".price_discount").html(currency_format(total_discount, 0))
                 $("#green-discount").show()
         }
 }
@@ -433,10 +435,12 @@ function update_order(redirect_link = null, valid_empty = false, action = "updat
 
         sales_persons = $("#sales_persons").val()
 
-        save_order(url, redirect_link, action, valid_empty, order_id, is_return, is_async, sales_persons)
+        address = $("#address").val()
+
+        save_order(url, redirect_link, action, valid_empty, order_id, is_return, is_async, sales_persons, address)
 }
 
-function save_order(url, redirect_link, action = null, valid_empty = true, order_id = null, is_return = false, is_async = false, sales_person = null) {
+function save_order(url, redirect_link, action = null, valid_empty = true, order_id = null, is_return = false, is_async = false, sales_person = null, address = null) {
 
         let base_url = "qp_phonix_front.qp_phonix_front.uses_cases.sales_order.sales_order"
 
@@ -520,6 +524,7 @@ function save_order(url, redirect_link, action = null, valid_empty = true, order
                         , order_id
                         , action
                         , sales_person
+                        , address
                         , "qp_phoenix_order_comment": $("#qp_phoenix_order_comment").val()
                 }
         }
@@ -722,3 +727,19 @@ function disabled_block() {
         $("#loader").hide()
 
 }
+
+function currency_format(value , decimal = 2){
+
+        currency = $("#currency").val()
+
+        formatoMoneda = {
+                "COP": "es-CO",
+                "USD": "en-US",
+                "EUR": "es-ES"
+
+        }
+
+        formatoMoneda = value.toLocaleString(formatoMoneda[currency], { style: 'currency', currency: 'COP', minimumFractionDigits: decimal, maximumFractionDigits: decimal });
+        
+        return formatoMoneda.replace(/[^\d.,]/g, ''); // Elimina cualquier símbolo no numérico
+    }

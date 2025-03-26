@@ -53,7 +53,6 @@ def send_sales_order(sales_order, vf_SaleOrderConfirmError):
 
     return res
 
-
 def __get_master_setup(company):
 
     master_name = frappe.db.get_list('qp_GP_MasterSetup',
@@ -72,8 +71,12 @@ def __prepare_petition(master_name, so_obj):
     so_json = {}
 
     customer_email = frappe.db.get_value("Customer", so_obj.customer, "email_id")
-
-    customer_addr = frappe.get_doc('Address', so_obj.customer_address)
+    
+    customer_addr = None
+    
+    if so_obj.customer_address:
+    
+        customer_addr = frappe.get_doc('Address', so_obj.customer_address)
 
     store_main = __get_value_master(master_name, 'store_main')
 
@@ -120,15 +123,15 @@ def __prepare_petition(master_name, so_obj):
     so_json['NameCustomer'] = so_obj.customer_name
     so_json['SurnameCustomer'] = ''
     so_json['ClassId'] = id_clase
-    so_json['AddressCustomer'] = customer_addr.address_line1
-    so_json['CityCustomer'] = customer_addr.city
-    so_json['CountryCustomer'] = customer_addr.country
-    so_json['PhoneCustomer'] = customer_addr.phone
+    so_json['AddressCustomer'] = customer_addr.address_line1 if customer_addr else ''
+    so_json['CityCustomer'] = customer_addr.city if customer_addr else ''
+    so_json['CountryCustomer'] = customer_addr.country if customer_addr else ''
+    so_json['PhoneCustomer'] = customer_addr.phone if customer_addr else ''
     so_json['MailCustomer'] = customer_email
-    so_json['AdressShipping'] = customer_addr.address_line1
-    so_json['CityShipping'] = customer_addr.city
-    so_json['CountryShipping'] = customer_addr.country
-    so_json['Reference1'] = customer_addr.city #define
+    so_json['AdressShipping'] = customer_addr.address_line1 if customer_addr else ''
+    so_json['CityShipping'] = customer_addr.city if customer_addr else ''
+    so_json['CountryShipping'] = customer_addr.country if customer_addr else ''
+    so_json['Reference1'] = customer_addr.qp_address_id if customer_addr else ''
     so_json['Reference2'] = None
     so_json['Reference3'] = None
     so_json['Comment'] = so_obj.qp_phoenix_order_comment or ""

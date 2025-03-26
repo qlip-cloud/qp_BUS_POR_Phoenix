@@ -32,25 +32,25 @@
     </span>
     {%if order.status == "Draft"%}
 
-    {#if is_valid and order.status_code == 0#}
+        {#if is_valid and order.status_code == 0#}
 
 
-    <a id="btn_edit_order" class="btn button-master button-default">
-        {{ _("EDITAR ORDEN") }}
-    </a>
+        <a id="btn_edit_order" class="btn button-master button-default">
+            {{ _("EDITAR ORDEN") }}
+        </a>
 
-    {%if has_sync and permission.confirm %}
+        {%if has_sync and permission.confirm %}
 
-    <a id="btn_confirm_order" class="btn button-master button-default disabled">
-        {{ _("CONFIRMAR ORDEN") }}
-    </a>
-    {%endif%}
+        <a id="btn_confirm_order" class="btn button-master button-default disabled">
+            {{ _("CONFIRMAR ORDEN") }}
+        </a>
+        {%endif%}
     {%endif%}
 
     {% endblock %}
 
     {% block principal_content %}
-
+        <input type="hidden" id="currency" value="{{order.currency}}">
     <style>
         .total-content>.subtitle {
             font-size: 0.7vw !important;
@@ -190,25 +190,36 @@
                     Dirección
                 </div>
                 <div class="col-md-12 info background-info information_label">
-                    {{order.address_line1}}
+
+                    <select name="" id="address" class="form-control" >
+                        <option value="0">Seleccione la direccion de envio</option>
+                        {% for address in addresses%}
+                        <option value="{{address.name}}" {{ 'selected' if address_selectd and 
+                        address.name==address_selectd.name else false }} data-city = "{{address.city}}"
+                        data-pincode="{{address.pincode}}" data-phone="{{address.phone}}">
+                            {{address.address_line1}} - {{address.city}}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    {#order.address_line1#}
                 </div>
                 <div class="col-md-12 label">
                     Ciudad
                 </div>
-                <div class="col-md-12 info background-info information_label">
-                    {{order.city}}
+                <div class="col-md-12 info background-info information_label" id="city-label">
+                    {{ address_selectd.city if address_selectd else '' }}
                 </div>
-                <div class="col-md-12 label">
+                <div class="col-md-12 label" >
                     Código Postal
                 </div>
-                <div class="col-md-12 info background-info information_label">
-                    {{order.pincode}}
+                <div class="col-md-12 info background-info information_label" id="pincode-label">
+                    {{ address_selectd.pincode if address_selectd else '' }}
                 </div>
                 <div class="col-md-12 label">
                     Número de contacto
                 </div>
-                <div class="col-md-12 info background-info information_label">
-                    {{order.phone}}
+                <div class="col-md-12 info background-info information_label" id="pincode-phone">
+                    {{ address_selectd.phone if address_selectd else '' }}
                 </div>
             </div>
             <div class="row shadow p-3 mb-5 bg-white rounded">
@@ -333,8 +344,7 @@
                     </div>
                     <div class=" col-md-12 title"
                         style="line-height: 48px;text-overflow: ellipsis;  white-space: nowrap;">
-                        {{order.currency_symbol}} <span id="" class="price_total ">{{order.total_format | replace(",",
-                            ".")}}</span>
+                        {{order.currency_symbol}} <span id="" class="price_total ">{{order.total_format}}</span>
                     </div>
                     {% if order.status == 'Draft' and not order.price_list_without_discount %}
 
@@ -344,7 +354,7 @@
                         Costo total con descuento <br>
                         <div class="price_discount_class">
                             {{order.currency_symbol}}
-                            <span id="" class="price_discount">{{order.total_format | replace(",",".")}}
+                            <span id="" class="price_discount">{{order.total_format }}
                         </div>
 
                     </div>
@@ -513,16 +523,14 @@
                                 <div class="description-label">Precio</div>
                                 <div class="background-info information_label ">
                                     {{order.currency_symbol}} <span
-                                        id="price-{{item.item_code | replace(':','-')}}">{{item.price_format |
-                                        replace(",", ".")}}</span>
+                                        id="price-{{item.item_code | replace(':','-')}}">{{item.price_format}}</span>
                                 </div>
                             </div>
                             <div class="col-sm-2">
                                 <div class="description-label">Total</div>
                                 <div class="background-info information_label ">
                                     {{order.currency_symbol}} <span
-                                        id="total-{{item.item_code | replace(':','-')}}">{{item.total_format |
-                                        replace(",", ".")}}</span>
+                                        id="total-{{item.item_code | replace(':','-')}}">{{item.total_format}}</span>
                                 </div>
                             </div>
                         </div>
@@ -542,7 +550,7 @@
                             Costo Total Antes de IVA
                         </div>
                         <div class=" col-md-12 title" style="line-height: 48px;">
-                            $ <span id="" class="price_total">{{order.total_format | replace(",", ".")}}</span>
+                            <span id="" class="price_total">{{order.total_format }}</span>
                         </div>
                         <div class=" col-md-12 subtitle">
                             COP
