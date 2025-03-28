@@ -50,7 +50,7 @@ def update_delivery_data(sale_order):
         
         return_json = so_respose.get("ReturnJson")
         
-        if so_respose.get("ReturnCode") == "SUCCESS":
+        if so_respose.get("ReturnCode") == "SUCCESS" and  return_json and return_json.get("Lines"):
             
             for item in sale_order.items:
                 
