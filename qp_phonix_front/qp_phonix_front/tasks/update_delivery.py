@@ -46,14 +46,17 @@ def update_delivery_data(sale_order):
     if (sale_order.qp_phonix_reference):
         
         so_respose = get_order_delivery_data(sale_order.qp_phonix_reference)
-
+        frappe.log_error(message=json.dumps(so_respose), title="Fin Prueba de sync delivery")
+        
+        return_json = so_respose.get("ReturnJson")
+        
         if so_respose.get("ReturnCode") == "SUCCESS":
             
             for item in sale_order.items:
                 
-                for line in so_respose.get("ReturnJson").get("Lines"):
+                for line in return_json.get("Lines"):
                     
-                    if line.get("Id") == item.item_code and line.get("LineNumber") == item.line_number and (item.delivery_date != getdate(line.get("RequestDate")) or item.qp_phoenix_status != getdate(line.get("Status"))):
+                    if line.get("Id") == item.item_code and line.get("LineNumber") == item.line_number and (item.delivery_date != getdate(line.get("RequestDate")) or item.qp_phoenix_status != line.get("Status")):
 
                         if line.get("RequestDate") != '1900-01-01':
                             
