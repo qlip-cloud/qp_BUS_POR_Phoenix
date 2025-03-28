@@ -9,19 +9,24 @@ from gp_phonix_integration.gp_phonix_integration.constant.api_setup import ORDER
 @frappe.whitelist()
 def all():
     
-    sales_names = frappe.db.get_list("Sales Order", 
-                                    filters = {
-                                         "status": "To Deliver and Bill", 
-                                         "delivery_date":[">=", today()],
-                                         "qp_phonix_reference": ["IS", "set"]
-                                    }, pluck='name')
-    
-    for sale_names in sales_names:
+    try:
+        sales_names = frappe.db.get_list("Sales Order", 
+                                        filters = {
+                                            "status": "To Deliver and Bill", 
+                                            "delivery_date":[">=", today()],
+                                            "qp_phonix_reference": ["IS", "set"]
+                                        }, pluck='name')
         
-        sale_order = frappe.get_doc("Sales Order", sale_names)
+        for sale_names in sales_names:
+            
+            sale_order = frappe.get_doc("Sales Order", sale_names)
+            
+            update_delivery_data(sale_order)
+            
+    except Exception as e:
         
-        update_delivery_data(sale_order)
-    
+        frappe.logger("scheduler").error(f"Error in update_delivery.all: {str(e)}")
+        
     frappe.db.commit()
            
 def only(sale_order):
@@ -31,7 +36,9 @@ def only(sale_order):
     frappe.db.commit()
     
 def update_delivery_data(sale_order):
+    
     is_change = False
+    
     if (sale_order.qp_phonix_reference):
         
         so_respose = get_order_delivery_data(sale_order.qp_phonix_reference)

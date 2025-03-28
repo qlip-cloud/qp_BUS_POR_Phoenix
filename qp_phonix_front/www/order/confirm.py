@@ -32,7 +32,7 @@ def get_context(context):
         
         sale_order = frappe.get_doc("Sales Order", order_id)
         
-        get_delivery_update(sale_order)
+        #get_delivery_update(sale_order)
 
         count_item = get_count_update(context, order_id)
 
