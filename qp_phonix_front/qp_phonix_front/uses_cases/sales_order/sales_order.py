@@ -812,6 +812,8 @@ def get_line(line, item):
     item.delivery_date_visible = True
 
     item.qp_phoenix_status = line.get("Status")
+    
+    item.line_number = line.get("LineNumber")
   
     return item.as_dict()
 
