@@ -9,8 +9,12 @@ from gp_phonix_integration.gp_phonix_integration.constant.api_setup import ORDER
 @frappe.whitelist()
 def all():
     
+    dt = datetime.now()    
+        
+    ts = datetime.timestamp(dt)
+    
     try:
-        frappe.log_error(message="Comienzo", title="Comienzo Prueba de sync delivery")
+        frappe.log_error(message="Comienzo", title=f"Comienzo de sync delivery: {ts}")
         
         sales_names = frappe.db.get_list("Sales Order", 
                                         filters = {
@@ -26,9 +30,8 @@ def all():
             update_delivery_data(sale_order)
             
     except Exception as e:
-        
-        frappe.log_error(message=frappe.get_traceback(), title="Fin Prueba de sync delivery")
-        
+        frappe.log_error(message=frappe.get_traceback(), title=f"Error de sync delivery: {ts}")
+                
         frappe.logger("scheduler").error(f"Error in update_delivery.all: {str(e)}")
         
     frappe.db.commit()
