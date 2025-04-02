@@ -9,19 +9,31 @@ from gp_phonix_integration.gp_phonix_integration.constant.api_setup import ORDER
 @frappe.whitelist()
 def all():
     
-    sales_names = frappe.db.get_list("Sales Order", 
-                                    filters = {
-                                         "status": "To Deliver and Bill", 
-                                         "delivery_date":[">=", today()],
-                                         "qp_phonix_reference": ["IS", "set"]
-                                    }, pluck='name')
-    
-    for sale_names in sales_names:
+    dt = datetime.now()    
         
-        sale_order = frappe.get_doc("Sales Order", sale_names)
-        
-        update_delivery_data(sale_order)
+    ts = datetime.timestamp(dt)
     
+    try:
+        frappe.log_error(message="Comienzo", title=f"Comienzo de sync delivery: {ts}")
+        
+        sales_names = frappe.db.get_list("Sales Order", 
+                                        filters = {
+                                            "status": "To Deliver and Bill", 
+                                            "delivery_date":[">=", today()],
+                                            "qp_phonix_reference": ["IS", "set"]
+                                        }, pluck='name')
+        
+        for sale_names in sales_names:
+            
+            sale_order = frappe.get_doc("Sales Order", sale_names)
+            
+            update_delivery_data(sale_order)
+            
+    except Exception as e:
+        frappe.log_error(message=frappe.get_traceback(), title=f"Error de sync delivery: {ts}")
+                
+        frappe.logger("scheduler").error(f"Error in update_delivery.all: {str(e)}")
+        
     frappe.db.commit()
            
 def only(sale_order):
@@ -31,18 +43,24 @@ def only(sale_order):
     frappe.db.commit()
     
 def update_delivery_data(sale_order):
+    
     is_change = False
+    
     if (sale_order.qp_phonix_reference):
         
         so_respose = get_order_delivery_data(sale_order.qp_phonix_reference)
-
-        if so_respose.get("ReturnCode") == "SUCCESS":
+        
+        return_json = so_respose.get("ReturnJson")
+        
+        lines = return_json.get("Lines")
+        
+        if so_respose.get("ReturnCode") == "SUCCESS" and  return_json and lines:
             
             for item in sale_order.items:
                 
-                for line in so_respose.get("ReturnJson").get("Lines"):
+                for line in lines:
                     
-                    if line.get("Id") == item.item_code and line.get("LineNumber") == item.line_number and (item.delivery_date != getdate(line.get("RequestDate")) or item.qp_phoenix_status != getdate(line.get("Status"))):
+                    if line.get("Id") == item.item_code and line.get("LineNumber") == item.line_number and (item.delivery_date != getdate(line.get("RequestDate")) or item.qp_phoenix_status != line.get("Status")):
 
                         if line.get("RequestDate") != '1900-01-01':
                             
