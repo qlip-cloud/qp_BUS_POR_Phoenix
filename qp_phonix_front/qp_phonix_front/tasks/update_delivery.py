@@ -50,11 +50,11 @@ def update_delivery_data(sale_order):
         
         so_respose = get_order_delivery_data(sale_order.qp_phonix_reference)
         
-        return_json = so_respose.get("ReturnJson")
+        if so_respose.get("ReturnCode") == "SUCCESS" and  "ReturnJson" in so_respose and "Lines" in so_respose.get("ReturnJson"):
+            
+            return_json = so_respose.get("ReturnJson")
         
-        lines = return_json.get("Lines")
-        
-        if so_respose.get("ReturnCode") == "SUCCESS" and  return_json and lines:
+            lines = return_json.get("Lines")
             
             for item in sale_order.items:
                 
