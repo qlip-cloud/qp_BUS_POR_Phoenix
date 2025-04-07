@@ -56,8 +56,6 @@ def update_delivery_data(sale_order):
         
             lines = return_json.get("Lines")
             
-            min_delivery_date = datetime.today()
-            
             for item in sale_order.items:
                 
                 for line in lines:
@@ -73,15 +71,15 @@ def update_delivery_data(sale_order):
                             item.delivery_date_visible = True
 
                             item.save()
-                            
-                        if min_delivery_date < item.delivery_date:
-                            
-                            min_delivery_date = item.delivery_date                            
                         
-            if sale_order.delivery_date < min_delivery_date:
-                
-                sale_order.delivery_date = min_delivery_date
+                        if sale_order.delivery_date < item.delivery_date:
                             
+                            is_change = True
+                            
+                            sale_order.delivery_date = item.delivery_date
+            
+            if is_change:
+                
                 update_delivery_log = frappe.get_doc({
                         'doctype': "qp_pf_UpdateDeliveryLog",
                         'sales_order': sale_order.name})
