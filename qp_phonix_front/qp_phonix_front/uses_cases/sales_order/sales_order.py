@@ -468,12 +468,10 @@ def __confirm_sales_order(order_json, sales_order):
         __send_check_out_so(sales_order)
 
         __set_auto_discount(sales_order)
-        sales_order.reload()
+        
         __send_sales_order(sales_order)
-        sales_order.reload()
         
         set_qp_subtotal(sales_order)
-        sales_order.reload()
                 
         sales_order.submit()
         
