@@ -465,7 +465,6 @@ def __confirm_sales_order(order_json, sales_order):
 
     if order_json.get('action') == "confirm":
 
-        
         __send_check_out_so(sales_order)
 
         __set_auto_discount(sales_order)
@@ -638,14 +637,14 @@ def __set_sales_order_response(sales_order, reference, response):
     
     sales_order.qp_phonix_reference = reference
     
-    __get_sales_order_items_response(sales_order, response.get("ReturnJson"))
+    #__get_sales_order_items_response(sales_order, response.get("ReturnJson"))
     
 def __get_sales_order_items_response(sales_order, returnJson):
     
     lines = []
     
-    #items = copy.deepcopy(sales_order.items)
-    items = []
+    items = copy.deepcopy(sales_order.items)
+
     lines = returnJson.get("Lines")
     
     sales_order_aux = frappe.new_doc("Sales Order")
@@ -656,24 +655,23 @@ def __get_sales_order_items_response(sales_order, returnJson):
         
     for line in lines:
                 
-        #new_line = get_line(line, copy.deepcopy(items[key_order]))
-        items.append(get_line(line))
+        new_line = get_line(line, copy.deepcopy(items[key_order]))
         
-        #sales_order_aux.append("items",new_line)
+        sales_order_aux.append("items",new_line)
         
-        #qty_control -= line.get("Quantity")
+        qty_control -= line.get("Quantity")
         
-        #if qty_control <= 0: 
+        if qty_control <= 0: 
                         
-            #sales_order.items[key_order].delete()
+            sales_order.items[key_order].delete()
                         
-            #key_order += 1
+            key_order += 1
             
-            #if key_order < len(items):
+            if key_order < len(items):
                 
-            #    qty_control = items[key_order].qty
+                qty_control = items[key_order].qty
                 
-    sales_order.items = items
+    sales_order.items = sales_order_aux.items
     
     sales_order.save()
 
@@ -806,15 +804,12 @@ def setup_order_json(order_json):
 
         order_json = json.loads(order_json)
             
-def get_line(line):
-#def get_line(line, item):
+def get_line(line, item):
 
-    #item.name = None
-    #item.creation = None
-    #item.modified = None
-    #item.modified_by = None
-    
-    item = frappe.new_doc("Sales Order Item")
+    item.name = None
+    item.creation = None
+    item.modified = None
+    item.modified_by = None
     
     item.qty = line.get("Quantity")
         
@@ -828,7 +823,7 @@ def get_line(line):
     
     item.line_number = line.get("LineNumber")
   
-    return item
+    return item.as_dict()
 
 def __get_item_attr(item_code, attr):
 
