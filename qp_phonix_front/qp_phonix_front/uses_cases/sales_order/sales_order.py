@@ -674,7 +674,7 @@ def __get_sales_order_items_response(sales_order, returnJson):
                 
     sales_order.items = sales_order_aux.items
     
-    sales_order.save()
+    sales_order.save(ignore_version=True)
 
 def __send_check_out_so(sales_order):
         
@@ -808,6 +808,9 @@ def setup_order_json(order_json):
 def get_line(line, item):
 
     item.name = None
+    item.creation = None
+    item.modified = None
+    item.modified_by = None
 
     item.qty = line.get("Quantity")
         
