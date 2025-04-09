@@ -85,7 +85,8 @@ def set_has_sync(context):
     email = frappe.session.user
 
     sql = """SELECT 
-                customer.qp_phonix_has_sync
+                customer.qp_phonix_has_sync,
+                customer.qp_vendor_required
             FROM
                 tabContact as contact
             inner join
@@ -99,6 +100,7 @@ def set_has_sync(context):
     result =  frappe.db.sql(sql, as_dict=1)
 
     context.has_sync = result[0]["qp_phonix_has_sync"]
+    context.is_vendor_required = result[0]["qp_vendor_required"]
 
 def set_sales_persons(context):
     
