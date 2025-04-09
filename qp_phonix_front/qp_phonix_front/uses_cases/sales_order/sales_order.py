@@ -555,7 +555,7 @@ def __set_auto_discount(sales_order):
                             
         __save_coupon(coupon_control)
     
-    sales_order.save()
+        sales_order.save()
              
 def __update_order_items(sales_order, item):
     
@@ -637,7 +637,7 @@ def __set_sales_order_response(sales_order, reference, response):
     
     sales_order.qp_phonix_reference = reference
     
-    #__get_sales_order_items_response(sales_order, response.get("ReturnJson"))
+    __get_sales_order_items_response(sales_order, response.get("ReturnJson"))
     
 def __get_sales_order_items_response(sales_order, returnJson):
     
