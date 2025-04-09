@@ -735,16 +735,18 @@ def __set_order_data(sales_order, order_json):
 def __set_sales_team(order_json, sales_order, customer):
     
     if (not order_json.get("sales_person")):
+        
         if (customer.qp_vendor_required):
+            
             raise Exception('<p>Vendedor es obligatorio</p>')
     else:
-        sales_order.append('sales_team', {
+        sales_order.sales_team = [{
             "sales_person": order_json.get("sales_person"),
             "allocated_percentage": 100,
             "allocated_amount": sales_order.base_total,
             "incentives": 0
             
-        })
+        }]
         
 def __set_ship_to(order_json, sales_order):
     
