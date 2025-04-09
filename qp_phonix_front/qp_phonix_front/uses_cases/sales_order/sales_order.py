@@ -392,7 +392,7 @@ def sales_order_update(order_json):
 
         item_delete_list = list(set(items_so).difference(set(items_upd)))
 
-        #__set_sales_team(order_json, sales_order, customer)
+        __set_sales_team(order_json, sales_order, customer)
         
         __set_ship_to(order_json, sales_order)
 
@@ -464,6 +464,8 @@ def sales_order_update(order_json):
 def __confirm_sales_order(order_json, sales_order):
 
     if order_json.get('action') == "confirm":
+        
+        sales_order.save()
 
         __send_check_out_so(sales_order)
 
