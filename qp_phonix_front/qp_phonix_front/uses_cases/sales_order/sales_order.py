@@ -465,9 +465,9 @@ def __confirm_sales_order(order_json, sales_order):
 
     if order_json.get('action') == "confirm":
 
-        __send_check_out_so(sales_order)
+        #__send_check_out_so(sales_order)
 
-        __set_auto_discount(sales_order)
+        #__set_auto_discount(sales_order)
         
         __send_sales_order(sales_order)
         
