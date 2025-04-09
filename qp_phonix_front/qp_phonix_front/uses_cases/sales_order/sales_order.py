@@ -808,9 +808,6 @@ def setup_order_json(order_json):
 def get_line(line, item):
 
     item.name = None
-    item.creation = None
-    item.modified = None
-    item.modified_by = None
 
     item.qty = line.get("Quantity")
         
