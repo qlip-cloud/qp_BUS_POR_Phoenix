@@ -465,8 +465,6 @@ def __confirm_sales_order(order_json, sales_order):
 
     if order_json.get('action') == "confirm":
         
-        sales_order.save()
-
         __send_check_out_so(sales_order)
 
         __set_auto_discount(sales_order)
@@ -556,8 +554,9 @@ def __set_auto_discount(sales_order):
                 __update_order_items(sales_order, item)        
                             
         __save_coupon(coupon_control)
+
     
-    sales_order.save()
+        sales_order.save()
              
 def __update_order_items(sales_order, item):
     
