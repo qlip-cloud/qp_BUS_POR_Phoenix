@@ -242,18 +242,20 @@
                     {{sales_team.sales_person or ''}}
                 </div>
                 {% else %}
-                <div class="col-md-12 label">
-                    <input type="checkbox" class="" name="" id='enable_sales_persons'> Habilitar Vendedores
-                </div>
-                <select name="" id="sales_persons" class="form-control" disabled>
-                    <option value="">Vendedores</option>
-                    {% for sales_person in sales_persons%}
-                    <option value="{{sales_person.name}}" data-gp_code="{{sales_person.gp_code}}" {{ 'selected' if
-                        sales_team and sales_team.sales_person==sales_person.name else '' }}>
+                    {% if is_vendor_required == 0 %}
+                        <div class="col-md-12 label">
+                            <input type="checkbox" class="" name="" id='enable_sales_persons'> Habilitar Vendedores
+                        </div>
+                    {% endif %}
+                    <select name="" id="sales_persons" class="form-control" data-is_vendor_required = "{{is_vendor_required}}" {{'disabled' if is_vendor_required == 0 else ''}}>
+                        <option value="">Vendedores</option>
+                        {% for sales_person in sales_persons%}
+                        <option value="{{sales_person.name}}" data-gp_code="{{sales_person.gp_code}}" {{ 'selected' if
+                            sales_team and sales_team.sales_person==sales_person.name else '' }}>
 
-                        {{sales_person.gp_code}} - {{sales_person.sales_person_name}}</option>
-                    {% endfor %}
-                </select>
+                            {{sales_person.gp_code if sales_person.gp_code else sales_person.sales_person_name }} - {{sales_person.sales_person_name}}</option>
+                        {% endfor %}
+                    </select>
                 {% endif %}
             </div>
             <div class="row shadow p-3 mb-5 bg-white rounded">

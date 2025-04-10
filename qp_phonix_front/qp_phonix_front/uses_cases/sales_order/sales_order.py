@@ -380,7 +380,7 @@ def sales_order_update(order_json):
 
         sales_order = __get_sales_order(order_id)
 
-        __validate_customer(sales_order)
+        customer  = get_and_validate_customer(sales_order)
         
         items_so = [x.get('name') for x in sales_order.items]
 
@@ -392,7 +392,7 @@ def sales_order_update(order_json):
 
         item_delete_list = list(set(items_so).difference(set(items_upd)))
 
-        __set_sales_team(order_json, sales_order)
+        __set_sales_team(order_json, sales_order, customer)
         
         __set_ship_to(order_json, sales_order)
 
@@ -464,12 +464,11 @@ def sales_order_update(order_json):
 def __confirm_sales_order(order_json, sales_order):
 
     if order_json.get('action') == "confirm":
-
         
         __send_check_out_so(sales_order)
 
         __set_auto_discount(sales_order)
-                
+        
         __send_sales_order(sales_order)
         
         set_qp_subtotal(sales_order)
@@ -555,8 +554,9 @@ def __set_auto_discount(sales_order):
                 __update_order_items(sales_order, item)        
                             
         __save_coupon(coupon_control)
+
     
-    sales_order.save()
+        sales_order.save()
              
 def __update_order_items(sales_order, item):
     
@@ -732,17 +732,24 @@ def __set_order_data(sales_order, order_json):
         
     sales_order.qp_phoenix_order_comment = order_json.get("qp_phoenix_order_comment")
         
-def __set_sales_team(order_json, sales_order):
+def __set_sales_team(order_json, sales_order, customer):
     
-    if (order_json.get("sales_person")):
-
-        sales_order.append('sales_team', {
-            "sales_person": order_json.get("sales_person"),
-            "allocated_percentage": 100,
-            "allocated_amount": sales_order.base_total,
-            "incentives": 0
+    if (not order_json.get("sales_person")):
+        
+        if (customer.qp_vendor_required):
             
-        })
+            raise Exception('<p>Vendedor es obligatorio</p>')
+    else:
+        
+        if not sales_order.sales_team:
+            
+            sales_order.append('sales_team', {
+                "sales_person": order_json.get("sales_person"),
+                "allocated_percentage": 100,
+                "allocated_amount": sales_order.base_total,
+                "incentives": 0
+                
+            })
         
 def __set_ship_to(order_json, sales_order):
     
@@ -754,13 +761,15 @@ def __set_ship_to(order_json, sales_order):
 
     sales_order.customer_address = order_json.get("address")
         
-def __validate_customer(sales_order):
+def get_and_validate_customer(sales_order):
         
     customer = get_customer_party()
         
     if customer.name != sales_order.customer:
 
         raise Exception(_('The user is not associated with the customer contact'))
+    
+    return customer
         
 def __get_sales_order(order_id):
 
@@ -802,7 +811,7 @@ def get_line(line, item):
     item.creation = None
     item.modified = None
     item.modified_by = None
-
+    
     item.qty = line.get("Quantity")
         
     param = {"days": 4} if line.get("Status") == "1" else {"weeks": 4}

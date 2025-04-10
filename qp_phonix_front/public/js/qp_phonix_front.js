@@ -58,17 +58,28 @@ $(document).ready(function () {
 
         $("#btn_confirm_order").on("click", () => {
                 if ($("#term_condition").prop("checked")){
+                        sales_persons = $("#sales_persons");
                         customerInput = $("#qp_phoenix_order_customer");
                         customerValue = customerInput.val().trim();
 
-                        if (customerValue === "") {
+                        if (customerValue === "" ) {
+
                                 customerInput.addClass("input-error");
                                 frappe.throw("La orden del cliente es obligatorio")
-                        } else {
                                 
-                                update_modal(2, 1)
-                        }
+                        } 
+                        
+                        if (sales_persons.val() === "" ) {
 
+                                is_vendor_required = sales_persons.data("is_vendor_required")
+
+                                if (is_vendor_required == "1") {
+                                        sales_persons.addClass("input-error");
+                                        frappe.throw("Vendedor es obligatorio")
+                                }
+                        } 
+                                
+                        update_modal(2, 1)
 
                 }else{
                         frappe.throw("Debe aceptar las condiciones comerciales")
