@@ -207,5 +207,11 @@ fixtures = [
                 "ValleyFloral Access"
             ]
         ]
-    ]}
+    ]},
+    {
+        "dt": "Custom Field",
+        "filters": [["name", "in", [
+            "Sales Order-qp_phoenix_order_file",
+        ]]]
+    }
 ]

@@ -1,14 +1,16 @@
 {% extends "qp_phonix_front/templates/main.html" %}
 
 {% block section_title %}
-    {%if is_valid%}
-        Orden
-    {%endif%}
-    
+{%if is_valid%}
+Orden
+{%endif%}
+
 {% endblock %}
 {% block section_title_left %}
 {%if order.status == "Draft"%}
-    <input type="checkbox" id="term_condition" > <strong><a target="_blank" style="text-decoration: underline;color:#000" href="/files/Condiciones%20Comerciales%20en%20la%20Oferta%206NOV2024.pdf">Acepto condiciones comerciales</a></strong>
+<input type="checkbox" id="term_condition"> <strong><a target="_blank" style="text-decoration: underline;color:#000"
+        href="/files/Condiciones%20Comerciales%20en%20la%20Oferta%206NOV2024.pdf">Acepto condiciones
+        comerciales</a></strong>
 {%endif%}
 
 {% endblock %}
@@ -32,25 +34,25 @@
     </span>
     {%if order.status == "Draft"%}
 
-        {#if is_valid and order.status_code == 0#}
+    {#if is_valid and order.status_code == 0#}
 
 
-        <a id="btn_edit_order" class="btn button-master button-default">
-            {{ _("EDITAR ORDEN") }}
-        </a>
+    <a id="btn_edit_order" class="btn button-master button-default">
+        {{ _("EDITAR ORDEN") }}
+    </a>
 
-        {%if has_sync and permission.confirm %}
+    {%if has_sync and permission.confirm %}
 
-        <a id="btn_confirm_order" class="btn button-master button-default disabled">
-            {{ _("CONFIRMAR ORDEN") }}
-        </a>
-        {%endif%}
+    <a id="btn_confirm_order" class="btn button-master button-default disabled">
+        {{ _("CONFIRMAR ORDEN") }}
+    </a>
+    {%endif%}
     {%endif%}
 
     {% endblock %}
 
     {% block principal_content %}
-        <input type="hidden" id="currency" value="{{order.currency}}">
+    <input type="hidden" id="currency" value="{{order.currency}}">
     <style>
         .total-content>.subtitle {
             font-size: 0.7vw !important;
@@ -128,6 +130,7 @@
         .price_discount_class {
             font-size: 28px;
         }
+
         .input-error {
             border: 2px solid red;
         }
@@ -191,11 +194,11 @@
                 </div>
                 <div class="col-md-12 info background-info information_label">
 
-                    <select name="" id="address" class="form-control" >
+                    <select name="" id="address" class="form-control">
                         <option value="0">Seleccione la direccion de envio</option>
                         {% for address in addresses%}
-                        <option value="{{address.name}}" data-city = "{{address.city}}"
-                        data-pincode="{{address.pincode}}" data-phone="{{address.phone}}">
+                        <option value="{{address.name}}" data-city="{{address.city}}" data-pincode="{{address.pincode}}"
+                            data-phone="{{address.phone}}">
                             {{address.address_line1}} - {{address.city}}
                         </option>
                         {% endfor %}
@@ -230,6 +233,11 @@
                 <input type="text" class="form-control " {{ 'disabled' if order.status !="Draft" else '' }}
                     id="qp_phoenix_order_customer" value={{order.qp_phoenix_order_customer if
                     order.qp_phoenix_order_customer else "" }}>
+                <div class="col-md-12 label">
+                    Orden de compra (Adjuntar archivo)
+                </div>
+                <input type="file" class="form-control" id="qp_phoenix_order_file"
+                    {{ 'disabled' if order.status !="Draft" else '' }}>
             </div>
 
             <div class="row shadow p-3 mb-5 bg-white rounded">
@@ -243,20 +251,22 @@
                     {{sales_team.sales_person or ''}}
                 </div>
                 {% else %}
-                    {% if is_vendor_required == 0 %}
-                        <div class="col-md-12 label">
-                            <input type="checkbox" class="" name="" id='enable_sales_persons'> Habilitar Vendedores
-                        </div>
-                    {% endif %}
-                    <select name="" id="sales_persons" class="form-control" data-is_vendor_required = "{{is_vendor_required}}" {{'disabled' if is_vendor_required == 0 else ''}}>
-                        <option value="">Vendedores</option>
-                        {% for sales_person in sales_persons%}
-                        <option value="{{sales_person.name}}" data-gp_code="{{sales_person.gp_code}}" {{ 'selected' if
-                            sales_team and sales_team.sales_person==sales_person.name else '' }}>
+                {% if is_vendor_required == 0 %}
+                <div class="col-md-12 label">
+                    <input type="checkbox" class="" name="" id='enable_sales_persons'> Habilitar Vendedores
+                </div>
+                {% endif %}
+                <select name="" id="sales_persons" class="form-control" data-is_vendor_required="{{is_vendor_required}}"
+                    {{'disabled' if is_vendor_required==0 else '' }}>
+                    <option value="">Vendedores</option>
+                    {% for sales_person in sales_persons%}
+                    <option value="{{sales_person.name}}" data-gp_code="{{sales_person.gp_code}}" {{ 'selected' if
+                        sales_team and sales_team.sales_person==sales_person.name else '' }}>
 
-                            {{sales_person.gp_code if sales_person.gp_code else sales_person.sales_person_name }} - {{sales_person.sales_person_name}}</option>
-                        {% endfor %}
-                    </select>
+                        {{sales_person.gp_code if sales_person.gp_code else sales_person.sales_person_name }} -
+                        {{sales_person.sales_person_name}}</option>
+                    {% endfor %}
+                </select>
                 {% endif %}
             </div>
             <div class="row shadow p-3 mb-5 bg-white rounded">
@@ -302,42 +312,42 @@
                             </div>
                         </div>
                         {% if coupon_list %}
-                            {% for coupon in coupon_list%}
-                            <div class="row">
-                                <div class=" col-md-12 label coupon_legend">
+                        {% for coupon in coupon_list%}
+                        <div class="row">
+                            <div class=" col-md-12 label coupon_legend">
 
-                                    {{coupon.description}}
+                                {{coupon.description}}
 
-                                </div>
                             </div>
-                            <div class="row label">
-                                <div class="col-md-12">
-                                    <ul class="coupon_name">
-                                        {% if has_coupon %}
-                                        <li>
-                                            {{coupon.title}}
-                                        </li>
-                                        {% endif %}
-                                    </ul>
-                                </div>
+                        </div>
+                        <div class="row label">
+                            <div class="col-md-12">
+                                <ul class="coupon_name">
+                                    {% if has_coupon %}
+                                    <li>
+                                        {{coupon.title}}
+                                    </li>
+                                    {% endif %}
+                                </ul>
                             </div>
-                            {% endfor %}
+                        </div>
+                        {% endfor %}
                         {% else %}
-                            <div class="row">
-                                <div class=" col-md-12 label coupon_legend">
+                        <div class="row">
+                            <div class=" col-md-12 label coupon_legend">
 
 
-                                </div>
                             </div>
-                            <div class="row label">
-                                <div class="col-md-12">
-                                    <ul class="coupon_name">
-                                        
-                                    </ul>
-                                </div>
+                        </div>
+                        <div class="row label">
+                            <div class="col-md-12">
+                                <ul class="coupon_name">
+
+                                </ul>
                             </div>
+                        </div>
                         {% endif %}
-                        
+
                     </div>
 
                 </div>
@@ -448,21 +458,21 @@
                                             style="font-size: 15px; color:{{item.qp_phoenix_status_color}}">{{item.qp_phoenix_status_title}}
                                             / Entrega: {{item.delivery_date}} </span>
                                         {% elif not order.price_list_without_discount %}
-                                            {% if item.has_discount %}
+                                        {% if item.has_discount %}
 
 
-                                            <span class="green-discount" id="label-{{item.item_code | replace(':','-')}}">
-                                                Producto con descuento</span>
-                                            {% elif item.auto_discount %}
+                                        <span class="green-discount" id="label-{{item.item_code | replace(':','-')}}">
+                                            Producto con descuento</span>
+                                        {% elif item.auto_discount %}
 
-                                            <span class="green-discount" id="label-{{item.item_code | replace(':','-')}}">
-                                                {{item.auto_qty | int}} UNIDADES APLICAN A {{item.auto_discount}}% DE DCTO
-                                                PARA
-                                                UN AHORRO TOTAL DE
-                                                {{order.currency_symbol}}{{item.auto_discount_percentage_format}}
+                                        <span class="green-discount" id="label-{{item.item_code | replace(':','-')}}">
+                                            {{item.auto_qty | int}} UNIDADES APLICAN A {{item.auto_discount}}% DE DCTO
+                                            PARA
+                                            UN AHORRO TOTAL DE
+                                            {{order.currency_symbol}}{{item.auto_discount_percentage_format}}
 
-                                                {% endif %}
-                                        {% endif %}
+                                            {% endif %}
+                                            {% endif %}
 
                                     </div>
                                 </div>
@@ -591,8 +601,10 @@
                         <div class="col sm-12 modal-message">
                             <p>Aquí puedes ver la confirmación de tu pedido.</p>
                             <p>Estas fechas están sujetas a cambios por parte de Casa Matriz.</p>
-                            <p>Si se requiere modificar y/o cancelar la orden de compra, debe contactarse con el asesor comercial en un plazo de 24 horas máximo una vez generada la orden de compra.</p>
-                            <p>La fecha de entrega de las referencias de importación serán reconfirmadas en un plazo máximo de 24 horas</p>
+                            <p>Si se requiere modificar y/o cancelar la orden de compra, debe contactarse con el asesor
+                                comercial en un plazo de 24 horas máximo una vez generada la orden de compra.</p>
+                            <p>La fecha de entrega de las referencias de importación serán reconfirmadas en un plazo
+                                máximo de 24 horas</p>
                         </div>
                     </div>
                     <div class="row">
