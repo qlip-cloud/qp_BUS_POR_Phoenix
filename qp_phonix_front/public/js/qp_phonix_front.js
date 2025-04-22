@@ -743,6 +743,11 @@ function currency_format(value, decimal = 2) {
 
 function uploadOrderFile(orderName, callback) {
   const fileInput = document.getElementById("qp_phoenix_order_file");
+
+  if (!fileInput) {
+    console.error("No se encontró el elemento de entrada de archivo");
+    return callback();
+  }
   const file = fileInput.files[0];
 
   if (!file || !orderName) {
