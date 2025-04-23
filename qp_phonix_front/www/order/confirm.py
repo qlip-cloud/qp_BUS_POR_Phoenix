@@ -52,6 +52,8 @@ def get_context(context):
         set_sales_address(context, sale_order.customer)
         
         set_address_seleted(context, sale_order.customer_address)
+
+        get_order_attachment(context, order_id)
         
         cache = frappe.cache()
         
@@ -170,3 +172,9 @@ def get_dynamic_link(doc, doctype):
 	]
     
     return frappe.get_all(doctype, filters=filters, fields=["*"])
+
+def get_order_attachment(context, order_id):
+    order = frappe.get_doc("Sales Order", order_id)
+    order_file = order.qp_phoenix_order_file
+    context.order_file = order_file
+

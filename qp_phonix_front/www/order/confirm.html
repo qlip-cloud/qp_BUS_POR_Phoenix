@@ -199,7 +199,7 @@ Orden
                         {% for address in addresses %}
                         <option value="{{ address.name }}" data-city="{{ address.city }}"
                             data-pincode="{{ address.pincode }}" data-phone="{{ address.phone }}" {% if order.status
-                            !="Draft" and ( (order.customer_address and order.customer_address==address.name) or
+                            !="Draft" and ( (order.customer_address and order.customer_address.name==address.name) or
                             (address_selectd and address_selectd.name==address.name) ) %}selected{% endif %}>
                             {{ address.address_line1 }} - {{ address.city }}
                         </option>
@@ -213,7 +213,9 @@ Orden
                     Ciudad
                 </div>
                 <div class="col-md-12 info background-info information_label" id="city-label">
-                   
+                    {% if order.status != 'Draft' %}
+                    {{ order.customer_address.city if order.customer_address.city else '' }}
+                    {% endif %}
                 </div>
                 <!--
                 <div class="col-md-12 label" >
@@ -243,10 +245,10 @@ Orden
                 </div>
                 <input type="file" class="form-control" id="qp_phoenix_order_file">
                 {% endif %}
-                {% if order.qp_phoenix_order_file %}
+                {% if order_file %}
                 <div class="col-md-12 mt-2">
                     <label class="label">Archivo adjunto:</label><br>
-                    <a href="{{ order.qp_phoenix_order_file }}" target="_blank">Ver archivo de orden de compra</a>
+                    <a href="{{ order_file }}" target="_blank">Ver archivo de orden de compra</a>
                 </div>
                 {% endif %}
 
