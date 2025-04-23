@@ -214,7 +214,9 @@ Orden
                 </div>
                 <div class="col-md-12 info background-info information_label" id="city-label">
                     {% if order.status != 'Draft' %}
-                    {{ order.customer_address.city if order.customer_address.city else '' }}
+                    {{ order.customer_address.city if order.customer_address and order.customer_address.city else '' }}
+                    {% else %}
+                    {{ address_selectd.city if address_selectd and address_selectd.city else '' }}
                     {% endif %}
                 </div>
                 <!--
