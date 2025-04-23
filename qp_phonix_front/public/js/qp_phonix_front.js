@@ -748,48 +748,48 @@ function currency_format(value, decimal = 2) {
 function uploadOrderFile(orderName, callback) {
   let fileInput = document.querySelector("#qp_phoenix_order_file");
 
-  if (!fileInput) {
+  if (!fileInput || !fileInput.files.length) {
     callback(null);
     return;
   }
+
   let file = fileInput.files[0];
 
-  if (!file || !order_id) {
-    callback(null);
-    return;
-  }
+  let formData = new FormData();
+  formData.append("file", file);
+  formData.append("is_private", 0); 
+  formData.append("doctype", "Sales Order");
+  formData.append("docname", order_id);
 
-  let reader = new FileReader();
-  reader.onload = function (e) {
-    frappe.call({
-      method: "frappe.client.attach_file",
-      args: {
-        filedata: e.target.result.split(",")[1],
-        filename: file.name,
-        doctype: "Sales Order",
-        docname: order_id,
-        is_private: 1
-      },
-      callback: function (r) {
-        if (!r.exc) {
-          frappe.call({
-            method: "frappe.client.set_value",
-            args: {
-              doctype: "Sales Order",
-              name: order_id,
-              fieldname: {
-                qp_phoenix_order_file: r.message.file_url
-              }
+  fetch("/api/method/upload_file", {
+    method: "POST",
+    body: formData,
+    headers: {
+      "X-Frappe-CSRF-Token": frappe.csrf_token,
+    },
+  })
+    .then((r) => r.json())
+    .then((data) => {
+      if (data.message && data.message.file_url) {
+        frappe.call({
+          method: "frappe.client.set_value",
+          args: {
+            doctype: "Sales Order",
+            name: order_id,
+            fieldname: {
+              qp_phoenix_order_file: data.message.file_url,
             },
-            callback: function () {
-              callback(file.name);
-            }
-          });
-        } else {
-          callback(null);
-        }
+          },
+          callback: function () {
+            callback(file.name);
+          },
+        });
+      } else {
+        callback(null);
       }
+    })
+    .catch((err) => {
+      console.error(err);
+      callback(null);
     });
-  };
-  reader.readAsDataURL(file);
 }
