@@ -772,10 +772,20 @@ function uploadOrderFile(orderName, callback) {
       },
       callback: function (r) {
         if (!r.exc) {
-          frappe.msgprint("Archivo subido con éxito");
-          callback(file.name);
+          frappe.call({
+            method: "frappe.client.set_value",
+            args: {
+              doctype: "Sales Order",
+              name: order_id,
+              fieldname: {
+                qp_phoenix_order_file: r.message.file_url
+              }
+            },
+            callback: function () {
+              callback(file.name);
+            }
+          });
         } else {
-          frappe.msgprint("Error al subir el archivo");
           callback(null);
         }
       }
