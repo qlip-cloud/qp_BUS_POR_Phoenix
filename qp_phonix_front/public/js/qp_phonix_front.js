@@ -539,13 +539,13 @@ function save_order(url, redirect_link, action = null, valid_empty = true, order
       , "qp_phoenix_order_comment": $("#qp_phoenix_order_comment").val()
     }
   }
-  
+
   if (len) {
     if (!is_async) active_block();
 
     let order_id = $("#order_id").val();
 
-    upload_order_file(order_id, function (file_name) {
+    uploadOrderFile(order_id, function (file_name) {
       if (file_name) {
         args.order_json.qp_phoenix_order_file = file_name;
       }
