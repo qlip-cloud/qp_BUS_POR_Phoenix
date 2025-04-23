@@ -539,26 +539,28 @@ function save_order(url, redirect_link, action = null, valid_empty = true, order
       , "qp_phoenix_order_comment": $("#qp_phoenix_order_comment").val()
     }
   }
-
-
+  
   if (len) {
-    if (!is_async)
+    if (!is_async) active_block();
 
-      active_block()
-    frappe.call({
-      method,
-      args,
-      callback: function (r) {
-        if (!r.exc) {
-          let response = r.message;
+    let order_id = $("#order_id").val();
 
-          if (response.result == 400) {
-            frappe.msgprint(response.msg);
-            disabled_block();
-            return;
-          }
-          uploadOrderFile(response.name, function () {
-            if (!is_async) {
+    upload_order_file(order_id, function (file_name) {
+      if (file_name) {
+        args.order_json.qp_phoenix_order_file = file_name;
+      }
+
+      frappe.call({
+        method,
+        args,
+        callback: function (r) {
+          if (!r.exc) {
+            let response = r.message;
+
+            if (response.result == 400) {
+              frappe.msgprint(response.msg);
+              disabled_block();
+            } else if (!is_async) {
               if (is_return) {
                 if (!redirect_link) {
                   disabled_block();
@@ -570,18 +572,20 @@ function save_order(url, redirect_link, action = null, valid_empty = true, order
                 redirect(redirect_link);
               }
             } else {
-              if (url == URL_CREATE_SALES_ORDER && !sessionStorage.getItem("order_id")) {
-                sessionStorage.setItem('order_id', response.name);
+              if (url == URL_CREATE_SALES_ORDER) {
+                if (!sessionStorage.getItem("order_id")) {
+                  sessionStorage.setItem('order_id', response.name);
+                }
+                $("#order_id").val(response.name);
               }
-              $("#order_id").val(response.name);
             }
-          });
-        }
-      },
-      freeze: true
-    })
-
-  } else if (valid_empty) {
+          }
+        },
+        freeze: true
+      });
+    });
+  }
+  else if (valid_empty) {
     frappe.msgprint("You have not selected any product")
   }
   else {
@@ -742,39 +746,40 @@ function currency_format(value, decimal = 2) {
 }
 
 function uploadOrderFile(orderName, callback) {
-  const fileInput = document.getElementById("qp_phoenix_order_file");
+  let fileInput = document.querySelector("#qp_phoenix_order_file");
 
   if (!fileInput) {
-    console.error("No se encontró el elemento de entrada de archivo");
-    return callback();
+    callback(null);
+    return;
   }
-  const file = fileInput.files[0];
+  let file = fileInput.files[0];
 
-  if (!file || !orderName) {
-    return callback();
+  if (!file || !order_id) {
+    callback(null);
+    return;
   }
 
-  const formData = new FormData();
-  formData.append("file", file);
-  formData.append("doctype", "Sales Order");
-  formData.append("docname", orderName);
-  formData.append("fieldname", "qp_phoenix_order_file");
-
-  fetch("/api/method/frappe.client.attach_file", {
-    method: "POST",
-    headers: {
-      "X-Frappe-CSRF-Token": frappe.csrf_token
-    },
-    body: formData
-  })
-    .then(res => res.json())
-    .then(res => {
-      console.log("Archivo adjunto con éxito", res.message);
-      callback();
-    })
-    .catch(err => {
-      console.error("Error al subir archivo", err);
-      frappe.msgprint("Error al subir archivo de orden de compra.");
-      callback();
+  let reader = new FileReader();
+  reader.onload = function (e) {
+    frappe.call({
+      method: "frappe.client.attach_file",
+      args: {
+        filedata: e.target.result.split(",")[1],
+        filename: file.name,
+        doctype: "Sales Order",
+        docname: order_id,
+        is_private: 1
+      },
+      callback: function (r) {
+        if (!r.exc) {
+          frappe.msgprint("Archivo subido con éxito");
+          callback(file.name);
+        } else {
+          frappe.msgprint("Error al subir el archivo");
+          callback(null);
+        }
+      }
     });
+  };
+  reader.readAsDataURL(file);
 }
