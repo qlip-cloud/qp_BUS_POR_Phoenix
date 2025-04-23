@@ -194,15 +194,18 @@ Orden
                 </div>
                 <div class="col-md-12 info background-info information_label">
 
-                    <select name="" id="address" class="form-control">
-                        <option value="0">Seleccione la direccion de envio</option>
-                        {% for address in addresses%}
+                    <select name="" id="address" class="form-control" {% if order.status !="Draft" %}disabled{% endif
+                        %}>
+                        <option value="0" data-city="">Seleccione la direccion de envio</option>
+                        {% for address in addresses %}
                         <option value="{{address.name}}" data-city="{{address.city}}" data-pincode="{{address.pincode}}"
-                            data-phone="{{address.phone}}">
+                            data-phone="{{address.phone}}" {% if order.customer_address and
+                            order.customer_address==address.name %}selected{% endif %}>
                             {{address.address_line1}} - {{address.city}}
                         </option>
                         {% endfor %}
                     </select>
+
                     {#order.address_line1#}
                 </div>
                 <div class="col-md-12 label">
@@ -233,11 +236,19 @@ Orden
                 <input type="text" class="form-control " {{ 'disabled' if order.status !="Draft" else '' }}
                     id="qp_phoenix_order_customer" value={{order.qp_phoenix_order_customer if
                     order.qp_phoenix_order_customer else "" }}>
+                {% if order.status == "Draft" %}
                 <div class="col-md-12 label">
                     Orden de compra (Adjuntar archivo)
                 </div>
-                <input type="file" class="form-control" id="qp_phoenix_order_file"
-                    {{ 'disabled' if order.status !="Draft" else '' }}>
+                <input type="file" class="form-control" id="qp_phoenix_order_file">
+                {% endif %}
+                {% if order.qp_phoenix_order_file %}
+                <div class="col-md-12 mt-2">
+                    <label class="label">Archivo adjunto:</label><br>
+                    <a href="{{ order.qp_phoenix_order_file }}" target="_blank">Ver archivo de orden de compra</a>
+                </div>
+                {% endif %}
+
             </div>
 
             <div class="row shadow p-3 mb-5 bg-white rounded">
