@@ -58,6 +58,8 @@ $(document).ready(function () {
 
   $("#btn_confirm_order").on("click", () => {
     if ($("#term_condition").prop("checked")) {
+      addressSelect = $("#address");
+      address = $("#address").val()
       sales_persons = $("#sales_persons");
       customerInput = $("#qp_phoenix_order_customer");
       customerValue = customerInput.val().trim();
@@ -77,6 +79,11 @@ $(document).ready(function () {
           sales_persons.addClass("input-error");
           frappe.throw("Vendedor es obligatorio")
         }
+      }
+
+      if (address === "" || address === "0") {
+        addressSelect.addClass("input-error");
+        frappe.throw("La dirección es obligatoria");
       }
 
       update_modal(2, 1)
