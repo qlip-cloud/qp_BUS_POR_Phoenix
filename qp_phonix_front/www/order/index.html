@@ -1,156 +1,164 @@
 {% extends "qp_phonix_front/templates/main.html" %}
 
 
-    {% block section_title %}                 
-        {{ _("Tus Ordenes") }}
-    {% endblock %}
+{% block section_title %}
+{{ _("Tus Ordenes") }}
+{% endblock %}
 
-    {% block button_title %}
-        <span data-url="/api/method/qp_phonix_front.www.order.index.export" target="_blank" class="btn button-master button-new button-default tab-section tab-all btn-redirect" style="display:none;">
-            {{ _("Exportar") }}
-        </span> 
-        <span data-url="/order/item_formulary" class="btn button-master button-new button-default btn-redirect">
-            {{ _("Nueva Orden") }}
-        </span>              
-    {% endblock %}
+{% block button_title %}
+<span data-url="/api/method/qp_phonix_front.www.order.index.export" target="_blank"
+    class="btn button-master button-new button-default tab-section tab-all btn-redirect" style="display:none;">
+    {{ _("Exportar") }}
+</span>
+<span class="btn button-master button-new button-default btn-redirect"
+    onclick="document.getElementById('import').click();">
+    {{ _("Importar") }}
+</span>
+<input type="file" id="import" accept=".xls,.xlsx" style="display:none;"/>
+<span data-url="/order/item_formulary" class="btn button-master button-new button-default btn-redirect">
+    {{ _("Nueva Orden") }}
+</span>
+{% endblock %}
 
 
-    {% block principal_content %}
+{% block principal_content %}
 
 
-    <style>
-        .description-label{
-            display: none;
+<style>
+    .description-label {
+        display: none;
 
-        }
+    }
 
-        @media (max-width: 576px){
-        .button-master{
+    @media (max-width: 576px) {
+        .button-master {
             width: 100%;
             margin-top: 0.25em;
             text-align: center;
         }
-        .order_id{
+
+        .order_id {
             font-size: 16px;
         }
 
-        .information-container{
+        .information-container {
             padding-right: 0em;
         }
 
-        .details-container, .description-column{
+        .details-container,
+        .description-column {
             display: none;
         }
 
 
-        .background-info{
+        .background-info {
             margin-top: 0.25em;
 
         }
-        .description-label{
+
+        .description-label {
             margin-bottom: 0.25em;
 
-            display:block;
+            display: block;
         }
-        .tab-container{
+
+        .tab-container {
             margin-top: 2em;
         }
     }
-    
-        .Delivery{
-            color: #4D6444;
-            font-weight: 600;
-            font-size: 21px;
 
-        }
+    .Delivery {
+        color: #4D6444;
+        font-weight: 600;
+        font-size: 21px;
 
-        .Delivery{
-            color: #DA6047;
-            font-weight: 600;
-            font-size: 21px;
+    }
 
-        }
+    .Delivery {
+        color: #DA6047;
+        font-weight: 600;
+        font-size: 21px;
 
-        .Draft{
-            color: #DA6047;
-            font-weight: 600;
-            font-size: 21px;
+    }
 
-        }
+    .Draft {
+        color: #DA6047;
+        font-weight: 600;
+        font-size: 21px;
 
-        .tab-items {
-            width: 100px;
-            cursor: pointer;
-            border-bottom: solid 2.5px #82927c54;
-            color: #82927c54;
-        }
+    }
 
-        .tab-items.active{
-            border-bottom: solid 2.5px #4D6444;
-            color: #4D6444;
-            font-size: larger;
-            
-        }
+    .tab-items {
+        width: 100px;
+        cursor: pointer;
+        border-bottom: solid 2.5px #82927c54;
+        color: #82927c54;
+    }
 
-        .margin.left{
-            margin-left: 20px;
-        }
+    .tab-items.active {
+        border-bottom: solid 2.5px #4D6444;
+        color: #4D6444;
+        font-size: larger;
 
-    </style>
+    }
+
+    .margin.left {
+        margin-left: 20px;
+    }
+</style>
 
 
-        {% if(order_list)%}
-            <div class="container">
+{% if(order_list)%}
+<div class="container">
 
-                <div class="row text-center tab-container">
-                    <div class="tab-items active margin-left" >
-                        ‌Borrador
-                    </div>
-                    <div class="tab-items">
-                        Órdenes
-                    </div>
-                </div> 
-                <div class="row" >
-                    <div class="tab-line">
-                    </div>   
+    <div class="row text-center tab-container">
+        <div class="tab-items active margin-left">
+            ‌Borrador
+        </div>
+        <div class="tab-items">
+            Órdenes
+        </div>
+    </div>
+    <div class="row">
+        <div class="tab-line">
+        </div>
 
-                    <div class="tab-line">
+        <div class="tab-line">
 
-                    </div>   
-                </div>   
-            
-                {%for order in order_list%}
+        </div>
+    </div>
 
-                    <div class="tab-section {{'tab-draft' if order.status == 'Draft' else 'tab-all'}}" style="display:none;">
+    {%for order in order_list%}
 
-                        {% include "qp_phonix_front/templates/index_list.html" %}
-                        <hr>
+    <div class="tab-section {{'tab-draft' if order.status == 'Draft' else 'tab-all'}}" style="display:none;">
 
-                    </div>
-                        
+        {% include "qp_phonix_front/templates/index_list.html" %}
+        <hr>
 
-                {%endfor%}
+    </div>
 
-            </div>
 
-        {%else%}
+    {%endfor%}
 
-            <div class="col-sm-12 image" >
-                <img class="img" src="/assets/qp_phonix_front/img/flower-bouquet.png" alt="">
-            </div>
-        
-        
-            <div class="col-sm-12 message" style="min-height: 300px;">
-                You still have no orders created, please create one by clicking create new order
-            </div>
-        
-            <div class="col-sm-12 button-second">
-                    
-                    <a href="/order/item_formulary" class="btn button-master button-content">
-                        Nueva Orden                           
-                    </a>
-            </div>
+</div>
 
-        {%endif%}
-    {% endblock %}
+{%else%}
 
+<div class="col-sm-12 image">
+    <img class="img" src="/assets/qp_phonix_front/img/flower-bouquet.png" alt="">
+</div>
+
+
+<div class="col-sm-12 message" style="min-height: 300px;">
+    You still have no orders created, please create one by clicking create new order
+</div>
+
+<div class="col-sm-12 button-second">
+
+    <a href="/order/item_formulary" class="btn button-master button-content">
+        Nueva Orden
+    </a>
+</div>
+
+{%endif%}
+{% endblock %}
