@@ -1,6 +1,6 @@
 import frappe
 from frappe import _
-from qp_phonix_front.uses_cases.item_list.item_list import paginator_item_list as get_item_list
+from ..item_list.item_list import paginator_item_list as get_item_list
 
 def validate_items_for_customer(items_list, idlevel):
     """
