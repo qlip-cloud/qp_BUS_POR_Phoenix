@@ -8,6 +8,7 @@ from frappe import _
 from qp_phonix_front.qp_phonix_front.uses_cases.shipping_method.shipping_method_list import __get_customer
 from qp_phonix_front.qp_phonix_front.tasks.update_delivery import update_delivery_data
 from qp_phonix_front.qp_phonix_front.uses_cases.item_list.item_list import paginator_item_list as get_item_list
+from qp_phonix_front.qp_phonix_front.uses_cases.imports.validate_items_list import validate_items_for_customer
 from datetime import datetime
 
 def get_context(context):
