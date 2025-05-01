@@ -171,17 +171,17 @@ $(document).ready(function () {
 
   })
 
-  // Importar archivo de excel y crear borrador de orden de compra a partir de él
+  // Importar archivo de Excel y crear borrador de orden de compra a partir de él
   $("#import").on("change", function () {
     const file = this.files[0];
     if (!file) {
       frappe.throw("Debe seleccionar un archivo");
       return;
     }
-
+  
     const formData = new FormData();
     formData.append("file", file);
-
+  
     fetch("/api/method/qp_phonix_front.www.order.index.import_file", {
       method: "POST",
       body: formData,
@@ -191,22 +191,46 @@ $(document).ready(function () {
     })
       .then(async (response) => {
         const data = await response.json();
+  
         if (!response.ok) {
           const errorMsg = data._server_messages
             ? JSON.parse(data._server_messages)[0]
             : "Error al importar el archivo.";
           throw new Error(errorMsg);
         }
-        frappe.msgprint(data.message);
+  
+        const importedItems = data.items;
+  
+        // Validar ítems
+        return fetch("/api/method/qp_phonix_front.www.order.index.validate_items_and_fetch_info", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Frappe-CSRF-Token": frappe.csrf_token,
+          },
+          body: JSON.stringify({
+            items: JSON.stringify(importedItems),
+          }),
+        });
+      })
+      .then(async (response) => {
+        const data = await response.json();
+  
+        if (!response.ok) {
+          const errorMsg = data._server_messages
+            ? JSON.parse(data._server_messages)[0]
+            : "Error al validar los productos.";
+          throw new Error(errorMsg);
+        }
+  
+        window.location.href = "/order/confirm";
       })
       .catch((error) => {
         console.error("Error:", error);
         frappe.msgprint(error.message || "Error desconocido.");
         $("#import").val('');
       });
-    
-    
-  });
+  });  
 })
 
 function und_factor($quantity) {

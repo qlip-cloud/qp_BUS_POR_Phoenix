@@ -117,8 +117,56 @@ def import_file():
         "message": _("Los datos se han importado correctamente")  
     }
 
+@frappe.whitelist()
+def validate_items_and_fetch_info(items: str):
+    """
+    Valida los ítems recibidos y retorna su información completa si son válidos.
+    """
+    import json
+    items_list = json.loads(items)
 
+    if not items_list:
+        frappe.throw(_("La lista de productos está vacía"))
 
+    context = frappe._dict()
+    get_idlevel(context)
+
+    enriched_items = validate_items_for_customer(items_list, context.idlevel)
+
+    return {
+        "message": _("Productos validados correctamente"),
+        "items": enriched_items
+    }
+
+def get_idlevel(context):
+
+    email = frappe.session.user
+
+    sql = """SELECT 
+                customer.name,
+                customer.customer_group,
+                customer.qp_box_no_sku,
+                customer.qp_box_sku,
+                customer.qp_phoenix_buy_no_sku,
+                customer.incomplete_boxes
+            FROM
+                tabContact as contact
+            inner join
+                `tabDynamic Link` as link
+                on (contact.name = link.parent)
+            inner join
+                `tabCustomer` as customer
+                on(link.link_name = customer.name)
+            where contact.email_id = '{}';""".format(email)
+    
+    result =  frappe.db.sql(sql, as_dict=1)
+
+    #print(result)
+    context.idlevel = result[0]["customer_group"]
+    context.qp_box_no_sku = int(result[0]["qp_box_no_sku"])
+    context.qp_box_sku = int(result[0]["qp_box_sku"])
+    context.qp_buy_no_sku = int(result[0]["qp_phoenix_buy_no_sku"])
+    context.incomplete_boxes = int(result[0]["incomplete_boxes"])
 
 def get_line(order, item):
     
