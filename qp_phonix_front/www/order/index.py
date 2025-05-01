@@ -1,5 +1,6 @@
 import openpyxl
 import frappe
+import json
 from qp_phonix_front.qp_phonix_front.validations.utils import is_guest
 from qp_phonix_front.qp_phonix_front.uses_cases.sales_order.sales_order import sales_order_list
 from qp_phonix_front.qp_phonix_front.services.try_catch import handler as try_catch
@@ -119,13 +120,16 @@ def import_file():
     }
 
 @frappe.whitelist()
-def validate_items_and_fetch_info(items: str):
+def validate_items_and_fetch_info():
     """
     Valida los ítems recibidos y retorna su información completa si son válidos.
     """
-    import json
-    items_list = json.loads(items)
+    data = frappe.request.get_json()
+    items = data.get("items")
+    if not items:
+        frappe.throw(_("No se han recibido ítems para validar"))
 
+    items_list = json.loads(items)
     if not items_list:
         frappe.throw(_("La lista de productos está vacía"))
 
