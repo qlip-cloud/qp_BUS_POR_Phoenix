@@ -170,8 +170,6 @@ $(document).ready(function () {
     redirect(redirect_link)
 
   })
-
-  // Importar archivo de Excel y crear borrador de orden de compra a partir de él
   $("#import").on("change", function () {
     const file = this.files[0];
     if (!file) {
@@ -182,6 +180,7 @@ $(document).ready(function () {
     const formData = new FormData();
     formData.append("file", file);
   
+    // Paso 1: Importar archivo
     fetch("/api/method/qp_phonix_front.www.order.index.import_file", {
       method: "POST",
       body: formData,
@@ -199,9 +198,7 @@ $(document).ready(function () {
           throw new Error(errorMsg);
         }
   
-        const importedItems = data.items;
-  
-        // Validar ítems
+        // Paso 2: Validar ítems
         return fetch("/api/method/qp_phonix_front.www.order.index.validate_items_and_fetch_info", {
           method: "POST",
           headers: {
@@ -209,7 +206,7 @@ $(document).ready(function () {
             "X-Frappe-CSRF-Token": frappe.csrf_token,
           },
           body: JSON.stringify({
-            items: JSON.stringify(importedItems),
+            items: JSON.stringify(data.items), 
           }),
         });
       })
@@ -230,7 +227,8 @@ $(document).ready(function () {
         frappe.msgprint(error.message || "Error desconocido.");
         $("#import").val('');
       });
-  });  
+  });
+  
 })
 
 function und_factor($quantity) {
