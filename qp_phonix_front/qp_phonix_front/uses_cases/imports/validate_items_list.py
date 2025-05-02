@@ -7,7 +7,8 @@ def validate_items_for_customer(items_list, idlevel):
     Valida que cada item esté permitido para el idlevel del usuario
     y retorna su información completa si es válido.
     """
-    valid_items = get_item_list(filter_text=None, has_limit=False, idlevel=idlevel)
+    items_code_list = [item.get("item_code") for item in items_list]
+    valid_items = get_item_list(filter_text=items_code_list, has_limit=False, idlevel=idlevel)
     valid_item_codes = {item.item_code for item in valid_items}
 
     enriched = []
