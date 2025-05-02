@@ -138,6 +138,12 @@ def validate_items_and_fetch_info():
 
     enriched_items = validate_items_for_customer(items_list, context.idlevel)
 
+    for enriched_item in enriched_items:
+        for item in items_list:
+            if enriched_item["item_code"] == item["item_code"]:
+                enriched_item["cantidad"] = item["cantidad"]
+                break
+
     frappe.local.session['imported_items'] = enriched_items
     frappe.local.session.modified = True
 
@@ -145,13 +151,6 @@ def validate_items_and_fetch_info():
         "message": _("Productos validados correctamente"),
         "items": enriched_items
     }
-
-@frappe.whitelist()
-def create_sales_order(items):
-    order = frappe.new_doc("Sales Order")
-    order.save()
-
-    return {"order_id": order.name}
 
 
 def get_idlevel(context):

@@ -171,6 +171,7 @@ $(document).ready(function () {
 
   })
 
+  
   $("#import").on("change", function () {
     const file = this.files[0];
     if (!file) {
@@ -207,7 +208,7 @@ $(document).ready(function () {
             "X-Frappe-CSRF-Token": frappe.csrf_token,
           },
           body: JSON.stringify({
-            items: JSON.stringify(data.message.items),
+            items: JSON.stringify(data.message.items), 
           }),
         });
       })
@@ -220,45 +221,11 @@ $(document).ready(function () {
             : "Error al validar los productos.";
           throw new Error(errorMsg);
         }
-  
-        // Paso 3: Crear Orden de Compra si no existe order_id
+        // Paso 3: Crear Orden de Compra
         const imported_items = data.message.items;
-  
-        let order_id = sessionStorage.getItem("order_id");  
-  
-        if (!order_id) {
-          return fetch("/api/method/qp_phonix_front.www.order.index.create_sales_order", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "X-Frappe-CSRF-Token": frappe.csrf_token,
-            },
-            body: JSON.stringify({
-              items: imported_items,
-            }),
-          })
-            .then(async (response) => {
-              const data = await response.json();
-              if (!response.ok) {
-                const errorMsg = data._server_messages
-                  ? JSON.parse(data._server_messages)[0]
-                  : "Error al crear la orden de venta.";
-                throw new Error(errorMsg);
-              }
-  
-              order_id = data.message.order_id;
-              sessionStorage.setItem("order_id", order_id); 
-  
-              save_order(URL_CREATE_SALES_ORDER, "/order/confirm", null, true, order_id, false, false, null, null, imported_items);
-            })
-            .catch((error) => {
-              console.error("Error:", error);
-              frappe.msgprint(error.message || "Error desconocido.");
-              $("#import").val('');
-            });
-        } else {
-          save_order(URL_CREATE_SALES_ORDER, "/order/confirm", null, true, order_id, false, false, null, null, imported_items);
-        }
+        sessionStorage.setItem("imported_items", JSON.stringify(imported_items));
+        save_order(URL_CREATE_SALES_ORDER, "/order/confirm", null, true, null, false, false, null, null, imported_items);
+        
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -266,7 +233,6 @@ $(document).ready(function () {
         $("#import").val('');
       });
   });
-  
   
 })
 
@@ -633,8 +599,22 @@ function save_order(url, redirect_link, action = null, valid_empty = true, order
   
     });
   } else {
-    items = imported_items
-    len = imported_items.length
+    imported_items.forEach((item) => {
+      let item_code = item.name;
+      let description = item.description_full;
+      let qty = parseInt(item.cantidad);
+      let rate = parseFloat(item.rate);
+      let discount_percentage = parseFloat(item.discount_percentage);
+
+      items.push({
+        qty,
+        item_code,
+        description,
+        rate,
+        discount_percentage,
+      });
+    }
+    )
   }
 
 
