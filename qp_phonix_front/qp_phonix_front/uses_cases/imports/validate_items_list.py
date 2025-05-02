@@ -8,7 +8,7 @@ def validate_items_for_customer(items_list, idlevel):
     y retorna su información completa si es válido.
     """
     items_code_list = [item.get("item_code") for item in items_list]
-    valid_items = get_item_list(filter_text=items_code_list, has_limit=False, idlevel=idlevel)
+    valid_items = get_item_list(item_code_list=items_code_list, has_limit=False, idlevel=idlevel)
     valid_item_codes = {item.item_code for item in valid_items}
 
     enriched = []
