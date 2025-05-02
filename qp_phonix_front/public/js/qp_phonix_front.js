@@ -170,6 +170,8 @@ $(document).ready(function () {
     redirect(redirect_link)
 
   })
+
+  
   $("#import").on("change", function () {
     const file = this.files[0];
     if (!file) {
@@ -219,8 +221,8 @@ $(document).ready(function () {
             : "Error al validar los productos.";
           throw new Error(errorMsg);
         }
+
   
-        window.location.href = "/order/confirm";
       })
       .catch((error) => {
         console.error("Error:", error);
