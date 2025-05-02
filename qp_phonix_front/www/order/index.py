@@ -140,7 +140,7 @@ def validate_items_and_fetch_info():
 
     for enriched_item in enriched_items:
         for item in items_list:
-            if enriched_item["item_code"] == item["item_code"]:
+            if enriched_item["name"] == item["item_code"]:
                 enriched_item["cantidad"] = item["cantidad"]
                 break
 
