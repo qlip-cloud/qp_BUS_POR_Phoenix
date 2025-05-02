@@ -171,7 +171,6 @@ $(document).ready(function () {
 
   })
 
-  
   $("#import").on("change", function () {
     const file = this.files[0];
     if (!file) {
@@ -208,7 +207,7 @@ $(document).ready(function () {
             "X-Frappe-CSRF-Token": frappe.csrf_token,
           },
           body: JSON.stringify({
-            items: JSON.stringify(data.message.items), 
+            items: JSON.stringify(data.message.items),
           }),
         });
       })
@@ -221,8 +220,45 @@ $(document).ready(function () {
             : "Error al validar los productos.";
           throw new Error(errorMsg);
         }
-
   
+        // Paso 3: Crear Orden de Compra si no existe order_id
+        const imported_items = data.message.items;
+  
+        let order_id = sessionStorage.getItem("order_id");  
+  
+        if (!order_id) {
+          return fetch("/api/method/qp_phonix_front.www.order.index.create_sales_order", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-Frappe-CSRF-Token": frappe.csrf_token,
+            },
+            body: JSON.stringify({
+              items: imported_items,
+            }),
+          })
+            .then(async (response) => {
+              const data = await response.json();
+              if (!response.ok) {
+                const errorMsg = data._server_messages
+                  ? JSON.parse(data._server_messages)[0]
+                  : "Error al crear la orden de venta.";
+                throw new Error(errorMsg);
+              }
+  
+              order_id = data.message.order_id;
+              sessionStorage.setItem("order_id", order_id); 
+  
+              save_order(URL_CREATE_SALES_ORDER, "/order/confirm", null, true, order_id, false, false, null, null, imported_items);
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+              frappe.msgprint(error.message || "Error desconocido.");
+              $("#import").val('');
+            });
+        } else {
+          save_order(URL_CREATE_SALES_ORDER, "/order/confirm", null, true, order_id, false, false, null, null, imported_items);
+        }
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -230,6 +266,7 @@ $(document).ready(function () {
         $("#import").val('');
       });
   });
+  
   
 })
 
@@ -518,7 +555,7 @@ function update_order(redirect_link = null, valid_empty = false, action = "updat
   save_order(url, redirect_link, action, valid_empty, order_id, is_return, is_async, sales_persons, address)
 }
 
-function save_order(url, redirect_link, action = null, valid_empty = true, order_id = null, is_return = false, is_async = false, sales_person = null, address = null) {
+function save_order(url, redirect_link, action = null, valid_empty = true, order_id = null, is_return = false, is_async = false, sales_person = null, address = null, imported_items = null) {
 
   let base_url = "qp_phonix_front.qp_phonix_front.uses_cases.sales_order.sales_order"
 
@@ -528,72 +565,79 @@ function save_order(url, redirect_link, action = null, valid_empty = true, order
 
   //let shipping_type = $("#select_shipping_method").val()
 
-  let items = []
+  let items = imported_items ? imported_items : []
 
   let len = 0;
 
-  $(".row_select").each(function () {
-
-    let qty = parseInt($(this).find("#quantity").val())
-    let quantity = parseInt($(this).find("#quantity").attr("data-quantity"))
-    let quantity_dis = parseInt($(this).find("#quantity").attr("data-quantity_dis"))
-    let description = $(this).attr("data-description")
-    let code = $(this).attr("data-code")
-    let rate = $(this).find("#item_price").val()
-    let discount_percentage = $(this).find("#item_discount").val()
-    let item_code = $(this).find("#item_id").val()
-    if (qty > 0) {
-
-      /*if(action != "confirm"){
-              if(qty > quantity_dis && quantity_dis > 0){
- 
-                      qty -= quantity_dis;
- 
-                      items.push({
-                              qty: quantity_dis,
-                              item_code: $(this).find("#item_id").val(),
-                              description: $(this).find("#item_id").val() + "_" + len,
-                              rate: $(this).find("#item_price").val(),
-                              discount_percentage: $(this).find("#item_discount").val()
-                      });
-                          
-                      len ++;
-              }
- 
-              if(qty > quantity && quantity > 0){
- 
-                      qty -= quantity;
- 
-                      items.push({
-                              qty: quantity,
-                              item_code: $(this).find("#item_id").val(),
-                              description: $(this).find("#item_id").val() + "_" + len,
-                              rate: $(this).find("#item_price").val(),
-                              discount_percentage: $(this).find("#item_discount").val()
-                      });
-                          
-                      len ++;
-              }
-      }*/
-
-      obj = {
-        qty,
-        code,
-        item_code,
-        description,
-        //description: action == "confirm" ? $(this).data("description") : $(this).find("#item_id").val() + "_" + len,
-        rate,
-        discount_percentage,
-
-
-        //,delivery_date
+  if (!imported_items){
+    $(".row_select").each(function () {
+  
+      let qty = parseInt($(this).find("#quantity").val())
+      let quantity = parseInt($(this).find("#quantity").attr("data-quantity"))
+      let quantity_dis = parseInt($(this).find("#quantity").attr("data-quantity_dis"))
+      let description = $(this).attr("data-description")
+      let code = $(this).attr("data-code")
+      let rate = $(this).find("#item_price").val()
+      let discount_percentage = $(this).find("#item_discount").val()
+      let item_code = $(this).find("#item_id").val()
+      if (qty > 0) {
+  
+        /*if(action != "confirm"){
+                if(qty > quantity_dis && quantity_dis > 0){
+   
+                        qty -= quantity_dis;
+   
+                        items.push({
+                                qty: quantity_dis,
+                                item_code: $(this).find("#item_id").val(),
+                                description: $(this).find("#item_id").val() + "_" + len,
+                                rate: $(this).find("#item_price").val(),
+                                discount_percentage: $(this).find("#item_discount").val()
+                        });
+                            
+                        len ++;
+                }
+   
+                if(qty > quantity && quantity > 0){
+   
+                        qty -= quantity;
+   
+                        items.push({
+                                qty: quantity,
+                                item_code: $(this).find("#item_id").val(),
+                                description: $(this).find("#item_id").val() + "_" + len,
+                                rate: $(this).find("#item_price").val(),
+                                discount_percentage: $(this).find("#item_discount").val()
+                        });
+                            
+                        len ++;
+                }
+        }*/
+  
+        obj = {
+          qty,
+          code,
+          item_code,
+          description,
+          //description: action == "confirm" ? $(this).data("description") : $(this).find("#item_id").val() + "_" + len,
+          rate,
+          discount_percentage,
+  
+  
+          //,delivery_date
+        }
+        items.push(obj);
+        console.log(obj)
+        len++;
       }
-      items.push(obj);
-      console.log(obj)
-      len++;
-    }
+  
+    });
+  } else {
+    items = imported_items
+    len = imported_items.length
+  }
 
-  });
+
 
   args = {
     'order_json': {

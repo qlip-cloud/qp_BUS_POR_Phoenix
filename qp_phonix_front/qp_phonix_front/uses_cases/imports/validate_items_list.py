@@ -4,13 +4,10 @@ from ..item_list.item_list import get_item_list
 
 def validate_items_for_customer(items_list, idlevel):
     item_code_list = [str(item.get("item_code")) for item in items_list]
-    print(f"item_code_list: {item_code_list}")
 
     valid_items = get_item_list(item_code_list=item_code_list, idlevel=idlevel)
-    print(f"valid_items: {valid_items}")
 
     valid_item_codes = {str(item.name) for item in valid_items}
-    print(f"valid_item_codes: {valid_item_codes}")
 
     input_qty_map = {str(item["item_code"]): item["cantidad"] for item in items_list}
 
