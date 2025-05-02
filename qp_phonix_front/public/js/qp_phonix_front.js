@@ -206,7 +206,7 @@ $(document).ready(function () {
             "X-Frappe-CSRF-Token": frappe.csrf_token,
           },
           body: JSON.stringify({
-            items: JSON.stringify(data.items), 
+            items: JSON.stringify(data.message.items), 
           }),
         });
       })
