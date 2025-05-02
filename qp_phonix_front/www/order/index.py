@@ -124,7 +124,7 @@ def validate_items_and_fetch_info():
     """
     Valida los ítems recibidos y retorna su información completa si son válidos.
     """
-    data = frappe.request.get_json()
+    data = json.loads(frappe.request.data)
     items = data.get("items")
     if not items:
         frappe.throw(_("No se han recibido ítems para validar"))
