@@ -224,7 +224,7 @@ $(document).ready(function () {
         // Paso 3: Crear Orden de Compra
         const imported_items = data.message.items;
         sessionStorage.setItem("imported_items", JSON.stringify(imported_items));
-        save_order(URL_CREATE_SALES_ORDER, "/order/confirm", null, true, null, false, false, null, null, imported_items);
+        save_order(URL_CREATE_SALES_ORDER, REDIRECT_CONFIRM, null, true, null, true, false, null, null, imported_items);
         
         $("#import").val('');
       })
