@@ -226,6 +226,7 @@ $(document).ready(function () {
         sessionStorage.setItem("imported_items", JSON.stringify(imported_items));
         save_order(URL_CREATE_SALES_ORDER, "/order/confirm", null, true, null, false, false, null, null, imported_items);
         
+        $("#import").val('');
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -531,7 +532,7 @@ function save_order(url, redirect_link, action = null, valid_empty = true, order
 
   //let shipping_type = $("#select_shipping_method").val()
 
-  let items = imported_items ? imported_items : []
+  let items = []
 
   let len = 0;
 
@@ -601,10 +602,10 @@ function save_order(url, redirect_link, action = null, valid_empty = true, order
   } else {
     imported_items.forEach((item) => {
       let item_code = item.name;
-      let description = item.description_full;
+      let description = item.description;
       let qty = parseInt(item.cantidad);
       let rate = parseFloat(item.rate);
-      let discount_percentage = parseFloat(item.discount_percentage);
+      let discount_percentage = parseFloat(item.discountpercentage);
 
       items.push({
         qty,
