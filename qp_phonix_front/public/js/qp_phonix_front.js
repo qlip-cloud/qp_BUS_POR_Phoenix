@@ -171,17 +171,17 @@ $(document).ready(function () {
 
   })
 
-  
+
   $("#import").on("change", function () {
     const file = this.files[0];
     if (!file) {
       frappe.throw("Debe seleccionar un archivo");
       return;
     }
-  
+
     const formData = new FormData();
     formData.append("file", file);
-  
+
     // Paso 1: Importar archivo
     fetch("/api/method/qp_phonix_front.www.order.index.import_file", {
       method: "POST",
@@ -192,14 +192,14 @@ $(document).ready(function () {
     })
       .then(async (response) => {
         const data = await response.json();
-  
+
         if (!response.ok) {
           const errorMsg = data._server_messages
             ? JSON.parse(data._server_messages)[0]
             : "Error al importar el archivo.";
           throw new Error(errorMsg);
         }
-  
+
         // Paso 2: Validar ítems
         return fetch("/api/method/qp_phonix_front.www.order.index.validate_items_and_fetch_info", {
           method: "POST",
@@ -208,13 +208,13 @@ $(document).ready(function () {
             "X-Frappe-CSRF-Token": frappe.csrf_token,
           },
           body: JSON.stringify({
-            items: JSON.stringify(data.message.items), 
+            items: JSON.stringify(data.message.items),
           }),
         });
       })
       .then(async (response) => {
         const data = await response.json();
-  
+
         if (!response.ok) {
           const errorMsg = data._server_messages
             ? JSON.parse(data._server_messages)[0]
@@ -223,9 +223,18 @@ $(document).ready(function () {
         }
         // Paso 3: Crear Orden de Compra
         const imported_items = data.message.items;
+        const productosSinStock = imported_items
+          .filter(item => parseFloat(item.quantity_dis || 0) === 0)
+          .map(item => item.item_name || item.name);
+
+        if (productosSinStock.length > 0) {
+          frappe.msgprint("Los siguientes productos no tienen inventario disponible: <br><ul>" +
+            productosSinStock.map(p => `<li>${p}</li>`).join("") +
+            "</ul>");
+        }
         sessionStorage.setItem("imported_items", JSON.stringify(imported_items));
         save_order(URL_CREATE_SALES_ORDER, REDIRECT_CONFIRM, null, true, null, true, false, null, null, imported_items);
-        
+
         $("#import").val('');
       })
       .catch((error) => {
@@ -234,7 +243,7 @@ $(document).ready(function () {
         $("#import").val('');
       });
   });
-  
+
 })
 
 function und_factor($quantity) {
@@ -536,9 +545,9 @@ function save_order(url, redirect_link, action = null, valid_empty = true, order
 
   let len = 0;
 
-  if (!imported_items){
+  if (!imported_items) {
     $(".row_select").each(function () {
-  
+
       let qty = parseInt($(this).find("#quantity").val())
       let quantity = parseInt($(this).find("#quantity").attr("data-quantity"))
       let quantity_dis = parseInt($(this).find("#quantity").attr("data-quantity_dis"))
@@ -548,7 +557,7 @@ function save_order(url, redirect_link, action = null, valid_empty = true, order
       let discount_percentage = $(this).find("#item_discount").val()
       let item_code = $(this).find("#item_id").val()
       if (qty > 0) {
-  
+
         /*if(action != "confirm"){
                 if(qty > quantity_dis && quantity_dis > 0){
    
@@ -580,7 +589,7 @@ function save_order(url, redirect_link, action = null, valid_empty = true, order
                         len ++;
                 }
         }*/
-  
+
         obj = {
           qty,
           code,
@@ -589,15 +598,15 @@ function save_order(url, redirect_link, action = null, valid_empty = true, order
           //description: action == "confirm" ? $(this).data("description") : $(this).find("#item_id").val() + "_" + len,
           rate,
           discount_percentage,
-  
-  
+
+
           //,delivery_date
         }
         items.push(obj);
         console.log(obj)
         len++;
       }
-  
+
     });
   } else {
     imported_items.forEach((item) => {
@@ -850,7 +859,7 @@ function uploadOrderFile(orderName, callback) {
 
   let formData = new FormData();
   formData.append("file", file);
-  formData.append("is_private", 0); 
+  formData.append("is_private", 0);
   formData.append("doctype", "Sales Order");
   formData.append("docname", order_id);
 

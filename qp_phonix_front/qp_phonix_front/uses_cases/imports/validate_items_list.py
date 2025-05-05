@@ -1,6 +1,7 @@
 import frappe
 from frappe import _
 from ..item_list.item_list import get_item_list 
+from gp_phonix_integration.gp_phonix_integration.use_case.get_item_inventary import handler as get_item_inventary
 
 def validate_items_for_customer(items_list, idlevel):
     item_code_list = [str(item.get("item_code")) for item in items_list]
@@ -17,6 +18,9 @@ def validate_items_for_customer(items_list, idlevel):
 
     for item in valid_items:
         item.cantidad = input_qty_map.get(str(item.item_code), 0)
+
+
+    valid_items = get_item_inventary(valid_items)
 
     return valid_items
 
