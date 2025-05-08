@@ -183,7 +183,7 @@ $(document).ready(function () {
     formData.append("file", file);
 
     // Paso 1: Importar archivo
-    fetch("/api/method/qp_phonix_front.www.order.index.import_file", {
+    fetch("/api/method/qp_phonix_front.www.order.item_formulary.import_file", {
       method: "POST",
       body: formData,
       headers: {
@@ -201,7 +201,7 @@ $(document).ready(function () {
         }
 
         // Paso 2: Validar ítems
-        return fetch("/api/method/qp_phonix_front.www.order.index.validate_items_and_fetch_info", {
+        return fetch("/api/method/qp_phonix_front.www.order.item_formulary.validate_items_and_fetch_info", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
