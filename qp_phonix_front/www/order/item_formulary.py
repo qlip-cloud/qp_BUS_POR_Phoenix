@@ -205,6 +205,12 @@ def import_file():
         producto = row[producto_index].value
         cantidad = row[cantidad_index].value
 
+        if producto is None and cantidad is None:
+            continue
+
+        if isinstance(producto, str):
+            producto = producto.strip()
+
         if producto is not None and cantidad is None:
             frappe.throw(_(f"Faltan datos en la fila {row_idx}"))
 
@@ -240,13 +246,7 @@ def validate_items_and_fetch_info():
     context = frappe._dict()
     get_idlevel(context)
 
-    enriched_items = validate_items_for_customer(items_list, context.idlevel)
-
-    for enriched_item in enriched_items:
-        for item in items_list:
-            if enriched_item.get("name") == str(item.get("item_code")):
-                enriched_item["cantidad"] = item["cantidad"]
-                break
+    enriched_items = validate_items_for_customer(items_list, context)
 
     frappe.local.session['imported_items'] = enriched_items
     frappe.local.session.modified = True
