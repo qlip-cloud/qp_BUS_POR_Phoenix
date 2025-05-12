@@ -392,11 +392,10 @@ def sales_order_update(order_json):
 
         item_delete_list = list(set(items_so).difference(set(items_upd)))
 
-        is_confirm = __confirm_sales_order(order_json, sales_order)
-
-        if is_confirm:
+        if order_json.get('action') == "confirm":
+            
             __set_sales_team(order_json, sales_order, customer)
-        
+            
             __set_ship_to(order_json, sales_order)
 
             __set_order_data(sales_order, order_json)
@@ -407,6 +406,7 @@ def sales_order_update(order_json):
         
         sales_order = __get_sales_order(order_id)
                 
+        is_confirm = __confirm_sales_order(order_json, sales_order)
             
         if not is_confirm:
             
