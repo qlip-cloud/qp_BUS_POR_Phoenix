@@ -115,7 +115,7 @@ def __prepare_petition(master_name, so_obj):
     so_json['Lot'] = ""
     so_json['Warehouse'] = item_types[0].title
     so_json['WarehousesAlter'] = bdg_alter #valida
-    so_json['DiscountAmount'] = so_obj.base_discount_amount
+    so_json['DiscountAmount'] = so_obj.discount_amount
     so_json['VendorId'] = vendor_id #valida
     so_json['Currency'] = so_obj.price_list_currency
     so_json['Lines'] = item_list

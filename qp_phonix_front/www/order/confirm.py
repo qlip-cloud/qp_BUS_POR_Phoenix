@@ -29,6 +29,7 @@ def get_context(context):
         context.permission = get_permission()
 
         order_id = query_params.get("order_id")
+    
         
         sale_order = frappe.get_doc("Sales Order", order_id)
         
@@ -44,6 +45,9 @@ def get_context(context):
             set_order_data(context, order_id)
 
             set_coupon_data(context, order_id)     
+
+        if not context.get("items_select"):
+            context.items_select = transform_items(sale_order)
 
         set_has_sync(context)
 
@@ -178,3 +182,27 @@ def get_order_attachment(context, order_id):
     order_file = order.qp_phoenix_order_file
     context.order_file = order_file
 
+def transform_items(sale_order):
+    items = []
+    for item in sale_order.items:
+        items.append({
+            "item_code": item.item_code,
+            "item_name": item.item_name,
+            "cantidad": item.qty,
+            "description": item.description,
+            "code": item.item_code,
+            "price": item.rate,
+            "image": item.image or "",  # Ajustalo según tu campo personalizado
+            "auto_discount": item.get("auto_discount", False),
+            "auto_qty": item.get("auto_qty", 0),
+            "auto_discount_percentage_format": item.get("auto_discount_percentage_format", "0%"),
+            "auto_discount_percentage": item.get("auto_discount_percentage", 0),
+            "has_discount": item.get("has_discount", False),
+            "inqt": item.get("inqt", 1),
+            "price_format": f"{item.rate:,.0f}",
+            "total_format": f"{item.amount:,.0f}",
+            "delivery_date": item.get("delivery_date", ""),
+            "qp_phoenix_status_color": item.get("qp_phoenix_status_color", ""),
+            "qp_phoenix_status_title": item.get("qp_phoenix_status_title", ""),
+        })
+    return items

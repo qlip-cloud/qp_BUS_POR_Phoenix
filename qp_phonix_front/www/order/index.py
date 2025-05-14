@@ -1,11 +1,14 @@
+import openpyxl
 import frappe
-
+import json
 from qp_phonix_front.qp_phonix_front.validations.utils import is_guest
 from qp_phonix_front.qp_phonix_front.uses_cases.sales_order.sales_order import sales_order_list
 from qp_phonix_front.qp_phonix_front.services.try_catch import handler as try_catch
-from frappe.utils.xlsxutils import make_xlsx
+from frappe.utils.xlsxutils import make_xlsx # type: ignore
+from frappe import _
 from qp_phonix_front.qp_phonix_front.uses_cases.shipping_method.shipping_method_list import __get_customer
 from qp_phonix_front.qp_phonix_front.tasks.update_delivery import update_delivery_data
+from qp_phonix_front.qp_phonix_front.uses_cases.item_list.item_list import paginator_item_list as get_item_list
 from datetime import datetime
 
 def get_context(context):
@@ -56,7 +59,7 @@ def export():
     frappe.response['filename'] = filename + '.xlsx'
     frappe.response['filecontent'] = xlsx_file.getvalue()
     frappe.response['type'] = 'binary'
-    
+
 def get_line(order, item):
     
    return [

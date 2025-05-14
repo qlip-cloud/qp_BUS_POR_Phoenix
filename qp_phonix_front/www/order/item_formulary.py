@@ -1,4 +1,6 @@
+import openpyxl
 import frappe
+from frappe import _
 import json
 from qp_phonix_front.qp_phonix_front.validations.utils import is_guest
 from qp_phonix_front.qp_phonix_front.uses_cases.front.service import set_shipping_data, set_items_data, set_order_data, get_order_item_list
@@ -9,6 +11,7 @@ from qp_phonix_front.qp_phonix_front.uses_cases.item_group.item_group_list impor
 #from qp_phonix_front.qp_phonix_front.uses_cases.item_list.item_list import get_product_class,get_product_sku
 from gp_phonix_integration.gp_phonix_integration.use_case.get_item_inventary import handler as get_item_inventary
 from qp_phonix_front.qp_phonix_front.uses_cases.item_list.item_list import paginator_item_list
+from qp_phonix_front.qp_phonix_front.uses_cases.imports.validate_items_list import validate_items_for_customer
 import copy
 
 import frappe
@@ -160,4 +163,95 @@ def get_autosave_control():
 
     company = frappe.get_last_doc('Company')
 
-    return (company.gp_autosave_control or 10) * 1000
+    return (company.gp_autosave_control or 10) * 1000 
+
+# Métodos para carga masiva de productos
+@frappe.whitelist()
+def import_file():
+    """ 
+    Importa un archivo Excel con los datos de Producto y Cantidad.
+    El archivo debe tener las siguientes columnas:
+    - Producto
+    - Cantidad
+    Retorna una lista de diccionarios con los datos importados.
+    """
+    file = frappe.request.files.get("file")
+    if not file:
+        frappe.throw(_("No se ha subido ningún archivo"))
+
+    if not file.filename.endswith(".xlsx"):
+        frappe.throw(_("El archivo no es un archivo de Excel"))
+
+    try:
+        wb = openpyxl.load_workbook(file, data_only=True)
+    except Exception as e:
+        frappe.throw(_("No se pudo leer el archivo Excel: ") + str(e))
+
+    sheet = wb.active  
+
+    headers = [cell.value for cell in next(sheet.iter_rows(min_row=1, max_row=1))]
+    expected_columns = ["Producto", "Cantidad"]
+
+    for column in expected_columns:
+        if column not in headers:
+            frappe.throw(_(f"El archivo no tiene la columna {column}"))
+
+    producto_index = headers.index("Producto")
+    cantidad_index = headers.index("Cantidad")
+
+    data = []
+
+    for row_idx, row in enumerate(sheet.iter_rows(min_row=2), start=2):
+        producto = row[producto_index].value
+        cantidad = row[cantidad_index].value
+
+        if producto is None and cantidad is None:
+            continue
+
+        if isinstance(producto, str):
+            producto = producto.strip()
+
+        if producto is not None and cantidad is None:
+            frappe.throw(_(f"Faltan datos en la fila {row_idx}"))
+
+        if not isinstance(cantidad, (int, float)):
+            frappe.throw(_(f"El valor de la columna Cantidad en la fila {row_idx} no es un número"))
+
+        if cantidad <= 0:
+            frappe.throw(_(f"El valor de la columna Cantidad en la fila {row_idx} debe ser mayor que 0"))
+
+        data.append({
+            "item_code": producto,
+            "cantidad": cantidad
+        })
+    return {
+        "items": data,
+        "message": _("Los datos se han importado correctamente")  
+    }
+
+@frappe.whitelist()
+def validate_items_and_fetch_info():
+    """
+    Valida los ítems recibidos y retorna su información completa si son válidos.
+    """
+    data = json.loads(frappe.request.data)
+    items = data.get("items")
+    if not items:
+        frappe.throw(_("No se han recibido ítems para validar"))
+
+    items_list = json.loads(items)
+    if not items_list:
+        frappe.throw(_("La lista de productos está vacía"))
+
+    context = frappe._dict()
+    get_idlevel(context)
+
+    enriched_items = validate_items_for_customer(items_list, context)
+
+    frappe.local.session['imported_items'] = enriched_items
+    frappe.local.session.modified = True
+
+    return {
+        "message": _("Productos validados correctamente"),
+        "items": enriched_items
+    }
