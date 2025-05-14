@@ -392,11 +392,13 @@ def sales_order_update(order_json):
 
         item_delete_list = list(set(items_so).difference(set(items_upd)))
 
-        __set_sales_team(order_json, sales_order, customer)
-        
-        __set_ship_to(order_json, sales_order)
+        if order_json.get('action') == "confirm":
+            
+            __set_sales_team(order_json, sales_order, customer)
+            
+            __set_ship_to(order_json, sales_order)
 
-        __set_order_data(sales_order, order_json)
+            __set_order_data(sales_order, order_json)
 
         __update_items(order_item_json, sales_order, item_update_list, item_insert_list)
                 
@@ -502,7 +504,12 @@ def get_delivery_future(param):
     
     fecha_inicial = datetime.now()
     
-    return fecha_inicial + timedelta(**param)
+    delivery_date = fecha_inicial + timedelta(**param)
+
+    while delivery_date.weekday() >= 5:
+        delivery_date += timedelta(days=1)
+    
+    return delivery_date
     
 def __set_auto_discount(sales_order):
     

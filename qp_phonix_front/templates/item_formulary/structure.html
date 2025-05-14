@@ -251,8 +251,6 @@
     .material-symbols-outlined {
         line-height: 1.5;
     }
-
-
 </style>
 <input type="hidden" id="order_id" value="{{order.so_name if order else ''}}">
 <div class="row " style="padding-top: 20px;">
@@ -322,8 +320,17 @@
     </div>
     <div class="col-md-2 button-new">
         {% if permission.button_confirm %}
-
-        <button id="confirm_draft" class="button-master button-default" style="width: 100%; ">Ir al Carrito</button>
+        <div class="row">
+            <button id="confirm_draft" class="button-master button-default" style="width: 100%; ">Ir al
+                Carrito</button>
+        </div>
+        <div class="row mt-2">
+            <span class="btn button-master button-default btn-redirect"
+                onclick="document.getElementById('import').click();">
+                {{ _("Importar") }}
+            </span>
+            <input type="file" id="import" accept=".xls,.xlsx" style="display:none;" />
+        </div>
         {%endif%}
 
     </div>
@@ -346,7 +353,7 @@
         </button>
 
     </div>
-    <div class="col-sm-12 col-md-6 text-left row-abc" >
+    <div class="col-sm-12 col-md-6 text-left row-abc">
         <button class="button-master button-default reconcile" id="reconcile" style="padding: 7px;">
             Consolidar referencias repetidas
 
