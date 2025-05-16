@@ -321,8 +321,7 @@
     <div class="col-md-2 button-new">
         {% if permission.button_confirm %}
         <div class="row">
-            <button id="confirm_draft" class="button-master button-default" style="width: 100%; ">Ir al
-                Carrito</button>
+            <button id="confirm_draft" class="button-master button-default" style="width: 100%;">Ir al Carrito</button>
         </div>
         <div class="row mt-2">
             <span class="btn button-master button-default btn-redirect"
@@ -331,9 +330,14 @@
             </span>
             <input type="file" id="import" accept=".xls,.xlsx" style="display:none;" />
         </div>
+        <div class="row mt-1">
+            <a href="/files/plantilla_importacion.xlsx" style="font-size: 14px; text-align: center; color: #14787e;">
+                Descargar plantilla de importación
+            </a>
+        </div>
         {%endif%}
-
     </div>
+
 </div>
 
 <div class="row">
