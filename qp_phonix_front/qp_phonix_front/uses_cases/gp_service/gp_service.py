@@ -65,7 +65,6 @@ def __get_master_setup(company):
 
     return master_name and master_name[0] or {}
 
-
 def __prepare_petition(master_name, so_obj):
     
     so_json = {}
@@ -90,7 +89,7 @@ def __prepare_petition(master_name, so_obj):
                 "Quantity": item.qty,
                 "Price": item.rate if so_obj.additional_discount_percentage > 0 else item.net_rate,
                 #"DiscountPercentage": item.discount_percentage, #valida
-                "DiscountPercentage": 0, #valida
+                "DiscountPercentage": so_obj.additional_discount_percentage, #valida
                 "DiscountPrice": 0, #valida
                 "Warehouse": item.item_group,
                 "ShippingMethod": None,
@@ -115,7 +114,7 @@ def __prepare_petition(master_name, so_obj):
     so_json['Lot'] = ""
     so_json['Warehouse'] = item_types[0].title
     so_json['WarehousesAlter'] = bdg_alter #valida
-    so_json['DiscountAmount'] = so_obj.discount_amount
+    so_json['DiscountAmount'] = 0
     so_json['VendorId'] = vendor_id #valida
     so_json['Currency'] = so_obj.price_list_currency
     so_json['Lines'] = item_list
