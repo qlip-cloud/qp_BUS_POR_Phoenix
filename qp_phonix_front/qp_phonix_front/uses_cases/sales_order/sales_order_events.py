@@ -19,6 +19,7 @@ def get_email_account_settings():
             return None
 
         email_account["password"] = frappe.utils.password.get_decrypted_password("Email Account", email_account["name"], fieldname="password")
+        frappe.log_error(f"Configuración de correo obtenida para: {email_account['email_id']}")
         return email_account
     except Exception as e:
         frappe.log_error(f"Error al obtener la configuración de la cuenta de correo predeterminada: {str(e)}")
@@ -28,15 +29,20 @@ def send_sales_order_modification_email(doc, method=None):
     """
     Función que se ejecuta por un doc_event para enviar un correo de modificación de orden de venta.
     """
+    frappe.log_error(f"Enviando correo de modificación de orden de venta para SO: {doc.name}")
 
     old_doc = doc.get_doc_before_save() 
     if not old_doc:
+        frappe.log_error(f"No se encontró el documento antes de guardar para SO: {doc.name}. El documento es nuevo o no se ha modificado.")
         return
 
     should_send_email = False
+    frappe.log_error(f"Estado actual del documento: {doc.status}, Estado anterior: {old_doc.status}")
+
     if doc.status == "To Deliver and Bill" and old_doc.status == "To Deliver and Bill":
         if old_doc.delivery_date != doc.delivery_date:
             should_send_email = True
+            frappe.log_error(f"Cambio en la fecha de entrega principal: {old_doc.delivery_date} -> {doc.delivery_date}")
         else:
             old_items = {item.item_code: item for item in old_doc.items if item.item_code}
             for item in doc.items:
@@ -45,9 +51,11 @@ def send_sales_order_modification_email(doc, method=None):
                 old_item = old_items.get(item.item_code)
                 if old_item and old_item.delivery_date != item.delivery_date:
                     should_send_email = True
+                    frappe.log_error(f"Cambio en la fecha de entrega para el artículo {item.item_code}: {old_item.delivery_date} -> {item.delivery_date}")
                     break
     
     if not should_send_email:
+        frappe.log_error(f"No se enviará correo de modificación para SO {doc.name}: No hay cambios en las fechas de entrega o el estado no es 'To Deliver and Bill'.")
         return 
 
     email_settings = get_email_account_settings()
@@ -55,6 +63,7 @@ def send_sales_order_modification_email(doc, method=None):
         frappe.log_error(f"No se pudo enviar correo para SO {doc.name}: Configuración de correo no disponible.")
         return
 
+    frappe.log_error(f"Intentando generar PDF para SO: {doc.name}")
     try:
         pdf_attachment = frappe.attach_print(
             doctype="Sales Order",
@@ -63,6 +72,7 @@ def send_sales_order_modification_email(doc, method=None):
             doc=doc
         )
         attachments = [pdf_attachment]
+        frappe.log_error(f"PDF generado exitosamente para SO: {doc.name}")
     except Exception as e:
         frappe.log_error(f"Error al generar PDF de la orden de venta {doc.name}: {str(e)}")
         attachments = []
@@ -70,12 +80,15 @@ def send_sales_order_modification_email(doc, method=None):
     recipients_set = set()
     if doc.get("contact_email"):
         recipients_set.add(doc.contact_email)
+        frappe.log_error(f"Destinatario agregado desde contact_email: {doc.contact_email}")
     if doc.get("owner"):
         owner_email = frappe.db.get_value("User", doc.owner, "email")
         if owner_email:
             recipients_set.add(owner_email)
+            frappe.log_error(f"Destinatario agregado desde owner: {owner_email}")
 
     if doc.get("customer"):
+        frappe.log_error(f"Buscando contactos para el cliente: {doc.customer}")
         contacts = frappe.db.sql("""
             SELECT DISTINCT c.name
             FROM `tabContact` c
@@ -85,13 +98,22 @@ def send_sales_order_modification_email(doc, method=None):
         
         for c in contacts:
             contact = frappe.get_doc("Contact", c.name)
-            if not contact.get("qp_is_recipient"):
+            # Make sure 'qp_is_recipient' is a valid field and correctly used
+            if not contact.get("qp_is_recipient"): # Assuming this field means "is NOT a recipient"
                 for email_id_row in contact.email_ids: 
                     if email_id_row.email_id:
                         recipients_set.add(email_id_row.email_id)
+                        frappe.log_error(f"Destinatario agregado desde contacto '{c.name}': {email_id_row.email_id}")
     
     to_addresses = list(recipients_set)
     cc_addresses = ["hilaryjohana1@gmail.com"] 
+
+    if not to_addresses:
+        frappe.log_error(f"No se encontraron destinatarios para SO: {doc.name}. No se enviará el correo.")
+        return
+
+    frappe.log_error(f"Destinatarios TO: {to_addresses}")
+    frappe.log_error(f"Destinatarios CC: {cc_addresses}")
 
     sender_email = email_settings["email_id"]
     sender_name = email_settings["name"]
@@ -113,6 +135,7 @@ def send_sales_order_modification_email(doc, method=None):
     msg.attach(MIMEText(message_html, "html"))
 
     if attachments:
+        frappe.log_error(f"Adjuntando {len(attachments)} archivos.")
         for attachment_data in attachments:
             part = MIMEBase("application", "octet-stream")
             part.set_payload(attachment_data["fcontent"])
@@ -132,23 +155,27 @@ def send_sales_order_modification_email(doc, method=None):
     use_tls = email_settings["use_tls"]
     use_ssl = email_settings["use_ssl"]
 
+    frappe.log_error(f"Intentando conectar al servidor SMTP: {smtp_server}:{smtp_port}")
     try:
         if use_ssl:
             server = smtplib.SMTP_SSL(smtp_server, smtp_port)
+            frappe.log_error("Usando SMTP_SSL.")
         else:
             server = smtplib.SMTP(smtp_server, smtp_port)
             if use_tls:
                 server.starttls()
+                frappe.log_error("Usando starttls.")
 
+        frappe.log_error("Iniciando sesión SMTP.")
         server.login(smtp_username, smtp_password)
+        frappe.log_error("Sesión SMTP iniciada exitosamente.")
         
-
         all_recipients_for_smtp = to_addresses + cc_addresses
+        frappe.log_error(f"Enviando correo desde '{sender_email}' a '{all_recipients_for_smtp}'")
         server.sendmail(sender_email, all_recipients_for_smtp, msg.as_string())
         server.quit()
         
         frappe.log_error(f"Correo directo enviado exitosamente para SO: {doc.name}") 
-        frappe.msgprint(_(f"Correo de modificación de Orden de Compra {doc.name} enviado a todos los destinatarios."))
 
     except smtplib.SMTPAuthenticationError as e:
         frappe.log_error(f"Error de autenticación SMTP al enviar correo para SO {doc.name}: {str(e)}")
