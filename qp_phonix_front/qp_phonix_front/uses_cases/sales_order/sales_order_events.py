@@ -24,7 +24,7 @@ def get_email_account_settings():
         frappe.log_error(f"Error al obtener la configuración de la cuenta de correo predeterminada: {str(e)}")
         return None
     
-def send_sales_order_modification_email(doc, method):
+def send_sales_order_modification_email(doc, method=None):
     """
     Función que se ejecuta por un doc_event para enviar un correo de modificación de orden de venta.
     """
