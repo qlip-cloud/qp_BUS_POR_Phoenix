@@ -558,6 +558,7 @@ function save_order(url, redirect_link, action = null, valid_empty = true, order
       let item_code = $(this).find("#item_id").val()
       let valor_minimo = $(this).find("#item_valor_minimo").val()
       let flete = $(this).find("#item_flete").val()
+      let price = parseFloat($(this).find("#price").val())
       if (qty > 0) {
 
         /*if(action != "confirm"){
@@ -591,7 +592,7 @@ function save_order(url, redirect_link, action = null, valid_empty = true, order
                         len ++;
                 }
         }*/
-        amount = rate * qty;
+        amount = price * qty;
         console.log("amount", amount)
         console.log("valor_minimo", valor_minimo)
         console.log("¿debe cobrar flete?", amount < valor_minimo)
