@@ -712,6 +712,8 @@ def __update_items(order_item_json, sales_order, item_update_list, item_insert_l
 
                     so_item_doc.qty = item.get('qty')
 
+                    so_item_doc.qp_phoenix_transport_charges = item.get('qp_phoenix_transport_charges', 0)
+
                 #item_delivery_date = datetime.strptime(item.get('delivery_date'), DATE_DELIVERY_FORMAT_FIELD).date()
 
                 #if item_delivery_date:
