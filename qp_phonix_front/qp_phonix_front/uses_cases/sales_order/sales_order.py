@@ -182,6 +182,7 @@ def get_sales_order(sales_order):
                         so_items.line_number,
                         so_items.idx,
                         so_items.delivery_date_visible,
+                        so_items.qp_phoenix_transport_charges,
                         ROUND(net_amount,2) as total,
                         FORMAT(net_amount,2, 'es_CO') as total_format,
                         so_items.description,
@@ -281,6 +282,8 @@ def get_sales_order(sales_order):
                 item['qp_phoenix_status_title'] = item.qp_phoenix_status_title
 
                 item['qp_phoenix_status_color'] = item.qp_phoenix_status_color
+
+                item['qp_phoenix_transport_charges'] = item.qp_phoenix_transport_charges or 0.0
 
                 item['line_number'] = item.line_number
                 item['idx'] = item.idx
@@ -721,8 +724,8 @@ def __update_items(order_item_json, sales_order, item_update_list, item_insert_l
                 'item_code': item.get('item_code'),
                 'description': item.get('description'),
                 'qty': item.get('qty'),
-                'rate': item.get('rate')
-                
+                'rate': item.get('rate'),
+                'qp_phoenix_transport_charges': item.get('qp_phoenix_transport_charges', 0)
             })
             
     sales_order.save()
