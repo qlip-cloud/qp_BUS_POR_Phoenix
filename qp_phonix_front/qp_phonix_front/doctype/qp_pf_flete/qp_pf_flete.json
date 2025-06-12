@@ -22,20 +22,20 @@
   },
   {
    "fieldname": "valor_minimo",
-   "fieldtype": "Float",
+   "fieldtype": "Currency",
    "label": "Valor M\u00ednimo",
    "reqd": 1
   },
   {
    "fieldname": "flete",
-   "fieldtype": "Float",
+   "fieldtype": "Currency",
    "label": "Flete",
    "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-06-12 09:37:38.543129",
+ "modified": "2025-06-12 10:47:28.291690",
  "modified_by": "Administrator",
  "module": "Qp Phonix Front",
  "name": "qp_pf_Flete",

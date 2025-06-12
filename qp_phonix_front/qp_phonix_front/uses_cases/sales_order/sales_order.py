@@ -1001,6 +1001,11 @@ def set_qp_subtotal(sale_order):
     sale_order.qp_phoenix_order_subtotal = sum(map(lambda item: item.price_list_rate * item.qty, sale_order.items))
     
     sale_order.qp_phoenix_order_discount = sale_order.qp_phoenix_order_subtotal - sale_order.total
+
+def set_qp_transport_charges(sale_order):
+    qp_phoenix_order_transport_charges = sum(map(lambda item: item.transport_charges, sale_order.items))
+
+    sale_order.qp_phoenix_order_subtotal += qp_phoenix_order_transport_charges
     
 class vf_SaleOrderConfirmError(Exception):
 

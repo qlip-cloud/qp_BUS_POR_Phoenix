@@ -9,6 +9,9 @@
 
     <input type="hidden" id="item_id" value="{{item.name}}">
     <input type="hidden" id="item_discount" value="{{item.discountpercentage if not item.price_list_without_discount else 0}}">
+    <input type="hidden" id="item_flete" class="item_flete" value="{{ item.flete }}">
+    <input type="hidden" id="item_valor_minimo" class="item_valor_minimo" value="{{ item.valor_minimo }}">
+
 
     <td rowspan="{{ 2 if item.description_full else 1}}"
         class="lateralleft padding_list {{'row_select' if item.cantidad else ''}}"><img src="{{item.image}}"
