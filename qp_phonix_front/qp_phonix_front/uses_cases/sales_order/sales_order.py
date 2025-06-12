@@ -568,23 +568,6 @@ def __set_auto_discount(sales_order):
     
         sales_order.save()
 
-def __add_transport_tax(sales_order):
-    from frappe.utils import flt
-    total_transport = sum(
-        [flt(item.qp_phoenix_transport_charges) for item in sales_order.items if flt(item.qp_phoenix_transport_charges) > 0]
-    )
-
-    if total_transport == 0:
-        return
-
-    sales_order.append("taxes", {
-        "charge_type": "Actual",
-        "account_head": "5205 - Cargos de transito y transporte - PC",  
-        "description": "Cargo por transporte",
-        "tax_amount": total_transport
-    })
-
-    sales_order.save()
             
 def __update_order_items(sales_order, item):
     

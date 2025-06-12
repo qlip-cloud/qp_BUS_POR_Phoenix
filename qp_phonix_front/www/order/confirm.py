@@ -192,7 +192,6 @@ def get_order_attachment(context, order_id):
 def transform_items(sale_order):
     items = []
     for item in sale_order.items:
-        item_flete = get_item_transport_charges(item.item_code, item.amount)
         items.append({
             "item_code": item.item_code,
             "item_name": item.item_name,
