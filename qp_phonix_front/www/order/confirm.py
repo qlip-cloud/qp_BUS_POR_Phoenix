@@ -209,7 +209,7 @@ def transform_items(sale_order):
             "inqt": item.get("inqt", 1),
             "price_format": f"{item.rate:,.0f}",
             "total_format": f"{item.amount:,.0f}",
-            "flete": item_flete,
+            "qp_phoenix_transport_charges": item.get("qp_phoenix_transport_charges", 0),
             "delivery_date": item.get("delivery_date", ""),
             "qp_phoenix_status_color": item.get("qp_phoenix_status_color", ""),
             "qp_phoenix_status_title": item.get("qp_phoenix_status_title", ""),

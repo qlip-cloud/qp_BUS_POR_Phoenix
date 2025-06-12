@@ -592,11 +592,16 @@ function save_order(url, redirect_link, action = null, valid_empty = true, order
                 }
         }*/
         amount = rate * qty;
+        console.log("amount", amount)
+        console.log("valor_minimo", valor_minimo)
+        console.log("¿debe cobrar flete?", amount < valor_minimo)
+
         if (valor_minimo && valor_minimo > amount) {
           qp_phoenix_transport_charges = parseFloat(flete) || 0;
         }else {
           qp_phoenix_transport_charges = 0;
         }
+        console.log("qp_phoenix_transport_charges", qp_phoenix_transport_charges)
         obj = {
           qty,
           code,
