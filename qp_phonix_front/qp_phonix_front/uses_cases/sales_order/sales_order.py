@@ -406,8 +406,6 @@ def sales_order_update(order_json):
         __update_items(order_item_json, sales_order, item_update_list, item_insert_list)
                 
         __delete_items(sales_order, item_delete_list)
-
-        __add_transport_tax(sales_order)
         
         sales_order = __get_sales_order(order_id)
                 
