@@ -81,9 +81,9 @@ web_include_js = "/assets/qp_phonix_front/js/qp_phonix_front.js"
 # ---------------
 # Override standard doctype classes
 
-# override_doctype_class = {
-# 	"ToDo": "custom_app.overrides.CustomToDo"
-# }
+override_doctype_class = {
+ 	"Sales Order": "qp_phonix_front.qp_phonix_front.overrides.overrided_sales_order.CustomSalesOrder"
+ }
 
 # Document Events
 # ---------------
@@ -112,7 +112,7 @@ doc_events = {
 	},
   "Supplier": {
 		"on_update": "qp_phonix_front.qp_phonix_front.uses_cases.sales_order.sales_order_events.test_supplier_event"
-	},
+	},	
 }
 
 # Scheduled Tasks
