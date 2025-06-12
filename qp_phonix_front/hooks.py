@@ -81,9 +81,9 @@ web_include_js = "/assets/qp_phonix_front/js/qp_phonix_front.js"
 # ---------------
 # Override standard doctype classes
 
-override_doctype_class = {
- 	"Sales Order": "qp_phonix_front.qp_phonix_front.overrides.overrided_sales_order.CustomSalesOrder"
- }
+# override_doctype_class = {
+# 	"ToDo": "custom_app.overrides.CustomToDo"
+# }
 
 # Document Events
 # ---------------
@@ -108,11 +108,8 @@ doc_events = {
  		"after_insert": "qp_phonix_front.qp_phonix_front.uses_cases.user.user_role.set_role_profile_name",
 	},
 	"Sales Order": {
-		"on_update": "qp_phonix_front.qp_phonix_front.uses_cases.sales_order.sales_order_events.send_sales_order_modification_email"
-	},
-  "Supplier": {
-		"on_update": "qp_phonix_front.qp_phonix_front.uses_cases.sales_order.sales_order_events.test_supplier_event"
-	},	
+		"on_update_after_submit": "qp_phonix_front.qp_phonix_front.uses_cases.sales_order.sales_order_events.send_sales_order_modification_email"
+	}	
 }
 
 # Scheduled Tasks

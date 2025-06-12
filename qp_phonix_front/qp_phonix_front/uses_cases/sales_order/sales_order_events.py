@@ -169,9 +169,3 @@ def send_sales_order_modification_email(doc, method=None):
     except Exception as e:
         frappe.log_error(f"Error general al enviar correo directo para SO {doc.name}: {str(e)}")
 
-def test_supplier_event(doc, method):
-    """
-    Función de prueba para eventos de proveedor.
-    """
-    frappe.log_error(f"Evento de prueba para proveedor: {doc.name} - {doc.supplier_name}")
-    

@@ -177,6 +177,13 @@ def get_dynamic_link(doc, doctype):
     
     return frappe.get_all(doctype, filters=filters, fields=["*"])
 
+def get_item_transport_charges(item_code, item_amount): 
+    item = frappe.get_doc("qp_pf_Flete", item_code)
+    if item:
+        if item_amount < item.valor_minimo:
+            return item.flete
+    return 0.0
+
 def get_order_attachment(context, order_id):
     order = frappe.get_doc("Sales Order", order_id)
     order_file = order.qp_phoenix_order_file
@@ -185,6 +192,7 @@ def get_order_attachment(context, order_id):
 def transform_items(sale_order):
     items = []
     for item in sale_order.items:
+        item_flete = get_item_transport_charges(item.item_code, item.amount)
         items.append({
             "item_code": item.item_code,
             "item_name": item.item_name,
@@ -201,6 +209,7 @@ def transform_items(sale_order):
             "inqt": item.get("inqt", 1),
             "price_format": f"{item.rate:,.0f}",
             "total_format": f"{item.amount:,.0f}",
+            "flete": item_flete,
             "delivery_date": item.get("delivery_date", ""),
             "qp_phoenix_status_color": item.get("qp_phoenix_status_color", ""),
             "qp_phoenix_status_title": item.get("qp_phoenix_status_title", ""),
