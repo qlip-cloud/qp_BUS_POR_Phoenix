@@ -11,14 +11,36 @@ from frappe import _
 def get_email_account_settings():
     """Obtiene la configuración de la cuenta de correo predeterminada de Frappe."""
     try:
+        """
+        Configuración de la cuenta de correo predeterminada:
+        - email_id: Correo electrónico de la cuenta.
+        - password: Contraseña de la cuenta (debe ser desencriptada).
+        - domain: Dominio del correo electrónico.
+        """
         email_account = frappe.db.get_value(
-            "Email Account", {"default_outgoing": 1}, ["smtp_server", "smtp_port", "email_id", "password", "use_tls", "use_ssl", "name"], as_dict=True
+            "Email Account", {"default_outgoing": 1}, ["name","email_id", "password", "domain"], as_dict=True
         )
         if not email_account:
             frappe.log_error("No se encontró una cuenta de correo predeterminada.")
             return None
 
         email_account["password"] = frappe.utils.password.get_decrypted_password("Email Account", email_account["name"], fieldname="password")
+
+        """
+        Configuración del servidor SMTP para el dominio especificado en la cuenta de correo:
+        - smtp_server: Servidor SMTP del dominio.
+        """
+        smtp_server = frappe.db.get_value(
+            "Email Domain", email_account["domain"], ["email_server", "smtp_server", "smtp_port", "use_tls", "use_ssl_for_outgoing"], as_dict=True
+        )
+        if not smtp_server:
+            frappe.log_error(f"No se encontró la configuración del dominio de correo: {email_account['domain']}")
+            return None
+        email_account["smtp_server"] = smtp_server["smtp_server"]
+        email_account["smtp_port"] = smtp_server["smtp_port"]
+        email_account["use_tls"] = smtp_server["use_tls"]
+        email_account["use_ssl_for_outgoing"] = smtp_server["use_ssl_for_outgoing"]
+        frappe.log_error(f"Configuración de correo obtenida: {email_account}")
         return email_account
     except Exception as e:
         frappe.log_error(f"Error al obtener la configuración de la cuenta de correo predeterminada: {str(e)}")
@@ -140,7 +162,7 @@ def send_sales_order_modification_email(doc, method=None):
     smtp_username = email_settings["email_id"]
     smtp_password = email_settings["password"]
     use_tls = email_settings["use_tls"]
-    use_ssl = email_settings["use_ssl"]
+    use_ssl = email_settings["use_ssl_for_outgoing"]
 
     frappe.log_error(f"Intentando conectar al servidor SMTP: {smtp_server}:{smtp_port}")
     try:
