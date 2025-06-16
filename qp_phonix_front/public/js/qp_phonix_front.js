@@ -556,9 +556,6 @@ function save_order(url, redirect_link, action = null, valid_empty = true, order
       let rate = $(this).find("#item_price").val()
       let discount_percentage = $(this).find("#item_discount").val()
       let item_code = $(this).find("#item_id").val()
-      let valor_minimo = $(this).find("#item_valor_minimo").val()
-      let flete = $(this).find("#item_flete").val()
-      let price = parseFloat($(this).find("#price").val())
       if (qty > 0) {
 
         /*if(action != "confirm"){
@@ -592,17 +589,7 @@ function save_order(url, redirect_link, action = null, valid_empty = true, order
                         len ++;
                 }
         }*/
-        amount = price * qty;
-        console.log("amount", amount)
-        console.log("valor_minimo", valor_minimo)
-        console.log("¿debe cobrar flete?", amount < valor_minimo)
 
-        if (valor_minimo && valor_minimo > amount) {
-          qp_phoenix_transport_charges = parseFloat(flete) || 0;
-        }else {
-          qp_phoenix_transport_charges = 0;
-        }
-        console.log("qp_phoenix_transport_charges", qp_phoenix_transport_charges)
         obj = {
           qty,
           code,
@@ -611,7 +598,6 @@ function save_order(url, redirect_link, action = null, valid_empty = true, order
           //description: action == "confirm" ? $(this).data("description") : $(this).find("#item_id").val() + "_" + len,
           rate,
           discount_percentage,
-          qp_phoenix_transport_charges
           //,delivery_date
         }
         items.push(obj);
@@ -627,15 +613,6 @@ function save_order(url, redirect_link, action = null, valid_empty = true, order
       let qty = parseInt(item.cantidad);
       let rate = parseFloat(item.rate);
       let discount_percentage = parseFloat(item.discountpercentage);
-      let valor_minimo = parseFloat(item.valor_minimo) || 0;
-      let flete = parseFloat(item.flete) || 0;
-
-      if (valor_minimo && valor_minimo > (rate * qty)) {
-        qp_phoenix_transport_charges = flete;
-      }
-      else {
-        qp_phoenix_transport_charges = 0;
-      }
 
       items.push({
         qty,
@@ -643,7 +620,6 @@ function save_order(url, redirect_link, action = null, valid_empty = true, order
         description,
         rate,
         discount_percentage,
-        qp_phoenix_transport_charges
       });
       len++;
     }

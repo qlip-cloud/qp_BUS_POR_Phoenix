@@ -182,7 +182,6 @@ def get_sales_order(sales_order):
                         so_items.line_number,
                         so_items.idx,
                         so_items.delivery_date_visible,
-                        so_items.qp_phoenix_transport_charges,
                         ROUND(net_amount,2) as total,
                         FORMAT(net_amount,2, 'es_CO') as total_format,
                         so_items.description,
@@ -283,8 +282,6 @@ def get_sales_order(sales_order):
 
                 item['qp_phoenix_status_color'] = item.qp_phoenix_status_color
 
-                item['qp_phoenix_transport_charges'] = item.qp_phoenix_transport_charges or 0.0
-
                 item['line_number'] = item.line_number
                 item['idx'] = item.idx
                 item['name'] = item.code
@@ -333,6 +330,8 @@ def create_sales_order(order_json):
         sale_order.insert()
         
         set_qp_subtotal(sale_order)
+
+        set_order_flete(sale_order)
         
         sale_order.save()
 
@@ -404,8 +403,10 @@ def sales_order_update(order_json):
             __set_order_data(sales_order, order_json)
 
         __update_items(order_item_json, sales_order, item_update_list, item_insert_list)
-                
+                    
         __delete_items(sales_order, item_delete_list)
+
+        set_order_flete(sales_order)
         
         sales_order = __get_sales_order(order_id)
                 
@@ -713,7 +714,6 @@ def __update_items(order_item_json, sales_order, item_update_list, item_insert_l
 
                     so_item_doc.qty = item.get('qty')
 
-                    so_item_doc.qp_phoenix_transport_charges = item.get('qp_phoenix_transport_charges', 0)
 
                 #item_delivery_date = datetime.strptime(item.get('delivery_date'), DATE_DELIVERY_FORMAT_FIELD).date()
 
@@ -728,7 +728,6 @@ def __update_items(order_item_json, sales_order, item_update_list, item_insert_l
                 'description': item.get('description'),
                 'qty': item.get('qty'),
                 'rate': item.get('rate'),
-                'qp_phoenix_transport_charges': item.get('qp_phoenix_transport_charges', 0)
             })
             
     sales_order.save()
@@ -811,6 +810,28 @@ def __get_order_id(order_json):
         return order_json.get("order_id")
 
     raise Exception(_('The Sales Order Item is empty'))
+
+def set_order_flete(sales_order):
+    valor_minimo, flete = frappe.get_value("qp_pf_Flete", "FLETE", ["valor_minimo", "flete"])
+
+    flete_existente = next((i for i in sales_order.items if i.item_code == "FLETE"), None)
+
+    total_items = sum(item.qty * item.rate for item in sales_order.items if item.item_code != "FLETE")
+
+    if total_items < valor_minimo:
+        if not flete_existente:
+            sales_order.append("items", {
+                "item_code": "FLETE",
+                "description": "Flete",
+                "qty": 1,
+                "rate": flete,
+                "amount": flete
+            })
+    else:
+        if flete_existente:
+            sales_order.items.remove(flete_existente)
+
+
 
 def setup_order_json(order_json):
     

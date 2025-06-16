@@ -134,8 +134,6 @@ def setup_order(context, order_id):
     
     items_select = add_qty_item_list(context.items_select, items_select)
 
-    items_select = add_shipping_info(items_select)
-
     return item_code_list, items_select
 
 def get_item_code_by_order(items_select):
@@ -161,21 +159,6 @@ def add_qty_item_list(items_select, item_list):
             
     return list_aux
 
-def add_shipping_info(item_list):
-    for item in item_list:
-        item_code = item.get("name") or item.get("item_code")
-
-        flete_info = frappe.db.get_value(
-            "qp_pf_Flete",
-            item_code,
-            ["valor_minimo", "flete"],
-            as_dict=True
-        )
-
-        item["valor_minimo"] = flete_info.valor_minimo if flete_info else 0.0
-        item["flete"] = flete_info.flete if flete_info else 0.0
-
-    return item_list
 
 def get_autosave_control():
 
@@ -265,8 +248,6 @@ def validate_items_and_fetch_info():
     get_idlevel(context)
 
     enriched_items = validate_items_for_customer(items_list, context)
-
-    enriched_items = add_shipping_info(enriched_items)
 
     frappe.local.session['imported_items'] = enriched_items
     frappe.local.session.modified = True

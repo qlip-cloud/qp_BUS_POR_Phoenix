@@ -498,19 +498,22 @@ Orden
                             </div>
                         </div>
                         <div class="row label description-column">
-                            <div class="col-sm-3">
+                            <div class="col-lg-3">
                                 <!-- input type="checkbox"-->
                                 Código de item
                                 {#item.SubCategoria_title#}
                             </div>
-                            <div class="col-sm-3">
+                            <div class="col-sm-2">
                                 Cantidad
                             </div>
                             <div class="col-sm-3">
                                 Pedir por paquetes de
                             </div>
-                            <div class="col-sm-3">
+                            <div class="col-sm-2">
                                 Precio
+                            </div>
+                            <div class="col-sm-2">
+                                Total
                             </div>
                         </div>
 
@@ -551,29 +554,13 @@ Orden
                                         id="price-{{item.item_code | replace(':','-')}}">{{item.price_format}}</span>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row label description-column">
-                            <div class="col-sm-3">
-                                Total Productos
-                            </div>
-                            <div class="col-sm-3">
-                                Costo Transporte
-                            </div>
-                        </div>
-                        <div class="row info">
-                            <div class="col-sm-3">
+                            <div class="col-sm-2">
                                 <div class="description-label">Total</div>
                                 <div class="background-info information_label ">
                                     {{order.currency_symbol}} <span
                                         id="total-{{item.item_code | replace(':','-')}}">{{item.total_format}}</span>
                                 </div>
                             </div>
-                            <div class="col-sm-3">
-                                <div class="description-label">Costo Transporte</div>
-                                <div class="background-info information_label ">
-                                    {{order.currency_symbol}} <span
-                                        id="flete-{{item.item_code | replace(':','-')}}">{{item.qp_phoenix_transport_charges}}</span>
-                                </div>
                         </div>
                     </div>
                 </div>

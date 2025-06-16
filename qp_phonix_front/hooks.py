@@ -214,8 +214,7 @@ fixtures = [
     {
         "dt": "Custom Field",
         "filters": [["name", "in", [
-            "Sales Order-qp_phoenix_order_file",
-            "Sales Order Item-qp_phoenix_transport_charges"
+            "Sales Order-qp_phoenix_order_file"
         ]]]
     }
 ]

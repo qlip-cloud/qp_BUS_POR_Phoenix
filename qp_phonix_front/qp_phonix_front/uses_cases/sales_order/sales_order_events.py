@@ -129,7 +129,7 @@ def send_sales_order_modification_email(doc, method=None):
     subject = _(f"Modificación Fechas Orden de Compra {doc.name} / {doc.qp_phonix_reference}")
     message_html = f"""
     Buen día, estimado cliente,<br><br>
-    Su orden de compra **{doc.name}** ha presentado cambios de fecha de entrega en algunos productos. Por favor, verifique el PDF adjunto, el cual contiene información detallada de estos cambios.<br><br>
+    Su orden de compra <strong>{doc.name}</strong> ha presentado cambios de fecha de entrega en algunos productos. Por favor, verifique el PDF adjunto, el cual contiene información detallada de estos cambios.<br><br>
     En caso de tener dudas, comuníquese con el personal de Ventas Internas y/o Ventas Externas.<br><br>
     """
 
