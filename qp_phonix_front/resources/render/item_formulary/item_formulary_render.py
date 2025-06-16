@@ -4,7 +4,6 @@ from qp_phonix_front.resources.response import handle as response
 from qp_phonix_front.qp_phonix_front.uses_cases.item_list.item_list import paginator_item_list
 from qp_phonix_front.qp_phonix_front.uses_cases.sales_order.sales_order import get_sales_order
 from qp_phonix_front.www.order.item_formulary import add_qty_item_list
-from qp_phonix_front.www.order.item_formulary import add_shipping_info
 from qp_phonix_front.qp_phonix_front.services.manager_permission import handler as get_permission
 from collections import Counter
 import json
@@ -50,8 +49,6 @@ def paginator(order_id = None, item_group = None, item_Categoria = None, item_Su
             item_list = __get_item_list(order_filter_text, paginator_item)
 
             list(map(lambda x: x.update({"initial": x.item_name[0].upper()}), item_list))
-
-            add_shipping_info(item_list)
 
             if order_id:
 
