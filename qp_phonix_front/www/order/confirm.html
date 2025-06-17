@@ -393,7 +393,7 @@ Orden
                     </div>
                 </div>
             </div>
-            {% if not qualifies_for_free_shipping %}
+            {% if not qualifies_for_free_shipping and order.status == 'Draft'  %}
             <div class="row">
                 <div class="col-md-12 alert alert-warning" style="margin-top: 15px;">
                     <strong>Tu pedido no cumple con el monto mínimo requerido para envío gratuito.</strong><br>
