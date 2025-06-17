@@ -846,8 +846,6 @@ def set_order_flete(sales_order):
             sales_order.items.remove(flete_existente)
 
 
-
-
 def setup_order_json(order_json):
     
     if not isinstance(order_json, dict):

@@ -65,6 +65,7 @@ def __get_master_setup(company):
 
     return master_name and master_name[0] or {}
 
+
 def __prepare_petition(master_name, so_obj):
     
     so_json = {}
@@ -79,23 +80,34 @@ def __prepare_petition(master_name, so_obj):
 
     store_main = __get_value_master(master_name, 'store_main')
 
+    global_discount = so_obj.discount_amount if so_obj.discount_amount else 0
+
+    global_discount = so_obj.additional_discount_percentage
+    all_items_match_global = all(
+        round((item.discount_percentage or 0), 2) == round(global_discount, 2)
+        for item in so_obj.items
+    ) if global_discount > 0 else False
+
+    use_global_discount = True if global_discount > 0 and all_items_match_global else False
+
     item_list = []
 
     for item in so_obj.items:
 
-        item_list.append(
-            {
-                "Id": item.item_code,
-                "Quantity": item.qty,
-                "Price": item.rate if so_obj.additional_discount_percentage > 0 else item.net_rate,
-                #"DiscountPercentage": item.discount_percentage, #valida
-                "DiscountPercentage": so_obj.additional_discount_percentage, #valida
-                "DiscountPrice": 0, #valida
-                "Warehouse": item.item_group,
-                "ShippingMethod": None,
-                "ShippingDate": None # valida
-            }
-        )
+        line = {
+            "Id": item.item_code,
+            "Quantity": item.qty,
+            "Price": item.rate if so_obj.additional_discount_percentage > 0 else item.net_rate,
+            #"DiscountPercentage": item.discount_percentage, #valida
+            "DiscountPrice": 0, #valida
+            "Warehouse": item.item_group,
+            "ShippingMethod": None,
+            "ShippingDate": None # valida
+        }
+        if not use_global_discount:
+            line["DiscountPercentage"] = item.discount_percentage if item.discount_percentage else 0
+
+        item_list.append(line)
 
     vendor_id = frappe.db.get_value("Sales Person", so_obj.sales_team[0].sales_person,"gp_code" ) if so_obj.sales_team else ''
 
@@ -114,7 +126,7 @@ def __prepare_petition(master_name, so_obj):
     so_json['Lot'] = ""
     so_json['Warehouse'] = item_types[0].title
     so_json['WarehousesAlter'] = bdg_alter #valida
-    so_json['DiscountAmount'] = 0
+    so_json['DiscountAmount'] = so_obj.discount_amount if use_global_discount else 0 
     so_json['VendorId'] = vendor_id #valida
     so_json['Currency'] = so_obj.price_list_currency
     so_json['Lines'] = item_list
