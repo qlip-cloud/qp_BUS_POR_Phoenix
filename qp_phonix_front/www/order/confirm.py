@@ -177,7 +177,7 @@ def set_flete_config(context, order):
 
     if flete_config:
         min_flete = flete_config[0].valor_minimo
-        qualifies_for_free_shipping = order.total_format >= min_flete
+        qualifies_for_free_shipping = order.net_total >= min_flete
         context.min_flete = min_flete
         context.qualifies_for_free_shipping = qualifies_for_free_shipping
         
