@@ -393,6 +393,20 @@ Orden
                     </div>
                 </div>
             </div>
+            {% if not qualifies_for_free_shipping %}
+            <div class="row">
+                <div class="col-md-12 alert alert-warning" style="margin-top: 15px;">
+                    <strong>Tu pedido no cumple con el monto mínimo requerido para envío gratuito.</strong><br>
+                    El mínimo es de {{ order.currency_symbol }}{{ min_shipping_amount }}.<br><br>
+                    Para continuar, puedes:
+                    <ul>
+                        <li>Ajustar tu carrito hasta alcanzar el monto mínimo, o</li>
+                        <li>Pagar el costo de envío adicional.</li>
+                    </ul>
+                    Gracias por tu preferencia.
+                </div>
+            {%endif%}
+            </div>
             <div class="row">
                 {%if count_change_item_list%}
                 <div class="col-sm-12">
