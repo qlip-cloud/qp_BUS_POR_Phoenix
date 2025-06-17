@@ -812,17 +812,31 @@ def __get_order_id(order_json):
     raise Exception(_('The Sales Order Item is empty'))
 
 def set_order_flete(sales_order):
-    valor_minimo, flete = frappe.get_value("qp_pf_Flete", "FLETE", ["valor_minimo", "flete"])
+    valores_flete = frappe.get_all(
+        "qp_pf_Flete",
+        fields=["name", "valor_minimo", "flete"],
+        limit=1
+    )
 
-    flete_existente = next((i for i in sales_order.items if i.item_code == "FLETE"), None)
+    if not valores_flete:
+        frappe.throw(_("No hay configuración de flete disponible en qp_pf_Flete"))
 
-    total_items = sum(item.qty * item.rate for item in sales_order.items if item.item_code != "FLETE")
+    flete_config = valores_flete[0]
+    item_code_flete = flete_config.name
+    valor_minimo = flete_config.valor_minimo
+    flete = flete_config.flete
+
+    flete_existente = next((i for i in sales_order.items if i.item_code == item_code_flete), None)
+
+    total_items = sum(item.qty * item.rate for item in sales_order.items if item.item_code != item_code_flete)
 
     if total_items < valor_minimo:
         if not flete_existente:
+            descripcion_flete = frappe.get_value("Item", item_code_flete, "description") or "Flete"
+
             sales_order.append("items", {
-                "item_code": "FLETE",
-                "description": "Flete",
+                "item_code": item_code_flete,
+                "description": descripcion_flete,
                 "qty": 1,
                 "rate": flete,
                 "amount": flete
@@ -830,6 +844,7 @@ def set_order_flete(sales_order):
     else:
         if flete_existente:
             sales_order.items.remove(flete_existente)
+
 
 
 
