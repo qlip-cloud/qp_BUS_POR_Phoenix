@@ -154,7 +154,7 @@ def redeem_coupon_items(coupon, order, coupon_log, item_row_copy):
 
 def setup_coupon_log(coupon, order, coupon_log, item_row_copy, callback):
 
-    transporte_code = frappe.db.get_value("qp_pf_Flete", None, "item") or "
+    transporte_code = frappe.db.get_value("qp_pf_Flete", None, "name") or ""
 
     for key, item in enumerate(item_row_copy):
 
