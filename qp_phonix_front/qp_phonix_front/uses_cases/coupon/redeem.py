@@ -103,7 +103,15 @@ def redeem_coupon(coupon, order, coupon_log, item_row_copy):
         #redeem_coupon_item(coupon, order, coupon_log) 
 def redeem_coupon_subtotal(coupon, order):
 
-    order.additional_discount_percentage += coupon.percentage
+    transport_item_code = frappe.db.get_value("qp_pf_Flete", None, "name") or ""
+
+    subtotal_without_transport = sum(
+        item.amount for item in order.items
+            if item.item_code != transport_item_code
+        )
+    discount_value = subtotal_without_transport * (coupon.percentage / 100.0)
+    order.additional_discount_percentage = 0
+    order.additional_discount_amount += discount_value
 
 def redeem_coupon_level_group(coupon, order, coupon_log, item_row_copy):
     
