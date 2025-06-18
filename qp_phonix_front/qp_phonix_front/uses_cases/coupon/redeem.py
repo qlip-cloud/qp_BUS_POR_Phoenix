@@ -103,7 +103,8 @@ def redeem_coupon(coupon, order, coupon_log, item_row_copy):
         #redeem_coupon_item(coupon, order, coupon_log) 
 def redeem_coupon_subtotal(coupon, order):
 
-    transport_item_code = frappe.db.get_value("qp_pf_Flete", None, "name") or ""
+    transport_item_code = frappe.get_all("qp_pf_Flete", pluck="name", limit=1)
+    transport_item_code = transport_item_code[0] if transport_item_code else ""
 
     subtotal_without_transport = sum(
         item.amount for item in order.items
@@ -162,13 +163,14 @@ def redeem_coupon_items(coupon, order, coupon_log, item_row_copy):
 
 def setup_coupon_log(coupon, order, coupon_log, item_row_copy, callback):
 
-    transporte_code = frappe.db.get_value("qp_pf_Flete", None, "name") or ""
+    transport_item_code = frappe.get_all("qp_pf_Flete", pluck="name", limit=1)
+    transport_item_code = transport_item_code[0] if transport_item_code else ""
 
     for key, item in enumerate(item_row_copy):
 
         # Si el item es transporte, no se aplica el cupón
         # Esto es para evitar que se aplique el descuento al flete
-        if item.item_code == transporte_code:
+        if item.item_code == transport_item_code:
             continue
 
         if not_is_auto_discount(item.item_code):

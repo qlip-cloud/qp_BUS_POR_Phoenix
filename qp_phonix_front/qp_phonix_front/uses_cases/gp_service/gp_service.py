@@ -60,10 +60,11 @@ def get_coupon_discount_strategy(sales_order):
     - items_with_discount: set de item_code (vacío si es global)
     - has_transport: bool
     """
-    transport_item = frappe.db.get_value("qp_pf_Flete", None, "name") or ""
+    transport_item_code = frappe.get_all("qp_pf_Flete", pluck="name", limit=1)
+    transport_item_code = transport_item_code[0] if transport_item_code else ""
 
     has_transport = any(
-        item.item_code == transport_item for item in sales_order.items
+        item.item_code == transport_item_code for item in sales_order.items
     )
 
     coupon_log_name = frappe.get_value("qp_pf_CouponLog", {"order_id": sales_order.name}, "name")
@@ -115,7 +116,8 @@ def __prepare_petition(master_name, so_obj):
     use_line_discounts, items_with_discount, coupon_percentage = get_coupon_discount_strategy(so_obj)
 
     item_list = []
-    transport_item_code = frappe.db.get_value("qp_pf_Flete", None, "name") or ""
+    transport_item_code = frappe.get_all("qp_pf_Flete", pluck="name", limit=1)
+    transport_item_code = transport_item_code[0] if transport_item_code else ""
 
     for item in so_obj.items:
         is_transport = item.item_code == transport_item_code 
