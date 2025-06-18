@@ -125,7 +125,7 @@ def __prepare_petition(master_name, so_obj):
         line = {
             "Id": item.item_code,
             "Quantity": item.qty,
-            "Price": item.rate if so_obj.additional_discount_percentage > 0 else item.net_rate,
+            "Price": item.rate if so_obj.discount_amount > 0 else item.net_rate,
             #"DiscountPercentage": item.discount_percentage, #valida
             "DiscountPrice": 0, #valida
             "Warehouse": item.item_group,
@@ -133,12 +133,16 @@ def __prepare_petition(master_name, so_obj):
             "ShippingDate": None # valida
         }
         if use_line_discounts:
-            if is_transport or (items_with_discount and not is_coupon_item):
+            if is_transport:
                 line["DiscountPercentage"] = 0
+            elif items_with_discount:
+                line["DiscountPercentage"] = coupon_percentage if is_coupon_item else 0
             else:
-                line["DiscountPercentage"] = coupon_percentage if item.item_code in items_with_discount else 0
+                # Cupón global con transporte
+                line["DiscountPercentage"] = coupon_percentage
         else:
             line["DiscountPercentage"] = 0
+
 
         item_list.append(line)
 
