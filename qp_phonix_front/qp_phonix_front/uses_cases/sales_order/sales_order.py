@@ -330,6 +330,8 @@ def create_sales_order(order_json):
         sale_order.insert()
         
         set_qp_subtotal(sale_order)
+
+        set_order_flete(sale_order)
         
         sale_order.save()
 
@@ -401,15 +403,17 @@ def sales_order_update(order_json):
             __set_order_data(sales_order, order_json)
 
         __update_items(order_item_json, sales_order, item_update_list, item_insert_list)
-                
+
         __delete_items(sales_order, item_delete_list)
+
         
         sales_order = __get_sales_order(order_id)
                 
         is_confirm = __confirm_sales_order(order_json, sales_order)
             
+        set_order_flete(sales_order)
+        
         if not is_confirm:
-            
             sales_order.save()
             
         frappe.db.commit()
@@ -564,7 +568,8 @@ def __set_auto_discount(sales_order):
 
     
         sales_order.save()
-             
+
+            
 def __update_order_items(sales_order, item):
     
     order_is_found = False
@@ -709,6 +714,7 @@ def __update_items(order_item_json, sales_order, item_update_list, item_insert_l
 
                     so_item_doc.qty = item.get('qty')
 
+
                 #item_delivery_date = datetime.strptime(item.get('delivery_date'), DATE_DELIVERY_FORMAT_FIELD).date()
 
                 #if item_delivery_date:
@@ -721,8 +727,7 @@ def __update_items(order_item_json, sales_order, item_update_list, item_insert_l
                 'item_code': item.get('item_code'),
                 'description': item.get('description'),
                 'qty': item.get('qty'),
-                'rate': item.get('rate')
-                
+                'rate': item.get('rate'),
             })
             
     sales_order.save()
@@ -805,6 +810,41 @@ def __get_order_id(order_json):
         return order_json.get("order_id")
 
     raise Exception(_('The Sales Order Item is empty'))
+
+def set_order_flete(sales_order):
+    valores_flete = frappe.get_all(
+        "qp_pf_Flete",
+        fields=["name", "valor_minimo", "flete"],
+        limit=1
+    )
+
+    if not valores_flete:
+        frappe.throw(_("No hay configuración de flete disponible en qp_pf_Flete"))
+
+    flete_config = valores_flete[0]
+    item_code_flete = flete_config.name
+    valor_minimo = flete_config.valor_minimo
+    flete = flete_config.flete
+
+    flete_existente = next((i for i in sales_order.items if i.item_code == item_code_flete), None)
+
+    total_items = sum(item.qty * item.rate for item in sales_order.items if item.item_code != item_code_flete)
+
+    if total_items < valor_minimo:
+        if not flete_existente:
+            descripcion_flete = frappe.get_value("Item", item_code_flete, "description") or "Flete"
+
+            sales_order.append("items", {
+                "item_code": item_code_flete,
+                "description": descripcion_flete,
+                "qty": 1,
+                "rate": flete,
+                "amount": flete
+            })
+    else:
+        if flete_existente:
+            sales_order.items.remove(flete_existente)
+
 
 def setup_order_json(order_json):
     
@@ -1001,6 +1041,7 @@ def set_qp_subtotal(sale_order):
     sale_order.qp_phoenix_order_subtotal = sum(map(lambda item: item.price_list_rate * item.qty, sale_order.items))
     
     sale_order.qp_phoenix_order_discount = sale_order.qp_phoenix_order_subtotal - sale_order.total
+
     
 class vf_SaleOrderConfirmError(Exception):
 

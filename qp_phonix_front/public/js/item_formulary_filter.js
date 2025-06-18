@@ -373,7 +373,7 @@ function item_group_filter_toggle(item_group_default) {
 
     //add_class_filter($Categoria_item)
 
-    add_class_filter($(`.item-row.${item_group_default}`))
+    add_class_filter($(`.item-row`))
 
     filter_show()
 

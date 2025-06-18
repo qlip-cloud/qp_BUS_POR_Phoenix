@@ -57,6 +57,8 @@ def get_context(context):
         
         set_address_seleted(context, sale_order.customer_address)
 
+        set_flete_config(context, sale_order)
+
         get_order_attachment(context, order_id)
         
         cache = frappe.cache()
@@ -165,6 +167,19 @@ def set_coupon_data(context, order_id):
 
         context.coupon_list = coupon_list
         context.has_coupon = True
+
+def set_flete_config(context, order):
+    flete_config = frappe.get_all(
+        "qp_pf_Flete",
+        fields=["name", "valor_minimo", "flete"],
+        limit=1
+    )
+
+    if flete_config:
+        min_flete = flete_config[0].valor_minimo
+        qualifies_for_free_shipping = order.net_total >= min_flete
+        context.min_flete = min_flete
+        context.qualifies_for_free_shipping = qualifies_for_free_shipping
         
 def get_dynamic_link(doc, doctype):
     
@@ -176,6 +191,7 @@ def get_dynamic_link(doc, doctype):
 	]
     
     return frappe.get_all(doctype, filters=filters, fields=["*"])
+
 
 def get_order_attachment(context, order_id):
     order = frappe.get_doc("Sales Order", order_id)

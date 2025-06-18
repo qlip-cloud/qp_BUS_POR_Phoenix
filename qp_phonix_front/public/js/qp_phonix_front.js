@@ -598,8 +598,6 @@ function save_order(url, redirect_link, action = null, valid_empty = true, order
           //description: action == "confirm" ? $(this).data("description") : $(this).find("#item_id").val() + "_" + len,
           rate,
           discount_percentage,
-
-
           //,delivery_date
         }
         items.push(obj);

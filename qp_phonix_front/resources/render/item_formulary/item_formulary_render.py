@@ -58,6 +58,7 @@ def paginator(order_id = None, item_group = None, item_Categoria = None, item_Su
 
                 add_qty_item_list(item_list, items_select)
 
+
             
             permission = get_permission()
 

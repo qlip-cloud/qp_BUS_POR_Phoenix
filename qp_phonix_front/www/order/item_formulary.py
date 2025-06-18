@@ -159,6 +159,7 @@ def add_qty_item_list(items_select, item_list):
             
     return list_aux
 
+
 def get_autosave_control():
 
     company = frappe.get_last_doc('Company')

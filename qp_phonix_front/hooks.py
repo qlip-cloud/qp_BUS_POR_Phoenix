@@ -106,7 +106,11 @@ get_website_user_home_page = "qp_phonix_front.qp_phonix_front.services.redirect_
 doc_events = {
  	"User": {
  		"after_insert": "qp_phonix_front.qp_phonix_front.uses_cases.user.user_role.set_role_profile_name",
-	}
+	},
+	"Sales Order": {
+		"on_update_after_submit": "qp_phonix_front.qp_phonix_front.uses_cases.sales_order.sales_order_events.send_sales_order_modification_email",
+    "on_submit": "qp_phonix_front.qp_phonix_front.uses_cases.sales_order.sales_order_events.send_sales_order_confirmation_email",
+	}	
 }
 
 # Scheduled Tasks
@@ -211,7 +215,7 @@ fixtures = [
     {
         "dt": "Custom Field",
         "filters": [["name", "in", [
-            "Sales Order-qp_phoenix_order_file",
+            "Sales Order-qp_phoenix_order_file"
         ]]]
     }
 ]
