@@ -111,7 +111,7 @@ def redeem_coupon_subtotal(coupon, order):
         )
     discount_value = subtotal_without_transport * (coupon.percentage / 100.0)
     order.additional_discount_percentage = 0
-    order.additional_discount_amount += discount_value
+    order.discount_amount += discount_value
 
 def redeem_coupon_level_group(coupon, order, coupon_log, item_row_copy):
     
