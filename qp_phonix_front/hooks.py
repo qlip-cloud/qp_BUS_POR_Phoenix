@@ -108,7 +108,8 @@ doc_events = {
  		"after_insert": "qp_phonix_front.qp_phonix_front.uses_cases.user.user_role.set_role_profile_name",
 	},
 	"Sales Order": {
-		"on_update_after_submit": "qp_phonix_front.qp_phonix_front.uses_cases.sales_order.sales_order_events.send_sales_order_modification_email"
+		"on_update_after_submit": "qp_phonix_front.qp_phonix_front.uses_cases.sales_order.sales_order_events.send_sales_order_modification_email",
+    "on_submit": "qp_phonix_front.qp_phonix_front.uses_cases.sales_order.sales_order_events.send_sales_order_confirmation_email",
 	}	
 }
 
