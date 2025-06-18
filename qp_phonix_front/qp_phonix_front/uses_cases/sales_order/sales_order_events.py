@@ -40,7 +40,6 @@ def get_email_account_settings():
         email_account["smtp_port"] = smtp_server["smtp_port"]
         email_account["use_tls"] = smtp_server["use_tls"]
         email_account["use_ssl_for_outgoing"] = smtp_server["use_ssl_for_outgoing"]
-        frappe.log_error(f"Configuración de correo obtenida: {email_account}")
         return email_account
     except Exception as e:
         frappe.log_error(f"Error al obtener la configuración de la cuenta de correo predeterminada: {str(e)}")
@@ -139,7 +138,7 @@ def send_sales_order_confirmation_email(doc, method=None):
         frappe.log_error(f"No se encontraron destinatarios para el correo de la orden de venta {doc.name}.")
         return
     to_addresses = [email for email in recipients if email]
-    cc_addresses = ["hilaryjohana1@gmail.com"]
+    cc_addresses = ["gyepes@phoenixcontact.com", "jperez@phoenixcontact.com", "mvasquez@phoenixcontact.com"]
     if not to_addresses:
         return
     sender_email = email_settings["email_id"]
@@ -230,7 +229,7 @@ def send_sales_order_modification_email(doc, method=None):
         frappe.log_error(f"No se encontraron destinatarios para el correo de la orden de venta {doc.name}.")
         return
     to_addresses = [email for email in recipients if email]
-    cc_addresses = ["hilaryjohana1@gmail.com"] 
+    cc_addresses = ["gyepes@phoenixcontact.com", "jperez@phoenixcontact.com", "mvasquez@phoenixcontact.com"]
 
     if not to_addresses:
         return
