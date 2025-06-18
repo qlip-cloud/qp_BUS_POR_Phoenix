@@ -57,10 +57,7 @@ def get_sales_order_attachment(doc, attachments):
             print_format="pdf-email",
             doc=doc
         )
-        attachments.append({
-            "fname": f"{doc.name}.pdf",
-            "fcontent": pdf_attachment.get("content")
-        })
+        attachments.append(pdf_attachment)
         return attachments
     except Exception as e:
         frappe.log_error(f"Error al generar PDF de la orden de venta {doc.name}: {str(e)}")
@@ -76,10 +73,11 @@ def get_sales_order_additional_attachments(doc, attachments):
         )
         if file:
             file_doc = frappe.get_doc("File", file["name"])
-            content = file_doc.get_content()
+            file_content = file_doc.get_content()
+            
             attachments.append({
                 "fname": file_doc.file_name,
-                "fcontent": content
+                "fcontent": file_content
             })
         return attachments
     except Exception as e:
