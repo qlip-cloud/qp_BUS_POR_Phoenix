@@ -71,8 +71,8 @@ def get_coupon_discount_strategy(sales_order):
     coupon_log = frappe.get_doc("qp_pf_CouponLog", coupon_log_name) if coupon_log_name else None
     coupon_percentage = coupon_log.discount_percentage if coupon_log else 0
 
-    has_coupon_items = coupon_log and coupon_log.qp_pf_CouponItem and len(coupon_log.qp_pf_CouponItem) > 0
-    items_with_discount = set(item.item_code for item in coupon_log.qp_pf_CouponItem) if has_coupon_items else set()
+    has_coupon_items = coupon_log and coupon_log.coupon_items and len(coupon_log.coupon_items) > 0
+    items_with_discount = set(item.item_code for item in coupon_log.coupon_items) if has_coupon_items else set()
 
     use_line_discounts = False
 
