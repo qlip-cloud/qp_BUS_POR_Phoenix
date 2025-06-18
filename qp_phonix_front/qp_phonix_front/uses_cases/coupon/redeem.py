@@ -154,7 +154,14 @@ def redeem_coupon_items(coupon, order, coupon_log, item_row_copy):
 
 def setup_coupon_log(coupon, order, coupon_log, item_row_copy, callback):
 
+    transporte_code = frappe.db.get_value("qp_pf_Flete", None, "item") or "
+
     for key, item in enumerate(item_row_copy):
+
+        # Si el item es transporte, no se aplica el cupón
+        # Esto es para evitar que se aplique el descuento al flete
+        if item.item_code == transporte_code:
+            continue
 
         if not_is_auto_discount(item.item_code):
             
