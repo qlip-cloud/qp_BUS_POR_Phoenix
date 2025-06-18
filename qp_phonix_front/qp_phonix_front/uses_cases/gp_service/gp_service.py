@@ -53,6 +53,37 @@ def send_sales_order(sales_order, vf_SaleOrderConfirmError):
 
     return res
 
+def get_coupon_discount_strategy(sales_order):
+    """
+    Retorna una tupla:
+    - use_line_discounts: bool
+    - items_with_discount: set de item_code (vacío si es global)
+    - has_transport: bool
+    """
+    transport_item = frappe.db.get_value("qp_pf_Flete", None, "name") or ""
+
+    has_transport = any(
+        item.item_code == transport_item for item in sales_order.items
+    )
+
+    coupon_log_name = frappe.get_value("qp_pf_CouponLog", {"order_id": sales_order.name}, "name")
+    coupon_log = frappe.get_doc("qp_pf_CouponLog", coupon_log_name) if coupon_log_name else None
+
+    has_coupon_items = coupon_log and coupon_log.qp_pf_CouponItem and len(coupon_log.qp_pf_CouponItem) > 0
+    items_with_discount = set(item.item_code for item in coupon_log.qp_pf_CouponItem) if has_coupon_items else set()
+
+    use_line_discounts = False
+
+    if has_coupon_items:
+        use_line_discounts = True
+    elif has_transport:
+        use_line_discounts = True
+    else:
+        use_line_discounts = False
+
+    return use_line_discounts, items_with_discount, has_transport
+
+
 def __get_master_setup(company):
 
     master_name = frappe.db.get_list('qp_GP_MasterSetup',
@@ -80,20 +111,14 @@ def __prepare_petition(master_name, so_obj):
 
     store_main = __get_value_master(master_name, 'store_main')
 
-    global_discount = so_obj.discount_amount if so_obj.discount_amount else 0
-
-    global_discount = so_obj.additional_discount_percentage
-    all_items_match_global = all(
-        round((item.discount_percentage or 0), 2) == round(global_discount, 2)
-        for item in so_obj.items
-    ) if global_discount > 0 else False
-
-    use_global_discount = True if global_discount > 0 and all_items_match_global else False
+    use_line_discounts, items_with_discount, has_transport = get_coupon_discount_strategy(so_obj)
 
     item_list = []
+    transport_item_code = frappe.db.get_value("qp_pf_Flete", None, "name") or ""
 
     for item in so_obj.items:
-
+        is_transport = item.item_code == transport_item_code 
+        is_coupon_item = item.item_code in items_with_discount
         line = {
             "Id": item.item_code,
             "Quantity": item.qty,
@@ -104,8 +129,13 @@ def __prepare_petition(master_name, so_obj):
             "ShippingMethod": None,
             "ShippingDate": None # valida
         }
-        if not use_global_discount:
-            line["DiscountPercentage"] = item.discount_percentage if item.discount_percentage else 0
+        if use_line_discounts:
+            if is_transport or (items_with_discount and not is_coupon_item):
+                line["DiscountPercentage"] = 0
+            else:
+                line["DiscountPercentage"] = so_obj.additional_discount_percentage if item.item_code in items_with_discount else 0
+        else:
+            line["DiscountPercentage"] = 0
 
         item_list.append(line)
 
@@ -126,7 +156,7 @@ def __prepare_petition(master_name, so_obj):
     so_json['Lot'] = ""
     so_json['Warehouse'] = item_types[0].title
     so_json['WarehousesAlter'] = bdg_alter #valida
-    so_json['DiscountAmount'] = so_obj.discount_amount if use_global_discount else 0 
+    so_json['DiscountAmount'] = so_obj.additional_discount_amount if not use_line_discounts else 0
     so_json['VendorId'] = vendor_id #valida
     so_json['Currency'] = so_obj.price_list_currency
     so_json['Lines'] = item_list
