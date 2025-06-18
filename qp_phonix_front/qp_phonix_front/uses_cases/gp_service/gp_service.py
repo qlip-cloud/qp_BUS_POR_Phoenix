@@ -74,15 +74,24 @@ def get_coupon_discount_strategy(sales_order):
     has_coupon_items = coupon_log and coupon_log.coupon_items and len(coupon_log.coupon_items) > 0
     items_with_discount = set(item.item_code for item in coupon_log.coupon_items) if has_coupon_items else set()
 
-    use_line_discounts = False
+    all_items_in_coupon = all(item.item_code in items_with_discount for item in sales_order.items)
+    same_discount_for_all = all(
+        round(item.discount_percentage or 0, 2) == round(coupon_percentage, 2)
+        for item in sales_order.items
+    )
 
-    if has_coupon_items:
-        use_line_discounts = True
-    elif has_transport:
-        use_line_discounts = True
+    is_global_coupon = not has_coupon_items 
+
+    if is_global_coupon:
+        if has_transport:
+            use_line_discounts = True  
+        else:
+            use_line_discounts = False 
     else:
-        use_line_discounts = False
-
+        if all_items_in_coupon and same_discount_for_all and not has_transport:
+            use_line_discounts = False  
+        else:
+            use_line_discounts = True  
     return use_line_discounts, items_with_discount, coupon_percentage
 
 
