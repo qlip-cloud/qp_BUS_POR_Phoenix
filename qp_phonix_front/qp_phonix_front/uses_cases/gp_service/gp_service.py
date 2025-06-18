@@ -68,6 +68,7 @@ def get_coupon_discount_strategy(sales_order):
 
     coupon_log_name = frappe.get_value("qp_pf_CouponLog", {"order_id": sales_order.name}, "name")
     coupon_log = frappe.get_doc("qp_pf_CouponLog", coupon_log_name) if coupon_log_name else None
+    coupon_percentage = coupon_log.discount_percentage if coupon_log else 0
 
     has_coupon_items = coupon_log and coupon_log.qp_pf_CouponItem and len(coupon_log.qp_pf_CouponItem) > 0
     items_with_discount = set(item.item_code for item in coupon_log.qp_pf_CouponItem) if has_coupon_items else set()
@@ -81,7 +82,7 @@ def get_coupon_discount_strategy(sales_order):
     else:
         use_line_discounts = False
 
-    return use_line_discounts, items_with_discount, has_transport
+    return use_line_discounts, items_with_discount, coupon_percentage
 
 
 def __get_master_setup(company):
@@ -111,7 +112,7 @@ def __prepare_petition(master_name, so_obj):
 
     store_main = __get_value_master(master_name, 'store_main')
 
-    use_line_discounts, items_with_discount, has_transport = get_coupon_discount_strategy(so_obj)
+    use_line_discounts, items_with_discount, coupon_percentage = get_coupon_discount_strategy(so_obj)
 
     item_list = []
     transport_item_code = frappe.db.get_value("qp_pf_Flete", None, "name") or ""
@@ -133,7 +134,7 @@ def __prepare_petition(master_name, so_obj):
             if is_transport or (items_with_discount and not is_coupon_item):
                 line["DiscountPercentage"] = 0
             else:
-                line["DiscountPercentage"] = so_obj.additional_discount_percentage if item.item_code in items_with_discount else 0
+                line["DiscountPercentage"] = coupon_percentage if item.item_code in items_with_discount else 0
         else:
             line["DiscountPercentage"] = 0
 
@@ -156,7 +157,7 @@ def __prepare_petition(master_name, so_obj):
     so_json['Lot'] = ""
     so_json['Warehouse'] = item_types[0].title
     so_json['WarehousesAlter'] = bdg_alter #valida
-    so_json['DiscountAmount'] = so_obj.additional_discount_amount if not use_line_discounts else 0
+    so_json['DiscountAmount'] = coupon_percentage if not use_line_discounts else 0
     so_json['VendorId'] = vendor_id #valida
     so_json['Currency'] = so_obj.price_list_currency
     so_json['Lines'] = item_list
