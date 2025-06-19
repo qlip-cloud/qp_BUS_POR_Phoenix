@@ -59,6 +59,8 @@ def get_context(context):
 
         set_flete_config(context, sale_order)
 
+        set_customer_debt_status(context, sale_order.customer)
+
         get_order_attachment(context, order_id)
         
         cache = frappe.cache()
@@ -181,6 +183,10 @@ def set_flete_config(context, order):
         context.min_flete = min_flete
         context.qualifies_for_free_shipping = qualifies_for_free_shipping
         
+def set_customer_debt_status(context, customer_name):
+    has_debt = frappe.db.get_value("Customer", customer_name, "qp_phoenix_has_debt") or 0
+    context.customer_has_debt = has_debt
+
 def get_dynamic_link(doc, doctype):
     
     

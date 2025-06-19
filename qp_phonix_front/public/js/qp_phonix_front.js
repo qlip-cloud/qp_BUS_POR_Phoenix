@@ -10,6 +10,8 @@ $(document).ready(function () {
 
   const REDIRECT_CONFIRM = `/order/confirm`;
 
+  const REDIRECT_ITEM_FORMULARY = `/order/item_formulary`;
+
   shipping_method = $('#select_shipping_method').val();
 
   if (sessionStorage.getItem("order_id")) {
@@ -63,6 +65,8 @@ $(document).ready(function () {
       sales_persons = $("#sales_persons");
       customerInput = $("#qp_phoenix_order_customer");
       customerValue = customerInput.val().trim();
+      customerHasDebtInpunt = $("#customer_has_debt");
+      customerHasDebt = customerHasDebtInpunt.val().trim();
 
       if (customerValue === "") {
 
@@ -84,6 +88,17 @@ $(document).ready(function () {
       if (address === "" || address === "0") {
         addressSelect.addClass("input-error");
         frappe.throw("La dirección es obligatoria");
+      }
+
+      if (customerHasDebt === "1") {
+        frappe.msgprint({
+          title: "Cliente en mora",
+          indicator: "orange",
+          message: `
+            <p><strong>Este cliente tiene pagos pendientes.</strong></p>
+            <p>Si no paga en los próximos días, su pedido <strong>no será facturado</strong>.</p>
+          `
+        });
       }
 
       update_modal(2, 1)
@@ -223,17 +238,7 @@ $(document).ready(function () {
         }
         // Paso 3: Crear Orden de Compra
         const imported_items = data.message.items;
-        const productosSinStock = imported_items
-          .filter(item => parseFloat(item.quantity_dis || 0) === 0)
-          .map(item => item.item_name || item.name);
-
-        if (productosSinStock.length > 0) {
-          frappe.msgprint("Los siguientes productos no tienen inventario disponible: <br><ul>" +
-            productosSinStock.map(p => `<li>${p}</li>`).join("") +
-            "</ul>");
-        }
-        sessionStorage.setItem("imported_items", JSON.stringify(imported_items));
-        save_order(URL_CREATE_SALES_ORDER, REDIRECT_CONFIRM, null, true, null, true, false, null, null, imported_items);
+        save_order(URL_CREATE_SALES_ORDER, REDIRECT_ITEM_FORMULARY, null, true, null, true, false, null, null, imported_items);
 
         $("#import").val('');
       })
