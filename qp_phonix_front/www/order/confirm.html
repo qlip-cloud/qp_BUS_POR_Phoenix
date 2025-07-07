@@ -53,6 +53,7 @@ Orden
 
     {% block principal_content %}
     <input type="hidden" id="currency" value="{{order.currency}}">
+    <input type="hidden" id="customer_has_debt" value="{{1 if customer_has_debt else 0}}">
     <style>
         .total-content>.subtitle {
             font-size: 0.7vw !important;
