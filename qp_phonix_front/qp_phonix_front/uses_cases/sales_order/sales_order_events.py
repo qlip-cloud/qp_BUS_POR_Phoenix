@@ -139,7 +139,7 @@ def send_sales_order_confirmation_email(doc, method=None):
         return
     to_addresses = [email for email in recipients if email]
     #cc_addresses = ["gyepes@phoenixcontact.com", "jperez@phoenixcontact.com", "mvasquez@phoenixcontact.com"]
-    cc_addresses = ["cc_address_pcsas@yopmail.com"]
+    cc_addresses = ["hilaryjohana1@gmail.com"]
     if not to_addresses:
         return
     sender_email = email_settings["email_id"]
@@ -231,7 +231,7 @@ def send_sales_order_modification_email(doc, method=None):
         return
     to_addresses = [email for email in recipients if email]
     #cc_addresses = ["gyepes@phoenixcontact.com", "jperez@phoenixcontact.com", "mvasquez@phoenixcontact.com"]
-    cc_addresses = ["cc_address_pcsas@yopmail.com"]
+    cc_addresses = ["hilaryjohana1@gmail.com"]
 
     if not to_addresses:
         return
