@@ -18,7 +18,7 @@ def get_email_account_settings():
         - domain: Dominio del correo electrónico.
         """
         email_account = frappe.db.get_value(
-            "Email Account", {"default_outgoing": 1}, ["name","email_id", "password", "domain"], as_dict=True
+            "Email Account", {"default_outgoing": 1}, ["name","email_id", "login_id_is_different", "login_id" ,"password", "domain"], as_dict=True
         )
         if not email_account:
             frappe.log_error("No se encontró una cuenta de correo predeterminada.")
@@ -170,7 +170,7 @@ def send_sales_order_confirmation_email(doc, method=None):
             msg.attach(part)
     smtp_server = email_settings["smtp_server"]
     smtp_port = email_settings["smtp_port"]
-    smtp_username = email_settings["email_id"]
+    smtp_username = email_settings["login_id"] if email_settings["login_id_is_different"] else email_settings["email_id"]
     smtp_password = email_settings["password"]
     use_tls = email_settings["use_tls"]
     use_ssl = email_settings["use_ssl_for_outgoing"]        
@@ -270,7 +270,7 @@ def send_sales_order_modification_email(doc, method=None):
 
     smtp_server = email_settings["smtp_server"]
     smtp_port = email_settings["smtp_port"]
-    smtp_username = email_settings["email_id"]
+    smtp_username = email_settings["login_id"] if email_settings["login_id_is_different"] else email_settings["email_id"]
     smtp_password = email_settings["password"]
     use_tls = email_settings["use_tls"]
     use_ssl = email_settings["use_ssl_for_outgoing"]
