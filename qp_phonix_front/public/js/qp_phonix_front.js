@@ -95,8 +95,7 @@ $(document).ready(function () {
           title: "Cliente en mora",
           indicator: "orange",
           message: `
-            <p><strong>Este cliente tiene pagos pendientes.</strong></p>
-            <p>Si no paga en los próximos días, su pedido <strong>no será facturado</strong>.</p>
+            <p>Tienes pagos pendientes. Si no efectúas tu pago en los próximos días, <strong>tu pedido no será facturado y despachado</strong></p>
           `
         });
       }
