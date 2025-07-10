@@ -508,11 +508,22 @@ def get_delivery_future(param):
     
     fecha_inicial = datetime.now()
     
-    delivery_date = fecha_inicial + timedelta(**param)
+    delivery_date = fecha_inicial
 
-    while delivery_date.weekday() >= 5:
-        delivery_date += timedelta(days=1)
-    
+    if "days" in param:
+        days_to_add = param["days"]
+        days_added = 0
+        while days_added < days_to_add:
+            delivery_date += timedelta(days=1)
+            if delivery_date.weekday() < 5: 
+                days_added += 1
+    elif "weeks" in param:
+        days_to_add = param["weeks"] * 7
+        delivery_date += timedelta(days=days_to_add)
+        while delivery_date.weekday() >= 5:
+            delivery_date += timedelta(days=1)
+
+
     return delivery_date
     
 def __set_auto_discount(sales_order):
