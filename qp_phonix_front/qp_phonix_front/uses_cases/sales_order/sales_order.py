@@ -518,8 +518,7 @@ def get_delivery_future(param):
             if delivery_date.weekday() < 5: 
                 days_added += 1
     elif "weeks" in param:
-        days_to_add = param["weeks"] * 7
-        delivery_date += timedelta(days=days_to_add)
+        delivery_date += timedelta(**param)
         while delivery_date.weekday() >= 5:
             delivery_date += timedelta(days=1)
 
