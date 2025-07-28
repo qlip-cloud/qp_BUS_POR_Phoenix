@@ -1,6 +1,8 @@
 
 import frappe
 import json
+from frappe.utils import today
+from datetime import datetime
 from qp_phonix_front.qp_phonix_front.validations.utils import is_guest
 from qp_phonix_front.qp_phonix_front.uses_cases.shipping_method.shipping_method_list import vf_shipping_method_list
 from qp_phonix_front.qp_phonix_front.uses_cases.front.service import set_order_data
@@ -10,7 +12,7 @@ from qp_phonix_front.qp_phonix_front.services.manager_permission import handler 
 from qp_phonix_front.qp_phonix_front.tasks.update_delivery import only
 from gp_phonix_integration.gp_phonix_integration.service.connection import execute_send
 from gp_phonix_integration.gp_phonix_integration.constant.api_setup import ORDER
-from frappe.utils import get_url, getdate,today
+
 
 def get_context(context):
 
@@ -63,6 +65,8 @@ def get_context(context):
 
         get_order_attachment(context, order_id)
         
+        set_confirmed_within_24h(context, sale_order)
+
         cache = frappe.cache()
         
         if(not cache.get("is_phoenix")):
@@ -214,7 +218,7 @@ def transform_items(sale_order):
             "description": item.description,
             "code": item.item_code,
             "price": item.rate,
-            "image": item.image or "",  # Ajustalo según tu campo personalizado
+            "image": item.image or "",  
             "auto_discount": item.get("auto_discount", False),
             "auto_qty": item.get("auto_qty", 0),
             "auto_discount_percentage_format": item.get("auto_discount_percentage_format", "0%"),
@@ -228,3 +232,14 @@ def transform_items(sale_order):
             "qp_phoenix_status_title": item.get("qp_phoenix_status_title", ""),
         })
     return items
+
+def set_confirmed_within_24h(context, order):
+    """
+    Check if the order was confirmed within 24 hours of its creation.
+    """
+    if order.status != "Draft" and order.transaction_date:
+        transaction_date = order.transaction_date
+        today_date = datetime.strptime(today(), "%Y-%m-%d").date()
+        context.confirmed_within_24h = (today_date - transaction_date).days < 1
+    else:
+        context.confirmed_within_24h = False

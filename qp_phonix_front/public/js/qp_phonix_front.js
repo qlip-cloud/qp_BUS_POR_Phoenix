@@ -142,6 +142,20 @@ $(document).ready(function () {
 
   })
 
+  $("#btn_cancel_order").on("click", () => {
+    order_id = $("#order_id").val()
+    if (order_id){
+      cancel_order(order_id)
+    }
+  })
+
+
+  $("#btn_download_pdf").on("click", () => {
+    order_id = $("#order_id").val()
+    if(order_id){
+      download_pdf(order_id)
+    }
+  })
 
   $("#btn_back_orders").click(() => {
     valid_change(REDIRECT_INDEX)
@@ -522,6 +536,34 @@ function get_change_count() {
 
   return count
 }
+
+function cancel_order(order_id) {
+  frappe.call({
+    method: "frappe.client.cancel",
+    args: {
+      doctype: "Sales Order",
+      name: order_id
+    },
+    callback: function (r) {
+      if (!r.exc) {
+        frappe.msgprint({
+          title: "Orden cancelada",
+          indicator: "green",
+          message: "La orden ha sido cancelada exitosamente."
+        });
+        redirect(`/order/index`);
+      } else {
+        frappe.msgprint({
+          title: "Error al cancelar la orden",
+          indicator: "red",
+          message: "Hubo un error al intentar cancelar la orden. Por favor, inténtalo de nuevo."
+        });
+      }
+    },
+  });
+}
+
+
 function update_order(redirect_link = null, valid_empty = false, action = "update", is_return = false, is_async = false) {
 
   url = "sales_order_update";
@@ -896,5 +938,16 @@ function uploadOrderFile(orderName, callback) {
       console.error(err);
       callback(null);
     });
+}
+
+function download_pdf(order_id){
+  var methodPath = 'frappe.utils.print_format.download_pdf';
+  var url = `/api/method/${methodPath}` +
+                      `?doctype=${encodeURIComponent('Sales Order')}` +
+                      `&name=${encodeURIComponent(order_id)}` +
+                      `&format=${encodeURIComponent('pdf-email')}` +
+                      `&no_letterhead=${1}`;
+  window.open(url, '_blank');
+
 }
 
