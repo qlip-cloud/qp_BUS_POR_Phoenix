@@ -67,6 +67,7 @@ $(document).ready(function () {
       customerValue = customerInput.val().trim();
       customerHasDebtInpunt = $("#customer_has_debt");
       customerHasDebt = customerHasDebtInpunt.val().trim();
+      qp_allow_partial_delivery = $("#qp_allow_partial_delivery").is(":checked") ? 1 : 0;
 
       if (customerValue === "") {
 
@@ -574,10 +575,12 @@ function update_order(redirect_link = null, valid_empty = false, action = "updat
 
   address = $("#address").val()
 
-  save_order(url, redirect_link, action, valid_empty, order_id, is_return, is_async, sales_persons, address)
+  qp_allow_partial_delivery = $("#qp_allow_partial_delivery").is(":checked") ? 1 : 0;
+
+  save_order(url, redirect_link, action, valid_empty, order_id, is_return, is_async, sales_persons, address, qp_allow_partial_delivery)
 }
 
-function save_order(url, redirect_link, action = null, valid_empty = true, order_id = null, is_return = false, is_async = false, sales_person = null, address = null, imported_items = null) {
+function save_order(url, redirect_link, action = null, valid_empty = true, order_id = null, is_return = false, is_async = false, sales_person = null, address = null, qp_allow_partial_delivery = null, imported_items = null) {
 
   let base_url = "qp_phonix_front.qp_phonix_front.uses_cases.sales_order.sales_order"
 
@@ -672,7 +675,9 @@ function save_order(url, redirect_link, action = null, valid_empty = true, order
     )
   }
 
-
+  if (qp_allow_partial_delivery === null) {
+    qp_allow_partial_delivery = $("#qp_allow_partial_delivery").is(":checked") ? 1 : 0;
+  }
 
   args = {
     'order_json': {
@@ -683,6 +688,7 @@ function save_order(url, redirect_link, action = null, valid_empty = true, order
       , sales_person
       , address
       , "qp_phoenix_order_comment": $("#qp_phoenix_order_comment").val()
+      , qp_allow_partial_delivery
     }
   }
 
