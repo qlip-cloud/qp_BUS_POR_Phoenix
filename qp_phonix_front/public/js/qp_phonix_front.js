@@ -552,7 +552,7 @@ function cancel_order(order_id) {
           indicator: "green",
           message: "La orden ha sido cancelada exitosamente."
         });
-        redirect(`/order/index`);
+        window.location.reload();
       } else {
         frappe.msgprint({
           title: "Error al cancelar la orden",

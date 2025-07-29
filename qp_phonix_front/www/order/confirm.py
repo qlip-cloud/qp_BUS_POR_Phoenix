@@ -233,13 +233,13 @@ def transform_items(sale_order):
         })
     return items
 
-def set_confirmed_within_24h(context, order):
-    """
-    Check if the order was confirmed within 24 hours of its creation.
-    """
-    if order.status != "Draft" and order.transaction_date:
-        transaction_date = order.transaction_date
-        today_date = datetime.strptime(today(), "%Y-%m-%d").date()
-        context.confirmed_within_24h = (today_date - transaction_date).days < 1
-    else:
+def set_confirmed_within_24h(context, sale_order):
+    if sale_order.status == "Draft":
         context.confirmed_within_24h = False
+    else:
+        order_confirmation_datetime = sale_order.confirmation_datetime
+        if order_confirmation_datetime:
+            order_confirmation_datetime = datetime.strptime(order_confirmation_datetime, "%Y-%m-%d %H:%M:%S")
+            current_datetime = datetime.now()
+            time_difference = current_datetime - order_confirmation_datetime
+            context.confirmed_within_24h = time_difference.total_seconds() <= 86400

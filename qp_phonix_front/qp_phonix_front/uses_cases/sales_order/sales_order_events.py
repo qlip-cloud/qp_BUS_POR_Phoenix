@@ -295,3 +295,12 @@ def send_sales_order_modification_email(doc, method=None):
     except Exception as e:
         frappe.log_error(f"Error general al enviar correo directo para SO {doc.name}: {str(e)}")
 
+def set_confirmation_datetime(doc, method=None):
+    """
+    Función que se ejecuta por un doc_event para establecer la fecha de confirmación de la orden de venta.
+    """
+    if doc.status == "To Deliver and Bill":
+        if not doc.qp_confirmation_datetime:
+            doc.qp_confirmation_datetime = frappe.utils.now()
+    else:
+        doc.qp_confirmation_datetime = None
