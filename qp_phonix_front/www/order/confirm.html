@@ -53,11 +53,13 @@ Orden
         {{ _("DESCARGAR PDF") }}
     </a>
     {% endif %}
+    <!--
     {% if order.status not in ("Draft", "Cancelled") and confirmed_within_24h %}
     <a id="btn_cancel_order" class="btn button-master button-default">
         {{ _("CANCELAR ORDEN") }}
     </a>
     {% endif %}
+    -->
     {% endblock %}
 
     {% block principal_content %}
