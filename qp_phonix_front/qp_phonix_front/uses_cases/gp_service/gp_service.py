@@ -191,8 +191,13 @@ def __prepare_petition(master_name, so_obj):
     so_json['Reference1'] = customer_addr.qp_address_id if customer_addr else ''
     so_json['Reference2'] = None
     so_json['Reference3'] = None
-    #so_json['Comment'] = "Acepta despachos parciales" if so_obj.qp_allow_partial_delivery else "NO acepta despachos parciales"
-    so_json['Comment'] = so_obj.qp_phoenix_order_comment or ""
+    partial_delivery_msg = "Acepta despachos parciales" if so_obj.qp_allow_partial_delivery else "NO acepta despachos parciales"
+    order_comment = so_obj.qp_phoenix_order_comment or ""
+    
+    if order_comment:
+        so_json['Comment'] = f"{partial_delivery_msg} // {order_comment}"
+    else:
+        so_json['Comment'] = partial_delivery_msg
 
     return json.dumps(so_json)
 

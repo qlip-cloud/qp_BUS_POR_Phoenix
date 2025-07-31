@@ -267,8 +267,8 @@ Orden
                 <div class="col-md-12 d-flex align-items-center gap-2 label mt-2">
                     <input type="checkbox" name="qp_allow_partial_delivery" id="qp_allow_partial_delivery" {% if
                         order.qp_allow_partial_delivery %}checked{% endif %} {{ 'disabled' if order.status !="Draft"
-                        else '' }} hidden>
-                    <label for="qp_allow_partial_delivery" class="m-0" hidden>Aceptar despacho parcial</label>
+                        else '' }}>
+                    <label for="qp_allow_partial_delivery" class="m-0">Aceptar despacho parcial</label>
                 </div>
             </div>
 
