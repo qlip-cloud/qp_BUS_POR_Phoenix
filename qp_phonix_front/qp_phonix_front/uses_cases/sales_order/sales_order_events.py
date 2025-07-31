@@ -138,7 +138,8 @@ def send_sales_order_confirmation_email(doc, method=None):
         frappe.log_error(f"No se encontraron destinatarios para el correo de la orden de venta {doc.name}.")
         return
     to_addresses = [email for email in recipients if email]
-    cc_addresses = ["gyepes@phoenixcontact.com", "jperez@phoenixcontact.com", "mvasquez@phoenixcontact.com"]
+    #cc_addresses = ["gyepes@phoenixcontact.com", "jperez@phoenixcontact.com", "mvasquez@phoenixcontact.com"]
+    cc_addresses = ["test@yopmail.com"]
     if not to_addresses:
         return
     sender_email = email_settings["email_id"]
@@ -229,7 +230,8 @@ def send_sales_order_modification_email(doc, method=None):
         frappe.log_error(f"No se encontraron destinatarios para el correo de la orden de venta {doc.name}.")
         return
     to_addresses = [email for email in recipients if email]
-    cc_addresses = ["gyepes@phoenixcontact.com", "jperez@phoenixcontact.com", "mvasquez@phoenixcontact.com"]
+    #cc_addresses = ["gyepes@phoenixcontact.com", "jperez@phoenixcontact.com", "mvasquez@phoenixcontact.com"]
+    cc_addresses = ["test@yopmail.com"]
 
     if not to_addresses:
         return
@@ -293,3 +295,12 @@ def send_sales_order_modification_email(doc, method=None):
     except Exception as e:
         frappe.log_error(f"Error general al enviar correo directo para SO {doc.name}: {str(e)}")
 
+def set_confirmation_datetime(doc, method=None):
+    """
+    Función que se ejecuta por un doc_event para establecer la fecha de confirmación de la orden de venta.
+    """
+    if doc.status == "To Deliver and Bill":
+        if not doc.confirmation_datetime:
+            doc.confirmation_datetime = frappe.utils.now()
+    else:
+        doc.confirmation_datetime = None

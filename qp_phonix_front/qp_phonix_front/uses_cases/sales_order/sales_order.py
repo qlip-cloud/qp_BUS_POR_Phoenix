@@ -128,6 +128,7 @@ def get_sales_order(sales_order):
                 so.status, 
                 so.qp_phoenix_order_customer, 
                 so.qp_phoenix_order_comment, 
+                so.qp_allow_partial_delivery,
                 item.item_group,
                 so.customer_name, 
                 price_list.qp_without_discount as price_list_without_discount,
@@ -508,11 +509,21 @@ def get_delivery_future(param):
     
     fecha_inicial = datetime.now()
     
-    delivery_date = fecha_inicial + timedelta(**param)
+    delivery_date = fecha_inicial
 
-    while delivery_date.weekday() >= 5:
-        delivery_date += timedelta(days=1)
-    
+    if "days" in param:
+        days_to_add = param["days"]
+        days_added = 0
+        while days_added < days_to_add:
+            delivery_date += timedelta(days=1)
+            if delivery_date.weekday() < 5: 
+                days_added += 1
+    elif "weeks" in param:
+        delivery_date += timedelta(**param)
+        while delivery_date.weekday() >= 5:
+            delivery_date += timedelta(days=1)
+
+
     return delivery_date
     
 def __set_auto_discount(sales_order):
@@ -743,6 +754,10 @@ def __set_order_data(sales_order, order_json):
     sales_order.qp_phoenix_order_customer = order_json.get("qp_phoenix_order_customer")
         
     sales_order.qp_phoenix_order_comment = order_json.get("qp_phoenix_order_comment")
+    
+    # Set qp_allow_partial_delivery field if provided
+    if order_json.get("qp_allow_partial_delivery") is not None:
+        sales_order.qp_allow_partial_delivery = order_json.get("qp_allow_partial_delivery")
         
 def __set_sales_team(order_json, sales_order, customer):
     
@@ -941,6 +956,9 @@ def __get_body(json_data):
     if json_data.get('shipping_type'):
 
         obj_data["qp_shipping_type"] = json_data.get('shipping_type')
+
+    if json_data.get('qp_allow_partial_delivery') is not None:
+        obj_data["qp_allow_partial_delivery"] = json_data.get('qp_allow_partial_delivery')
 
     return obj_data
     #return json.dumps(obj_data)

@@ -23,7 +23,8 @@ def get_context(context):
         
         context.statues = {
             "Draft": "‌Borrador",
-            "To Deliver and Bill": "Para entregar y facturar"
+            "To Deliver and Bill": "Para entregar y facturar",
+            "Cancelled": "Cancelado",
         }
         context.order_list = sales_order_list()
 

@@ -44,7 +44,7 @@ web_include_js = "/assets/qp_phonix_front/js/qp_phonix_front.js"
 
 # website user home page (by Role)
 # role_home_page = {
-#	"Role": "home_page"
+# 	"Role": "home_page"
 # }
 
 # Generators
@@ -94,49 +94,50 @@ web_include_js = "/assets/qp_phonix_front/js/qp_phonix_front.js"
 # 		"on_update": "method",
 # 		"on_cancel": "method",
 # 		"on_trash": "method"
-#	}
+# 	}
 # }
 
-website_context = {
-	"favicon": 	"/assets/qp_phonix_front/img/favicon.png"
-}
+website_context = {"favicon": "/assets/qp_phonix_front/img/favicon.png"}
 
-get_website_user_home_page = "qp_phonix_front.qp_phonix_front.services.redirect_after_login.handler"
+get_website_user_home_page = (
+    "qp_phonix_front.qp_phonix_front.services.redirect_after_login.handler"
+)
 
 doc_events = {
- 	"User": {
- 		"after_insert": "qp_phonix_front.qp_phonix_front.uses_cases.user.user_role.set_role_profile_name",
-	},
-	"Sales Order": {
-		"on_update_after_submit": "qp_phonix_front.qp_phonix_front.uses_cases.sales_order.sales_order_events.send_sales_order_modification_email",
-    "on_submit": "qp_phonix_front.qp_phonix_front.uses_cases.sales_order.sales_order_events.send_sales_order_confirmation_email",
-	}	
+    "User": {
+        "after_insert": "qp_phonix_front.qp_phonix_front.uses_cases.user.user_role.set_role_profile_name",
+    },
+    "Sales Order": {
+        "on_update_after_submit": "qp_phonix_front.qp_phonix_front.uses_cases.sales_order.sales_order_events.send_sales_order_modification_email",
+        "on_submit": [
+            "qp_phonix_front.qp_phonix_front.uses_cases.sales_order.sales_order_events.send_sales_order_confirmation_email",
+            "qp_phonix_front.qp_phonix_front.uses_cases.sales_order.sales_order_events.set_confirmation_datetime",
+        ],
+    },
 }
 
 # Scheduled Tasks
 # ---------------
 
 scheduler_events = {
-    "cron":{
-        "0 18 * * *": [
-			"qp_phonix_front.qp_phonix_front.tasks.update_delivery.all"
-		]
+    "cron": {
+        "0 18 * * *": ["qp_phonix_front.qp_phonix_front.tasks.update_delivery.all"]
     },
-# 	"all": [
-# 		"qp_phonix_front.tasks.all"
-# 	],
-# 	"daily": [
-# 		"qp_phonix_front.tasks.daily"
-# 	],
-# 	"hourly": [
-# 		"qp_phonix_front.tasks.hourly"
-# 	],
-# 	"weekly": [
-# 		"qp_phonix_front.tasks.weekly"
-# 	]
-# 	"monthly": [
-# 		"qp_phonix_front.tasks.monthly"
-# 	]
+    # 	"all": [
+    # 		"qp_phonix_front.tasks.all"
+    # 	],
+    # 	"daily": [
+    # 		"qp_phonix_front.tasks.daily"
+    # 	],
+    # 	"hourly": [
+    # 		"qp_phonix_front.tasks.hourly"
+    # 	],
+    # 	"weekly": [
+    # 		"qp_phonix_front.tasks.weekly"
+    # 	]
+    # 	"monthly": [
+    # 		"qp_phonix_front.tasks.monthly"
+    # 	]
 }
 
 # Testing
@@ -167,24 +168,22 @@ scheduler_events = {
 # --------------------
 
 user_data_fields = [
-	{
-		"doctype": "{doctype_1}",
-		"filter_by": "{filter_by}",
-		"redact_fields": ["{field_1}", "{field_2}"],
-		"partial": 1,
-	},
-	{
-		"doctype": "{doctype_2}",
-		"filter_by": "{filter_by}",
-		"partial": 1,
-	},
-	{
-		"doctype": "{doctype_3}",
-		"strict": False,
-	},
-	{
-		"doctype": "{doctype_4}"
-	}
+    {
+        "doctype": "{doctype_1}",
+        "filter_by": "{filter_by}",
+        "redact_fields": ["{field_1}", "{field_2}"],
+        "partial": 1,
+    },
+    {
+        "doctype": "{doctype_2}",
+        "filter_by": "{filter_by}",
+        "partial": 1,
+    },
+    {
+        "doctype": "{doctype_3}",
+        "strict": False,
+    },
+    {"doctype": "{doctype_4}"},
 ]
 
 # Authentication and authorization
@@ -197,26 +196,10 @@ user_data_fields = [
 # -----------------------------------------
 
 fixtures = [
-    {"doctype": "Role", "filters": [
-        [
-            "name", "in", [
-                "Customer",
-                "Sales User"
-            ]
-        ]
-    ]},
-	{"doctype": "Role Profile", "filters": [
-        [
-            "name", "in", [
-                "ValleyFloral Access"
-            ]
-        ]
-    ]},
+    {"doctype": "Role", "filters": [["name", "in", ["Customer", "Sales User"]]]},
+    {"doctype": "Role Profile", "filters": [["name", "in", ["ValleyFloral Access"]]]},
     {
         "dt": "Custom Field",
-        "filters": [["name", "in", [
-            "Sales Order-qp_phoenix_order_file",
-            "Customer-qp_phoenix_has_debt"
-        ]]]
-    }
+        "filters": [["name", "in", ["Customer-qp_phoenix_has_debt"]]],
+    },
 ]

@@ -22,6 +22,7 @@ Orden
     class="btn button-master button-default btn-redirect">
     {{ _("EXPORTAR") }}
 </span>
+
 {%if has_sync %}
 
 <span data-url="/order/index" class="btn button-master button-back  btn-redirect">
@@ -40,7 +41,6 @@ Orden
     <a id="btn_edit_order" class="btn button-master button-default">
         {{ _("EDITAR ORDEN") }}
     </a>
-
     {%if has_sync and permission.confirm %}
 
     <a id="btn_confirm_order" class="btn button-master button-default disabled">
@@ -48,7 +48,18 @@ Orden
     </a>
     {%endif%}
     {%endif%}
-
+    {% if order.status not in ("Draft", "Cancelled") %}
+    <a id="btn_download_pdf" class="btn button-master button-default">
+        {{ _("DESCARGAR PDF") }}
+    </a>
+    {% endif %}
+    <!--
+    {% if order.status not in ("Draft", "Cancelled") and confirmed_within_24h %}
+    <a id="btn_cancel_order" class="btn button-master button-default">
+        {{ _("CANCELAR ORDEN") }}
+    </a>
+    {% endif %}
+    -->
     {% endblock %}
 
     {% block principal_content %}
@@ -253,7 +264,12 @@ Orden
                     <a href="{{ order_file }}" target="_blank">Ver archivo de orden de compra</a>
                 </div>
                 {% endif %}
-
+                <div class="col-md-12 d-flex align-items-center gap-2 label mt-2">
+                    <input type="checkbox" name="qp_allow_partial_delivery" id="qp_allow_partial_delivery" {% if
+                        order.qp_allow_partial_delivery %}checked{% endif %} {{ 'disabled' if order.status !="Draft"
+                        else '' }}>
+                    <label for="qp_allow_partial_delivery" class="m-0">Aceptar despacho parcial</label>
+                </div>
             </div>
 
             <div class="row shadow p-3 mb-5 bg-white rounded">
@@ -394,7 +410,7 @@ Orden
                     </div>
                 </div>
             </div>
-            {% if not qualifies_for_free_shipping and order.status == 'Draft'  %}
+            {% if not qualifies_for_free_shipping and order.status == 'Draft' %}
             <div class="row">
                 <div class="col-md-12 alert alert-warning" style="margin-top: 15px;">
                     <strong>Tu pedido no cumple con el monto mínimo requerido para envío gratuito.</strong><br>

@@ -67,6 +67,7 @@ $(document).ready(function () {
       customerValue = customerInput.val().trim();
       customerHasDebtInpunt = $("#customer_has_debt");
       customerHasDebt = customerHasDebtInpunt.val().trim();
+      qp_allow_partial_delivery = $("#qp_allow_partial_delivery").is(":checked") ? 1 : 0;
 
       if (customerValue === "") {
 
@@ -95,8 +96,7 @@ $(document).ready(function () {
           title: "Cliente en mora",
           indicator: "orange",
           message: `
-            <p><strong>Este cliente tiene pagos pendientes.</strong></p>
-            <p>Si no paga en los próximos días, su pedido <strong>no será facturado</strong>.</p>
+            <p>Tienes pagos pendientes. Si no efectúas tu pago en los próximos días, <strong>tu pedido no será facturado y despachado</strong></p>
           `
         });
       }
@@ -143,6 +143,20 @@ $(document).ready(function () {
 
   })
 
+  $("#btn_cancel_order").on("click", () => {
+    order_id = $("#order_id").val()
+    if (order_id){
+      cancel_order(order_id)
+    }
+  })
+
+
+  $("#btn_download_pdf").on("click", () => {
+    order_id = $("#order_id").val()
+    if(order_id){
+      download_pdf(order_id)
+    }
+  })
 
   $("#btn_back_orders").click(() => {
     valid_change(REDIRECT_INDEX)
@@ -523,6 +537,34 @@ function get_change_count() {
 
   return count
 }
+
+function cancel_order(order_id) {
+  frappe.call({
+    method: "frappe.client.cancel",
+    args: {
+      doctype: "Sales Order",
+      name: order_id
+    },
+    callback: function (r) {
+      if (!r.exc) {
+        frappe.msgprint({
+          title: "Orden cancelada",
+          indicator: "green",
+          message: "La orden ha sido cancelada exitosamente."
+        });
+        window.location.reload();
+      } else {
+        frappe.msgprint({
+          title: "Error al cancelar la orden",
+          indicator: "red",
+          message: "Hubo un error al intentar cancelar la orden. Por favor, inténtalo de nuevo."
+        });
+      }
+    },
+  });
+}
+
+
 function update_order(redirect_link = null, valid_empty = false, action = "update", is_return = false, is_async = false) {
 
   url = "sales_order_update";
@@ -533,10 +575,12 @@ function update_order(redirect_link = null, valid_empty = false, action = "updat
 
   address = $("#address").val()
 
-  save_order(url, redirect_link, action, valid_empty, order_id, is_return, is_async, sales_persons, address)
+  qp_allow_partial_delivery = $("#qp_allow_partial_delivery").is(":checked") ? 1 : 0;
+
+  save_order(url, redirect_link, action, valid_empty, order_id, is_return, is_async, sales_persons, address, qp_allow_partial_delivery)
 }
 
-function save_order(url, redirect_link, action = null, valid_empty = true, order_id = null, is_return = false, is_async = false, sales_person = null, address = null, imported_items = null) {
+function save_order(url, redirect_link, action = null, valid_empty = true, order_id = null, is_return = false, is_async = false, sales_person = null, address = null, qp_allow_partial_delivery = null, imported_items = null) {
 
   let base_url = "qp_phonix_front.qp_phonix_front.uses_cases.sales_order.sales_order"
 
@@ -631,7 +675,9 @@ function save_order(url, redirect_link, action = null, valid_empty = true, order
     )
   }
 
-
+  if (qp_allow_partial_delivery === null) {
+    qp_allow_partial_delivery = $("#qp_allow_partial_delivery").is(":checked") ? 1 : 0;
+  }
 
   args = {
     'order_json': {
@@ -642,6 +688,7 @@ function save_order(url, redirect_link, action = null, valid_empty = true, order
       , sales_person
       , address
       , "qp_phoenix_order_comment": $("#qp_phoenix_order_comment").val()
+      , qp_allow_partial_delivery
     }
   }
 
@@ -897,5 +944,16 @@ function uploadOrderFile(orderName, callback) {
       console.error(err);
       callback(null);
     });
+}
+
+function download_pdf(order_id){
+  var methodPath = 'frappe.utils.print_format.download_pdf';
+  var url = `/api/method/${methodPath}` +
+                      `?doctype=${encodeURIComponent('Sales Order')}` +
+                      `&name=${encodeURIComponent(order_id)}` +
+                      `&format=${encodeURIComponent('pdf-email')}` +
+                      `&no_letterhead=${1}`;
+  window.open(url, '_blank');
+
 }
 
