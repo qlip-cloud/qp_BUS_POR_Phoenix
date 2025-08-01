@@ -138,8 +138,7 @@ def send_sales_order_confirmation_email(doc, method=None):
         frappe.log_error(f"No se encontraron destinatarios para el correo de la orden de venta {doc.name}.")
         return
     to_addresses = [email for email in recipients if email]
-    #cc_addresses = ["gyepes@phoenixcontact.com", "jperez@phoenixcontact.com", "mvasquez@phoenixcontact.com"]
-    cc_addresses = ["test@yopmail.com"]
+    cc_addresses = ["gyepes@phoenixcontact.com", "jperez@phoenixcontact.com", "mvasquez@phoenixcontact.com"]
     if not to_addresses:
         return
     sender_email = email_settings["email_id"]
@@ -230,8 +229,7 @@ def send_sales_order_modification_email(doc, method=None):
         frappe.log_error(f"No se encontraron destinatarios para el correo de la orden de venta {doc.name}.")
         return
     to_addresses = [email for email in recipients if email]
-    #cc_addresses = ["gyepes@phoenixcontact.com", "jperez@phoenixcontact.com", "mvasquez@phoenixcontact.com"]
-    cc_addresses = ["test@yopmail.com"]
+    cc_addresses = ["gyepes@phoenixcontact.com", "jperez@phoenixcontact.com", "mvasquez@phoenixcontact.com"]
 
     if not to_addresses:
         return
