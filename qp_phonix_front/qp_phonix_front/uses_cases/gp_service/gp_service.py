@@ -131,10 +131,18 @@ def __prepare_petition(master_name, so_obj):
     for item in so_obj.items:
         is_transport = item.item_code == transport_item_code 
         is_coupon_item = item.item_code in items_with_discount
+        price = item.rate if so_obj.discount_amount > 0 else item.net_rate
+        if coupon_percentage > 0:
+            if use_line_discounts:
+                if is_coupon_item:
+                    price = price / (1 - (coupon_percentage / 100))
+            else:
+                # Cupón global
+                price = price / (1 - (coupon_percentage / 100))
         line = {
             "Id": item.item_code,
             "Quantity": item.qty,
-            "Price": item.rate if so_obj.discount_amount > 0 else item.net_rate,
+            "Price": price,
             #"DiscountPercentage": item.discount_percentage, #valida
             "DiscountPrice": 0, #valida
             "Warehouse": item.item_group,
