@@ -114,6 +114,24 @@ def get_sales_order_email_recipients(doc):
     
     return list(recipients_set)
 
+
+def get_cc_emails():
+    site = frappe.local.site or ""
+
+    if site == "phoenixcontact.qlip.cloud":  
+        return ["testqaphoenix@yopmail.com"]
+
+    if site == "portal-phoenixcontact.qlip.cloud": 
+        return [
+            "gyepes@phoenixcontact.com",
+            "jperez@phoenixcontact.com",
+            "mvasquez@phoenixcontact.com"
+        ]
+
+    return ["gyepes@phoenixcontact.com", "jperez@phoenixcontact.com", "mvasquez@phoenixcontact.com"]
+
+
+
 def send_sales_order_confirmation_email(doc, method=None):
     """
     Función que se ejecuta por un doc_event para enviar un correo de confirmación de orden de venta.
@@ -138,7 +156,8 @@ def send_sales_order_confirmation_email(doc, method=None):
         frappe.log_error(f"No se encontraron destinatarios para el correo de la orden de venta {doc.name}.")
         return
     to_addresses = [email for email in recipients if email]
-    cc_addresses = ["gyepes@phoenixcontact.com", "jperez@phoenixcontact.com", "mvasquez@phoenixcontact.com"]
+    cc_addresses = get_cc_emails()
+    
     if not to_addresses:
         return
     sender_email = email_settings["email_id"]
@@ -229,7 +248,7 @@ def send_sales_order_modification_email(doc, method=None):
         frappe.log_error(f"No se encontraron destinatarios para el correo de la orden de venta {doc.name}.")
         return
     to_addresses = [email for email in recipients if email]
-    cc_addresses = ["gyepes@phoenixcontact.com", "jperez@phoenixcontact.com", "mvasquez@phoenixcontact.com"]
+    cc_addresses = get_cc_emails()
 
     if not to_addresses:
         return
