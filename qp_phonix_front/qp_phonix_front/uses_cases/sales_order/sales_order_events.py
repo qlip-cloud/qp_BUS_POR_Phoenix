@@ -118,10 +118,18 @@ def get_sales_order_email_recipients(doc):
 def get_cc_emails():
     site = frappe.local.site or ""
 
-    if site == "phoenixcontact.qlip.cloud":
+    if site == "phoenixcontact.qlip.cloud":  
         return ["testqaphoenix@yopmail.com"]
 
-    return ["test2qaphoenix@yopmail.com"]
+    if site == "portal-phoenixcontact.qlip.cloud": 
+        return [
+            "gyepes@phoenixcontact.com",
+            "jperez@phoenixcontact.com",
+            "mvasquez@phoenixcontact.com"
+        ]
+
+    return ["gyepes@phoenixcontact.com", "jperez@phoenixcontact.com", "mvasquez@phoenixcontact.com"]
+
 
 
 def send_sales_order_confirmation_email(doc, method=None):
