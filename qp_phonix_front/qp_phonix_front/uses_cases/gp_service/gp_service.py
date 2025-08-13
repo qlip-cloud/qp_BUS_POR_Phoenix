@@ -136,9 +136,6 @@ def __prepare_petition(master_name, so_obj):
             if use_line_discounts:
                 if is_coupon_item:
                     price = price / (1 - (coupon_percentage / 100))
-            else:
-                # Cupón global
-                price = price / (1 - (coupon_percentage / 100))
         line = {
             "Id": item.item_code,
             "Quantity": item.qty,
