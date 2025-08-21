@@ -76,6 +76,12 @@ $(document).ready(function () {
 
       }
 
+      if (/\s/.test(customerValue)) {
+        customerInput.addClass("input-error");
+        frappe.throw("El campo 'Orden del Cliente' no puede contener espacios en blanco");
+      }
+
+
       if (sales_persons.val() === "") {
 
         is_vendor_required = sales_persons.data("is_vendor_required")
