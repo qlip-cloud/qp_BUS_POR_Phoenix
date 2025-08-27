@@ -10,7 +10,6 @@ $(document).ready(function () {
 
   const REDIRECT_CONFIRM = `/order/confirm`;
 
-  const REDIRECT_ITEM_FORMULARY = `/order/item_formulary`;
 
   shipping_method = $('#select_shipping_method').val();
 
@@ -210,6 +209,7 @@ $(document).ready(function () {
 })
 
 $(document).on("change", "#import", function () {
+  const REDIRECT_ITEM_FORMULARY = `/order/item_formulary`;
   const file = this.files[0];
   if (!file) {
     frappe.throw("Debe seleccionar un archivo");
