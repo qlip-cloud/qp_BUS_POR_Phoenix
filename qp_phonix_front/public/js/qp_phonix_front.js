@@ -76,6 +76,12 @@ $(document).ready(function () {
 
       }
 
+      if (/\s/.test(customerValue)) {
+        customerInput.addClass("input-error");
+        frappe.throw("El campo 'Orden del Cliente' no puede contener espacios en blanco");
+      }
+
+
       if (sales_persons.val() === "") {
 
         is_vendor_required = sales_persons.data("is_vendor_required")
@@ -252,7 +258,7 @@ $(document).ready(function () {
         }
         // Paso 3: Crear Orden de Compra
         const imported_items = data.message.items;
-        save_order(URL_CREATE_SALES_ORDER, REDIRECT_ITEM_FORMULARY, null, true, null, true, false, null, null, imported_items);
+        save_order(URL_CREATE_SALES_ORDER, REDIRECT_ITEM_FORMULARY, null, true, null, true, false, null, null, null, imported_items);
 
         $("#import").val('');
       })

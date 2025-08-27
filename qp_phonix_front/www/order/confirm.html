@@ -251,7 +251,8 @@ Orden
                 </div>
                 <input type="text" class="form-control " {{ 'disabled' if order.status !="Draft" else '' }}
                     id="qp_phoenix_order_customer" value={{order.qp_phoenix_order_customer if
-                    order.qp_phoenix_order_customer else "" }}>
+                    order.qp_phoenix_order_customer else "" }}
+                    >
                 {% if order.status == "Draft" %}
                 <div class="col-md-12 label">
                     Orden de compra (Adjuntar archivo)
