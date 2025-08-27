@@ -667,7 +667,7 @@ function save_order(url, redirect_link, action = null, valid_empty = true, order
       let item_code = item.name;
       let description = item.description;
       let qty = parseInt(item.cantidad);
-      let rate = parseFloat(item.rate);
+      let rate = parseFloat(item.price);
       let discount_percentage = parseFloat(item.discountpercentage);
 
       items.push({
