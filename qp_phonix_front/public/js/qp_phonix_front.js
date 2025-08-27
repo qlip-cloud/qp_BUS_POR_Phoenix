@@ -10,6 +10,7 @@ $(document).ready(function () {
 
   const REDIRECT_CONFIRM = `/order/confirm`;
 
+  const REDIRECT_ITEM_FORMULARY = `/order/item_formulary`;
 
   shipping_method = $('#select_shipping_method').val();
 
@@ -150,7 +151,7 @@ $(document).ready(function () {
 
   $("#btn_cancel_order").on("click", () => {
     order_id = $("#order_id").val()
-    if (order_id) {
+    if (order_id){
       cancel_order(order_id)
     }
   })
@@ -158,7 +159,7 @@ $(document).ready(function () {
 
   $("#btn_download_pdf").on("click", () => {
     order_id = $("#order_id").val()
-    if (order_id) {
+    if(order_id){
       download_pdf(order_id)
     }
   })
@@ -206,71 +207,69 @@ $(document).ready(function () {
   })
 
 
-})
+  $("#import").on("change", function () {
+    const file = this.files[0];
+    if (!file) {
+      frappe.throw("Debe seleccionar un archivo");
+      return;
+    }
 
-$(document).on("change", "#import", function () {
-  const REDIRECT_ITEM_FORMULARY = `/order/item_formulary`;
-  const file = this.files[0];
-  if (!file) {
-    frappe.throw("Debe seleccionar un archivo");
-    return;
-  }
+    const formData = new FormData();
+    formData.append("file", file);
 
-  const formData = new FormData();
-  formData.append("file", file);
+    // Paso 1: Importar archivo
+    fetch("/api/method/qp_phonix_front.www.order.item_formulary.import_file", {
+      method: "POST",
+      body: formData,
+      headers: {
+        "X-Frappe-CSRF-Token": frappe.csrf_token,
+      },
+    })
+      .then(async (response) => {
+        const data = await response.json();
 
-  // Paso 1: Importar archivo
-  fetch("/api/method/qp_phonix_front.www.order.item_formulary.import_file", {
-    method: "POST",
-    body: formData,
-    headers: {
-      "X-Frappe-CSRF-Token": frappe.csrf_token,
-    },
-  })
-    .then(async (response) => {
-      const data = await response.json();
+        if (!response.ok) {
+          const errorMsg = data._server_messages
+            ? JSON.parse(data._server_messages)[0]
+            : "Error al importar el archivo.";
+          throw new Error(errorMsg);
+        }
 
-      if (!response.ok) {
-        const errorMsg = data._server_messages
-          ? JSON.parse(data._server_messages)[0]
-          : "Error al importar el archivo.";
-        throw new Error(errorMsg);
-      }
+        // Paso 2: Validar ítems
+        return fetch("/api/method/qp_phonix_front.www.order.item_formulary.validate_items_and_fetch_info", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Frappe-CSRF-Token": frappe.csrf_token,
+          },
+          body: JSON.stringify({
+            items: JSON.stringify(data.message.items),
+          }),
+        });
+      })
+      .then(async (response) => {
+        const data = await response.json();
 
-      // Paso 2: Validar ítems
-      return fetch("/api/method/qp_phonix_front.www.order.item_formulary.validate_items_and_fetch_info", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Frappe-CSRF-Token": frappe.csrf_token,
-        },
-        body: JSON.stringify({
-          items: JSON.stringify(data.message.items),
-        }),
+        if (!response.ok) {
+          const errorMsg = data._server_messages
+            ? JSON.parse(data._server_messages)[0]
+            : "Error al validar los productos.";
+          throw new Error(errorMsg);
+        }
+        // Paso 3: Crear Orden de Compra
+        const imported_items = data.message.items;
+        save_order(URL_CREATE_SALES_ORDER, REDIRECT_ITEM_FORMULARY, null, true, null, true, false, null, null, null, imported_items);
+
+        $("#import").val('');
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        frappe.msgprint(error.message || "Error desconocido.");
+        $("#import").val('');
       });
-    })
-    .then(async (response) => {
-      const data = await response.json();
+  });
 
-      if (!response.ok) {
-        const errorMsg = data._server_messages
-          ? JSON.parse(data._server_messages)[0]
-          : "Error al validar los productos.";
-        throw new Error(errorMsg);
-      }
-      // Paso 3: Crear Orden de Compra
-      const imported_items = data.message.items;
-      save_order(URL_CREATE_SALES_ORDER, REDIRECT_ITEM_FORMULARY, null, true, null, true, false, null, null, imported_items);
-
-      $("#import").val('');
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-      frappe.msgprint(error.message || "Error desconocido.");
-      $("#import").val('');
-    });
-});
-
+})
 
 function und_factor($quantity) {
 
@@ -667,7 +666,7 @@ function save_order(url, redirect_link, action = null, valid_empty = true, order
       let item_code = item.name;
       let description = item.description;
       let qty = parseInt(item.cantidad);
-      let rate = parseFloat(item.price);
+      let rate = parseFloat(item.rate);
       let discount_percentage = parseFloat(item.discountpercentage);
 
       items.push({
@@ -953,13 +952,13 @@ function uploadOrderFile(orderName, callback) {
     });
 }
 
-function download_pdf(order_id) {
+function download_pdf(order_id){
   var methodPath = 'frappe.utils.print_format.download_pdf';
   var url = `/api/method/${methodPath}` +
-    `?doctype=${encodeURIComponent('Sales Order')}` +
-    `&name=${encodeURIComponent(order_id)}` +
-    `&format=${encodeURIComponent('pdf-email')}` +
-    `&no_letterhead=${1}`;
+                      `?doctype=${encodeURIComponent('Sales Order')}` +
+                      `&name=${encodeURIComponent(order_id)}` +
+                      `&format=${encodeURIComponent('pdf-email')}` +
+                      `&no_letterhead=${1}`;
   window.open(url, '_blank');
 
 }
