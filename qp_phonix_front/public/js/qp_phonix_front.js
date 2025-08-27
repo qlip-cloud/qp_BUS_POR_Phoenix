@@ -271,6 +271,11 @@ $(document).ready(function () {
 
 })
 
+$(document).on("change", "#import", function () {
+  console.log("Cambio detectado:", this.files);
+});
+
+
 function und_factor($quantity) {
 
   let row = $quantity.data("select")
