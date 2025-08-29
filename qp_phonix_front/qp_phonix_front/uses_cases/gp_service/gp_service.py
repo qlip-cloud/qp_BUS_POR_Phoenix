@@ -92,7 +92,9 @@ def get_coupon_discount_strategy(sales_order):
         order_item_codes = set(item.item_code for item in sales_order.items)
         if order_item_codes == items_with_discount and same_discount_for_all:
             is_global_coupon = True
-
+    frappe.log_error(
+        message=f"Coupon strategy: is_global_coupon={is_global_coupon}, all_items_in_coupon={all_items_in_coupon}, same_discount_for_all={same_discount_for_all}, has_transport={has_transport}, items_with_discount={items_with_discount}, order_items_codes={order_item_codes}",
+    )
     # 5. Decidir si usar descuentos por línea o no
     if is_global_coupon:
         use_line_discounts = has_transport  # global + transporte = por línea
