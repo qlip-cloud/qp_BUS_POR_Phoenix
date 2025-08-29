@@ -60,6 +60,7 @@ def get_coupon_discount_strategy(sales_order):
     - items_with_discount: set de item_code (vacío si es global)
     - has_transport: bool
     """
+    # 1. Detectar item de transporte
     transport_item_code = frappe.get_all("qp_pf_Flete", pluck="name", limit=1)
     transport_item_code = transport_item_code[0] if transport_item_code else ""
 
@@ -67,10 +68,14 @@ def get_coupon_discount_strategy(sales_order):
         item.item_code == transport_item_code for item in sales_order.items
     )
 
-    coupon_log_name = frappe.get_value("qp_pf_CouponLog", {"order_id": sales_order.name}, "name")
+    # 2. Obtener datos del coupon log
+    coupon_log_name = frappe.get_value(
+        "qp_pf_CouponLog", {"order_id": sales_order.name}, "name"
+    )
     coupon_log = frappe.get_doc("qp_pf_CouponLog", coupon_log_name) if coupon_log_name else None
     coupon_percentage = coupon_log.discount_percentage if coupon_log else 0
 
+    # 3. Construir set de items con descuento
     has_coupon_items = coupon_log and coupon_log.coupon_items and len(coupon_log.coupon_items) > 0
     items_with_discount = set(item.item_code for item in coupon_log.coupon_items) if has_coupon_items else set()
 
@@ -80,19 +85,25 @@ def get_coupon_discount_strategy(sales_order):
         for item in sales_order.items
     )
 
-    is_global_coupon = not has_coupon_items 
+    # 4. Detectar si debería considerarse cupón global
+    is_global_coupon = not has_coupon_items
+    # Aquí, verifico que si el cupón log tiene items, pero son todos los de la orden con un mismo descuento, es global
+    if has_coupon_items:
+        order_item_codes = set(item.item_code for item in sales_order.items)
+        if order_item_codes == items_with_discount and same_discount_for_all:
+            is_global_coupon = True
 
+    # 5. Decidir si usar descuentos por línea o no
     if is_global_coupon:
-        if has_transport:
-            use_line_discounts = True  
-        else:
-            use_line_discounts = False 
+        use_line_discounts = has_transport  # global + transporte = por línea
     else:
         if all_items_in_coupon and same_discount_for_all and not has_transport:
-            use_line_discounts = False  
+            use_line_discounts = False  # todos los items tienen el cupón, sin transporte
         else:
-            use_line_discounts = True  
+            use_line_discounts = True   # resto de casos, por línea
+
     return use_line_discounts, items_with_discount, coupon_percentage
+
 
 
 def __get_master_setup(company):
