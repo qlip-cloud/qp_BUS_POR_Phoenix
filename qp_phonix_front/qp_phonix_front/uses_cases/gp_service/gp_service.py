@@ -74,35 +74,28 @@ def get_coupon_discount_strategy(sales_order):
     )
     coupon_log = frappe.get_doc("qp_pf_CouponLog", coupon_log_name) if coupon_log_name else None
     coupon_percentage = coupon_log.discount_percentage if coupon_log else 0
-
+    """
+    Caso 1: Si el coupon_log no tiene items, el cupón es global y se aplica a toda la orden, por lo que se envía el descuento
+    cabecera
+    Caso 2: Si el coupon_log tiene items deben revisarse dos cosas, primero, si los items del coupon_log están todos en la orden, 
+    el descuento se enviará por cabecera, en cambio, si tiene items, pero no son todos los de la orden, se enviará por línea.
+    IMPORTANTE: El porcentaje del descuento no coincide con el descuento que está en el item del sales order, pues ese ya tiene
+    el descuento comercial
+    """
     # 3. Construir set de items con descuento
     has_coupon_items = coupon_log and coupon_log.coupon_items and len(coupon_log.coupon_items) > 0
     items_with_discount = set(item.item_code for item in coupon_log.coupon_items) if has_coupon_items else set()
 
     all_items_in_coupon = all(item.item_code in items_with_discount for item in sales_order.items)
-    same_discount_for_all = all(
-        round(item.discount_percentage or 0, 2) == round(coupon_percentage, 2)
-        for item in sales_order.items
-    )
-
+    
     # 4. Detectar si debería considerarse cupón global
-    is_global_coupon = not has_coupon_items
-    # Aquí, verifico que si el cupón log tiene items, pero son todos los de la orden con un mismo descuento, es global
-    if has_coupon_items:
-        order_item_codes = set(item.item_code for item in sales_order.items)
-        if order_item_codes == items_with_discount and same_discount_for_all:
-            is_global_coupon = True
+    is_global_coupon = not has_coupon_items or (has_coupon_items and all_items_in_coupon)
+
     frappe.log_error(
-        message=f"Coupon strategy: is_global_coupon={is_global_coupon}, all_items_in_coupon={all_items_in_coupon}, same_discount_for_all={same_discount_for_all}, has_transport={has_transport}, items_with_discount={items_with_discount}, order_items_codes={order_item_codes}",
+        message=f"Coupon strategy: is_global_coupon={is_global_coupon}, all_items_in_coupon={all_items_in_coupon}, has_transport={has_transport}, items_with_discount={items_with_discount}",
     )
-    # 5. Decidir si usar descuentos por línea o no
-    if is_global_coupon:
-        use_line_discounts = has_transport  # global + transporte = por línea
-    else:
-        if all_items_in_coupon and same_discount_for_all and not has_transport:
-            use_line_discounts = False  # todos los items tienen el cupón, sin transporte
-        else:
-            use_line_discounts = True   # resto de casos, por línea
+    
+    use_line_discounts = not is_global_coupon
 
     return use_line_discounts, items_with_discount, coupon_percentage
 
