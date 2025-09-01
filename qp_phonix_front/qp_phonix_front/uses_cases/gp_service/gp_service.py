@@ -118,11 +118,6 @@ def get_coupon_discount_strategy(sales_order):
     if is_global_coupon and coupon_logs_docs:
         coupon_percentage = coupon_logs_docs[0].discount_percentage
 
-    frappe.log_error(
-        message=f"Coupon strategy: is_global_coupon={is_global_coupon}, "
-                f"all_items_in_coupon={all_items_in_coupon}, has_transport={has_transport}, "
-                f"items_with_discount={items_with_discount}",
-    )
     
     use_line_discounts = not is_global_coupon
 
