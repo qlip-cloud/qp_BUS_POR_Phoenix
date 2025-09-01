@@ -53,56 +53,6 @@ def send_sales_order(sales_order, vf_SaleOrderConfirmError):
 
     return res
 
-def get_coupon_discount_strategy(sales_order):
-    """
-    Retorna una tupla:
-    - use_line_discounts: bool
-    - items_with_discount: set de item_code (vacío si es global)
-    - coupon_percentage: float
-    - rate_old_map: dict {item_code: rate_old}
-    """
-    # 1. Detectar item de transporte
-    transport_item_code = frappe.get_all("qp_pf_Flete", pluck="name", limit=1)
-    transport_item_code = transport_item_code[0] if transport_item_code else ""
-
-    has_transport = any(
-        item.item_code == transport_item_code for item in sales_order.items
-    )
-
-    # 2. Obtener datos del coupon log
-    coupon_log_name = frappe.get_value(
-        "qp_pf_CouponLog", {"order_id": sales_order.name}, "name"
-    )
-    coupon_log = frappe.get_doc("qp_pf_CouponLog", coupon_log_name) if coupon_log_name else None
-    coupon_percentage = coupon_log.discount_percentage if coupon_log else 0
-
-    # 3. Construir set de items con descuento y map de rate_old
-    has_coupon_items = coupon_log and coupon_log.coupon_items and len(coupon_log.coupon_items) > 0
-    
-    items_with_discount = set()
-    rate_old_map = {}
-    if has_coupon_items:
-        for ci in coupon_log.coupon_items:
-            items_with_discount.add(ci.item_code)
-            rate_old_map[ci.item_code] = ci.rate_old
-
-    all_items_in_coupon = all(item.item_code in items_with_discount for item in sales_order.items)
-    
-    # 4. Detectar si debería considerarse cupón global
-    is_global_coupon = not has_coupon_items or (has_coupon_items and all_items_in_coupon)
-
-    frappe.log_error(
-        message=f"Coupon strategy: is_global_coupon={is_global_coupon}, "
-                f"all_items_in_coupon={all_items_in_coupon}, has_transport={has_transport}, "
-                f"items_with_discount={items_with_discount}",
-    )
-    
-    use_line_discounts = not is_global_coupon
-
-    return use_line_discounts, items_with_discount, coupon_percentage, rate_old_map
-
-
-
 def __get_master_setup(company):
 
     master_name = frappe.db.get_list('qp_GP_MasterSetup',
@@ -116,6 +66,66 @@ def __get_master_setup(company):
     return master_name and master_name[0] or {}
 
 
+def get_coupon_discount_strategy(sales_order):
+    """
+    Retorna una tupla:
+    - use_line_discounts: bool
+    - items_with_discount: set de item_code (vacío si es global)
+    - coupon_percentage: float (para descuentos globales)
+    - rate_old_map: dict {item_code: rate_old}
+    - coupon_percentage_map: dict {item_code: percentage}  (porcentaje de descuento en un item para descuentos por línea)
+    """
+
+    transport_item_code = frappe.get_all("qp_pf_Flete", pluck="name", limit=1)
+    transport_item_code = transport_item_code[0] if transport_item_code else ""
+
+    has_transport = any(
+        item.item_code == transport_item_code for item in sales_order.items
+    )
+
+    coupon_logs_names = frappe.get_all(
+        "qp_pf_CouponLog", {"order_id": sales_order.name}, "name"
+    )
+    coupon_logs_docs = [
+        frappe.get_doc("qp_pf_CouponLog", name) for name in coupon_logs_names
+    ]
+
+    has_coupon_items = any(
+        coupon_log and coupon_log.coupon_items and len(coupon_log.coupon_items) > 0 
+        for coupon_log in coupon_logs_docs
+    )
+
+    items_with_discount = set()
+    rate_old_map = {}
+    coupon_percentage_map = {}
+    
+    for log in coupon_logs_docs:
+        for ci in log.coupon_items:
+            items_with_discount.add(ci.item_code)
+            rate_old_map[ci.item_code] = ci.rate_old
+            coupon_percentage_map[ci.item_code] = log.discount_percentage
+
+    all_items_in_coupon = all(
+        item.item_code in items_with_discount for item in sales_order.items
+    )
+    
+    is_global_coupon = not has_coupon_items or (has_coupon_items and all_items_in_coupon)
+
+    coupon_percentage = 0
+    if is_global_coupon and coupon_logs_docs:
+        coupon_percentage = coupon_logs_docs[0].discount_percentage
+
+    frappe.log_error(
+        message=f"Coupon strategy: is_global_coupon={is_global_coupon}, "
+                f"all_items_in_coupon={all_items_in_coupon}, has_transport={has_transport}, "
+                f"items_with_discount={items_with_discount}",
+    )
+    
+    use_line_discounts = not is_global_coupon
+
+    return use_line_discounts, items_with_discount, coupon_percentage, rate_old_map, coupon_percentage_map
+
+
 def __prepare_petition(master_name, so_obj):
     
     so_json = {}
@@ -125,12 +135,11 @@ def __prepare_petition(master_name, so_obj):
     customer_addr = None
     
     if so_obj.customer_address:
-    
         customer_addr = frappe.get_doc('Address', so_obj.customer_address)
 
     store_main = __get_value_master(master_name, 'store_main')
 
-    use_line_discounts, items_with_discount, coupon_percentage, rate_old_map = get_coupon_discount_strategy(so_obj)
+    use_line_discounts, items_with_discount, coupon_percentage, rate_old_map, coupon_percentage_map = get_coupon_discount_strategy(so_obj)
 
     item_list = []
     transport_item_code = frappe.get_all("qp_pf_Flete", pluck="name", limit=1)
@@ -140,38 +149,38 @@ def __prepare_petition(master_name, so_obj):
         is_transport = item.item_code == transport_item_code 
         is_coupon_item = item.item_code in items_with_discount
         price = rate_old_map.get(item.item_code, item.rate)
+        
         line = {
             "Id": item.item_code,
             "Quantity": item.qty,
             "Price": price,
-            #"DiscountPercentage": item.discount_percentage, #valida
-            "DiscountPrice": 0, #valida
+            "DiscountPrice": 0,
             "Warehouse": item.item_group,
             "ShippingMethod": None,
-            "ShippingDate": None # valida
+            "ShippingDate": None
         }
+        
         if use_line_discounts:
             if is_transport:
                 line["DiscountPercentage"] = 0
-            elif items_with_discount:
-                line["DiscountPercentage"] = coupon_percentage if is_coupon_item else 0
+            elif is_coupon_item:
+                line["DiscountPercentage"] = coupon_percentage_map.get(item.item_code, 0)
             else:
-                # Cupón global con transporte
-                line["DiscountPercentage"] = coupon_percentage
+                line["DiscountPercentage"] = 0
         else:
             line["DiscountPercentage"] = 0
 
-
         item_list.append(line)
 
-    vendor_id = frappe.db.get_value("Sales Person", so_obj.sales_team[0].sales_person,"gp_code" ) if so_obj.sales_team else ''
+    vendor_id = frappe.db.get_value(
+        "Sales Person", 
+        so_obj.sales_team[0].sales_person,
+        "gp_code"
+    ) if so_obj.sales_team else ''
 
     order_id = __get_value_master(master_name, 'order_id')
-
     id_clase = __get_value_master(master_name, 'customer_class')
-
     bdg_alter = [{"Id": ""}]
-
     item_types = vf_item_group_list()
 
     so_json['IdDoc'] = order_id
@@ -180,9 +189,9 @@ def __prepare_petition(master_name, so_obj):
     so_json['IdOrderCustomer'] = so_obj.qp_phoenix_order_customer or ""
     so_json['Lot'] = ""
     so_json['Warehouse'] = item_types[0].title
-    so_json['WarehousesAlter'] = bdg_alter #valida
+    so_json['WarehousesAlter'] = bdg_alter
     so_json['DiscountAmount'] = coupon_percentage if not use_line_discounts else 0
-    so_json['VendorId'] = vendor_id #valida
+    so_json['VendorId'] = vendor_id
     so_json['Currency'] = so_obj.price_list_currency
     so_json['Lines'] = item_list
     so_json['IdCustomer'] = so_obj.customer
@@ -200,6 +209,7 @@ def __prepare_petition(master_name, so_obj):
     so_json['Reference1'] = customer_addr.qp_address_id if customer_addr else ''
     so_json['Reference2'] = None
     so_json['Reference3'] = None
+    
     partial_delivery_msg = "Acepta despachos parciales" if so_obj.qp_allow_partial_delivery else "NO acepta despachos parciales"
     order_comment = so_obj.qp_phoenix_order_comment or ""
     
