@@ -81,7 +81,7 @@ def get_coupon_discount_strategy(sales_order):
     
     items_with_discount = set()
     rate_old_map = {}
-    if has_coupon_items:
+    if has_coupon_items and not all_items_in_coupon:
         for ci in coupon_log.coupon_items:
             items_with_discount.add(ci.item_code)
             rate_old_map[ci.item_code] = ci.rate_old
