@@ -81,7 +81,7 @@ def get_coupon_discount_strategy(sales_order):
     
     items_with_discount = set()
     rate_old_map = {}
-    if has_coupon_items and not all_items_in_coupon:
+    if has_coupon_items:
         for ci in coupon_log.coupon_items:
             items_with_discount.add(ci.item_code)
             rate_old_map[ci.item_code] = ci.rate_old
@@ -139,11 +139,7 @@ def __prepare_petition(master_name, so_obj):
     for item in so_obj.items:
         is_transport = item.item_code == transport_item_code 
         is_coupon_item = item.item_code in items_with_discount
-        price = item.rate
-        if coupon_percentage > 0:
-            if use_line_discounts:
-                if is_coupon_item:
-                    price = rate_old_map.get(item.item_code, item.rate)
+        price = rate_old_map.get(item.item_code, item.rate)
         line = {
             "Id": item.item_code,
             "Quantity": item.qty,
