@@ -108,8 +108,11 @@ def get_coupon_discount_strategy(sales_order):
     all_items_in_coupon = all(
         item.item_code in items_with_discount for item in sales_order.items
     )
-    
-    is_global_coupon = not has_coupon_items or (has_coupon_items and all_items_in_coupon)
+
+    all_coupon_logs_same_discount = len(set(log.discount_percentage for log in coupon_logs_docs)) <= 1
+
+    is_global_coupon = (not has_coupon_items or 
+                   (has_coupon_items and all_items_in_coupon and all_coupon_logs_same_discount))
 
     coupon_percentage = 0
     if is_global_coupon and coupon_logs_docs:
