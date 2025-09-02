@@ -414,6 +414,7 @@ def sales_order_update(order_json):
             
         set_order_flete(sales_order)
         
+        frappe.log_error(title="Debug", message=f"Sales Order Items: {sales_order.items}")
         if not is_confirm:
             sales_order.save()
             
@@ -858,7 +859,7 @@ def set_order_flete(sales_order):
             })
     else:
         if flete_existente:
-            sales_order.items.remove(flete_existente)
+            sales_order.remove(flete_existente)
 
 
 def setup_order_json(order_json):
