@@ -443,10 +443,6 @@ def sales_order_update(order_json):
 
         sales_order = __get_sales_order(order_id)
 
-        is_confirm = __confirm_sales_order(order_json, sales_order)
-
-        set_order_flete(sales_order)
-
         frappe.log_error(
             title="Debug Sales Order Items",
             message=json.dumps(
@@ -457,6 +453,12 @@ def sales_order_update(order_json):
                 indent=2,
             ),
         )
+        
+        set_order_flete(sales_order)
+
+        is_confirm = __confirm_sales_order(order_json, sales_order)
+
+
         if not is_confirm:
             sales_order.save()
 
