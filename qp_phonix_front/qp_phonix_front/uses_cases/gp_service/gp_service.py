@@ -105,8 +105,12 @@ def get_coupon_discount_strategy(sales_order):
             rate_old_map[ci.item_code] = ci.rate_old
             coupon_percentage_map[ci.item_code] = log.discount_percentage
 
+    items_excluding_transport = [
+        item for item in sales_order.items if item.item_code != transport_item_code
+    ]
+
     all_items_in_coupon = all(
-        item.item_code in items_with_discount for item in sales_order.items
+        item.item_code in items_with_discount for item in items_excluding_transport
     )
 
     all_coupon_logs_same_discount = len(set(log.discount_percentage for log in coupon_logs_docs)) <= 1
