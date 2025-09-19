@@ -217,6 +217,7 @@ def transform_items(sale_order):
             "cantidad": item.qty,
             "description": item.description,
             "code": item.item_code,
+            "price_list_rate": f"{item.price_list_rate:,.0f}",
             "price": item.rate,
             "image": item.image or "",  
             "auto_discount": item.get("auto_discount", False),

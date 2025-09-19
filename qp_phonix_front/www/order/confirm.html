@@ -529,28 +529,16 @@ Orden
 
                             </div>
                         </div>
-                        <div class="row label description-column">
-                            <div class="col-lg-3">
-                                <!-- input type="checkbox"-->
-                                Código de item
-                                {#item.SubCategoria_title#}
-                            </div>
-                            <div class="col-sm-2">
-                                Cantidad
-                            </div>
-                            <div class="col-sm-3">
-                                Pedir por paquetes de
-                            </div>
-                            <div class="col-sm-2">
-                                Precio
-                            </div>
-                            <div class="col-sm-2">
-                                Total
-                            </div>
+                       <div class="row label description-column">
+                            <div class="col-sm-2">Código de item</div>
+                            <div class="col-sm-2">Cantidad</div>
+                            <div class="col-sm-2">Paquetes</div>
+                            <div class="col-sm-2">Precio de lista</div>
+                            <div class="col-sm-2">Precio</div>
+                            <div class="col-sm-2">Total</div>
                         </div>
-
                         <div class="row info">
-                            <div class="col-sm-3">
+                            <div class="col-sm-2">
                                 <div class="description-label">Código de item</div>
                                 <div
                                     class="background-info information_label {#'' if item.SubCategoria_value else cell_empty#}">
@@ -573,10 +561,17 @@ Orden
                                     {%endif%}
                                 </div>
                             </div>
-                            <div class="col-sm-3">
+                            <div class="col-sm-2">
                                 <div class="description-label">Pedir por paquetes de</div>
                                 <div class="background-info information_label">
                                     Unidad x {{item.inqt}}
+                                </div>
+                            </div>
+                            <div class="col-sm-2">
+                                <div class="description-label">Precio de lista</div>
+                                <div class="background-info information_label ">
+                                    {{order.currency_symbol}} <span
+                                        id="price_list_rate-{{item.item_code | replace(':','-')}}">{{item.price_list_rate}}</span>
                                 </div>
                             </div>
                             <div class="col-sm-2">
