@@ -933,6 +933,10 @@ def __get_order_id(order_json):
 
 
 def set_order_flete(sales_order):
+
+    if sales_order.currency != "COP":
+        return
+    
     valores_flete = frappe.get_all(
         "qp_pf_Flete", fields=["name", "valor_minimo", "flete"], limit=1
     )
