@@ -973,6 +973,7 @@ def set_order_flete(sales_order):
                     "qty": 1,
                     "rate": flete,
                     "amount": flete,
+                    "price_list_rate": flete,
                 },
             )
     else:
