@@ -934,8 +934,6 @@ def __get_order_id(order_json):
 
 def set_order_flete(sales_order):
 
-    if sales_order.currency != "COP":
-        return
     
     valores_flete = frappe.get_all(
         "qp_pf_Flete", fields=["name", "valor_minimo", "flete"], limit=1
@@ -958,6 +956,12 @@ def set_order_flete(sales_order):
         for item in sales_order.items
         if item.item_code != item_code_flete
     )
+
+    if sales_order.currency == "EUR":
+        trm = frappe.get_last_doc('Currency Exchange')
+        conversion_rate = trm.exchange_rate if trm else 1
+        flete = flete / conversion_rate
+        valor_minimo = valor_minimo / conversion_rate
 
     if total_items < valor_minimo:
         if not flete_existente:
