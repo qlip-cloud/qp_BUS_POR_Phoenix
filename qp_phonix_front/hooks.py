@@ -148,9 +148,9 @@ scheduler_events = {
 # Overriding Methods
 # ------------------------------
 #
-# override_whitelisted_methods = {
-# 	"frappe.desk.doctype.event.event.get_events": "qp_phonix_front.event.get_events"
-# }
+override_whitelisted_methods = {
+    "erpnext.stock.get_item_details.get_item_details": "qp_phonix_front.override.get_item_details.get_item_details"
+}
 #
 # each overriding function accepts a `data` argument;
 # generated from the base implementation of the doctype dashboard,

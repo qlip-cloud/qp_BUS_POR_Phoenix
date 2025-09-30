@@ -183,7 +183,7 @@ def set_flete_config(context, order):
 
     if flete_config:
         min_flete = flete_config[0].valor_minimo
-        qualifies_for_free_shipping = order.net_total >= min_flete
+        qualifies_for_free_shipping = order.net_total >= min_flete or order.currency != "COP"
         context.min_flete = min_flete
         context.qualifies_for_free_shipping = qualifies_for_free_shipping
         
@@ -217,6 +217,7 @@ def transform_items(sale_order):
             "cantidad": item.qty,
             "description": item.description,
             "code": item.item_code,
+            "price_list_rate": f"{item.price_list_rate:,.0f}",
             "price": item.rate,
             "image": item.image or "",  
             "auto_discount": item.get("auto_discount", False),
