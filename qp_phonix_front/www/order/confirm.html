@@ -251,8 +251,7 @@ Orden
                 </div>
                 <input type="text" class="form-control " {{ 'disabled' if order.status !="Draft" else '' }}
                     id="qp_phoenix_order_customer" value={{order.qp_phoenix_order_customer if
-                    order.qp_phoenix_order_customer else "" }}
-                    >
+                    order.qp_phoenix_order_customer else "" }}>
                 {% if order.status == "Draft" %}
                 <div class="col-md-12 label">
                     Orden de compra (Adjuntar archivo)
@@ -529,73 +528,48 @@ Orden
 
                             </div>
                         </div>
-                       <div class="row label description-column">
-                            <div class="col-sm-2">Código de item</div>
-                            <div class="col-sm-2">Cantidad</div>
-                            <div class="col-sm-2">Paquetes</div>
-                            <div class="col-sm-2">Precio de lista</div>
-                            <div class="col-sm-2">Descuento</div>
-                            <div class="col-sm-2">Precio</div>
-                            <div class="col-sm-2">Total</div>
-                        </div>
-                        <div class="row info">
-                            <div class="col-sm-2">
-                                <div class="description-label">Código de item</div>
-                                <div
-                                    class="background-info information_label {#'' if item.SubCategoria_value else cell_empty#}">
-                                    {{item.item_code}}
-                                </div>
-                            </div>
 
-                            <div class="col-sm-2 ">
-                                <div class="description-label">Cantidad</div>
-                                <div class="background-info information_label">
-
-                                    <input type="hidden" name="" id="item_id" value="{{item.item_code}}">
-
-                                    {%if order.status_code == 0%}
-                                    <input type="number" class="form-control quantity" data-factor="{{item.inqt}}"
-                                        data-value="{{item.cantidad | int}}" id="quantity"
-                                        value="{{item.cantidad | int}}" readonly>
-                                    {%else%}
-                                    {{item.cantidad | int}}
-                                    {%endif%}
-                                </div>
-                            </div>
-                            <div class="col-sm-2">
-                                <div class="description-label">Pedir por paquetes de</div>
-                                <div class="background-info information_label">
-                                    Unidad x {{item.inqt}}
-                                </div>
-                            </div>
-                            <div class="col-sm-2">
-                                <div class="description-label">Precio de lista</div>
-                                <div class="background-info information_label ">
-                                    {{order.currency_symbol}} <span
-                                        id="price_list_rate-{{item.item_code | replace(':','-')}}">{{item.price_list_rate}}</span>
-                                </div>
-                            </div>
-                            <div class="col-sm-2">
-                                <div class="description-label">Descuento</div>
-                                <div class="background-info information_label ">
-                                    {{order.currency_symbol}} <span
-                                        id="discount-{{item.item_code | replace(':','-')}}">{{item.discount_percentage}}</span>
-                                </div>
-                            </div>
-                            <div class="col-sm-2">
-                                <div class="description-label">Precio</div>
-                                <div class="background-info information_label ">
-                                    {{order.currency_symbol}} <span
-                                        id="price-{{item.item_code | replace(':','-')}}">{{item.price_format}}</span>
-                                </div>
-                            </div>
-                            <div class="col-sm-2">
-                                <div class="description-label">Total</div>
-                                <div class="background-info information_label ">
-                                    {{order.currency_symbol}} <span
-                                        id="total-{{item.item_code | replace(':','-')}}">{{item.total_format}}</span>
-                                </div>
-                            </div>
+                        <div class="table-responsive">
+                            <table class="table table-sm align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr class="text-center">
+                                        <th>Código</th>
+                                        <th>Cantidad</th>
+                                        <th>Paquete</th>
+                                        <th>Precio lista</th>
+                                        <th>Descuento</th>
+                                        <th>Precio</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-center">
+                                    <tr>
+                                        <td>{{ item.item_code }}</td>
+                                        <td>
+                                            {% if order.status_code == 0 %}
+                                            <input type="number"
+                                                class="form-control form-control-sm text-center quantity"
+                                                data-factor="{{ item.inqt }}" data-value="{{ item.cantidad | int }}"
+                                                id="quantity" value="{{ item.cantidad | int }}" readonly>
+                                            {% else %}
+                                            {{ item.cantidad | int }}
+                                            {% endif %}
+                                        </td>
+                                        <td>Unidad x {{ item.inqt }}</td>
+                                        <td>{{ order.currency_symbol }} <span
+                                                id="price_list_rate-{{ item.item_code | replace(':','-') }}">{{
+                                                item.price_list_rate }}</span></td>
+                                        <td><span id="discount-{{ item.item_code | replace(':','-') }}">{{
+                                                item.discount_percentage }}%</span></td>
+                                        <td>{{ order.currency_symbol }} <span
+                                                id="price-{{ item.item_code | replace(':','-') }}">{{ item.price_format
+                                                }}</span></td>
+                                        <td>{{ order.currency_symbol }} <span
+                                                id="total-{{ item.item_code | replace(':','-') }}">{{ item.total_format
+                                                }}</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
