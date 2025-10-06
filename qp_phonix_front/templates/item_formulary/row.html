@@ -128,6 +128,14 @@
             Este producto se encuentra descontinuado.
         </div>
         {% endif %}
+        {% if item.qp_dangerous_goods %}
+        <div class="margin-left text-danger d-flex align-items-center" style="font-weight: bold;">
+            <span class="material-symbols-outlined">
+                priority_high
+            </span>
+            Mercancía especial, por favor, contactése con el asesor comercial.
+        </div>
+        {% endif %}
 
     </td>
 

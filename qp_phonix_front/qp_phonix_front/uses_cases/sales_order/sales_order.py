@@ -198,6 +198,7 @@ def get_sales_order(sales_order):
                         IF(so_items.image IS NULL or so_items.image = '', '%s', so_items.image) as image,
                         so_items.price_list_rate,
                         so_items.net_rate as price,
+                        so_items.discount_percentage,
                         FORMAT(so_items.net_rate,2, 'es_CO') as price_format,
                         so.qp_phoenix_order_comment,
                         so_items.qty as cantidad,
