@@ -198,6 +198,7 @@ def get_sales_order(sales_order):
                         IF(so_items.image IS NULL or so_items.image = '', '%s', so_items.image) as image,
                         so_items.price_list_rate,
                         so_items.net_rate as price,
+                        so_items.discount_percentage,
                         FORMAT(so_items.net_rate,2, 'es_CO') as price_format,
                         so.qp_phoenix_order_comment,
                         so_items.qty as cantidad,
@@ -420,7 +421,7 @@ def sales_order_update(order_json):
 
         customer = get_and_validate_customer(sales_order)
 
-        items_so = [x.get("name") for x in sales_order.items]
+        items_so = [x.get("name") for x in sales_order.items] 
 
         items_upd = [x.get("code") for x in order_item_json]
 
@@ -824,6 +825,7 @@ def __update_items(order_item_json, sales_order, item_update_list, item_insert_l
                 {
                     "item_code": item.get("item_code"),
                     "description": item.get("description"),
+                    "discount_percentage": item.get("discount_percentage"),
                     "qty": item.get("qty"),
                     "rate": item.get("rate"),
                 },
@@ -934,8 +936,6 @@ def __get_order_id(order_json):
 
 def set_order_flete(sales_order):
 
-    if sales_order.currency != "COP":
-        return
     
     valores_flete = frappe.get_all(
         "qp_pf_Flete", fields=["name", "valor_minimo", "flete"], limit=1
@@ -958,6 +958,12 @@ def set_order_flete(sales_order):
         for item in sales_order.items
         if item.item_code != item_code_flete
     )
+
+    if sales_order.currency == "EUR":
+        trm = frappe.get_last_doc('Currency Exchange')
+        conversion_rate = trm.exchange_rate if trm else 1
+        flete = flete / conversion_rate
+        valor_minimo = valor_minimo / conversion_rate
 
     if total_items < valor_minimo:
         if not flete_existente:

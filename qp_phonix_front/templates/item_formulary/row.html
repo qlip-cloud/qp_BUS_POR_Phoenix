@@ -82,12 +82,11 @@
             data-select="{{item.name | replace(':','-')}}" data-sku="{{item.sku}}"
             data-qp_prioritize_unit_package="{{item.qp_prioritize_unit_package}}"
             data-quantity_dis="{{item.quantity_dis}}" data-quantity_format={{permission.quantity_format}}
-            data-next={{key}} data-code={{item.code}} {{'disabled' if item.qp_discontinued else '' }}>
+            data-next={{key}} data-code={{item.code}} {{'disabled' if item.qp_discontinued or item.qp_dangerous_goods or (item.price_format | replace(',', '.') | float == 0) else '' }}>
     </td>
     {%endif%}
     {% if permission.inqt %}
     {% set count = count + 1 %}
-
     <td class="lateralright {{'item_select' if item.cantidad else ''}}">
         <div class="margin-left ">Unidad <br> x {{item.inqt}}</div>
     </td>
@@ -126,6 +125,14 @@
                 priority_high
             </span>
             Este producto se encuentra descontinuado.
+        </div>
+        {% endif %}
+        {% if item.qp_dangerous_goods %}
+        <div class="margin-left text-danger d-flex align-items-center" style="font-weight: bold;">
+            <span class="material-symbols-outlined">
+                priority_high
+            </span>
+            Mercancía especial, por favor, contactése con el asesor comercial.
         </div>
         {% endif %}
 
