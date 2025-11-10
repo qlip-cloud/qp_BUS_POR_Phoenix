@@ -422,12 +422,8 @@ def sales_order_update(order_json):
         customer = get_and_validate_customer(sales_order)
 
         items_so = [x.get("name") for x in sales_order.items] 
-        print("Sales Orden Items")
-        print(items_so)
 
         items_upd = [x.get("code") for x in order_item_json]
-        print("Items to update")
-        print(items_upd)
 
         item_update_list = list(set(items_so).intersection(set(items_upd)))
 
