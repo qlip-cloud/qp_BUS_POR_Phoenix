@@ -86,7 +86,7 @@
             data-debug-price-format="{{item.price_format}}"
             data-debug-discontinued="{{item.qp_discontinued}}"
             data-debug-dangerous="{{item.qp_dangerous_goods}}"
-            data-next={{key}} data-code={{item.code}} {{'disabled' if item.qp_discontinued or item.qp_dangerous_goods or (item.price_format | replace('.', '') | replace(',', '.') | float == 0) else '' }}>
+            data-next={{key}} data-code={{item.code}} {{'disabled' if item.qp_discontinued or item.qp_dangerous_goods or (item.price_format | replace(',', '') | float == 0) else '' }}>
     </td>
     {%endif%}
     {% if permission.inqt %}
