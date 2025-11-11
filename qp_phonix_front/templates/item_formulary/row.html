@@ -83,7 +83,7 @@
             data-qp_prioritize_unit_package="{{item.qp_prioritize_unit_package}}"
             data-quantity_dis="{{item.quantity_dis}}" data-quantity_format={{permission.quantity_format}}
             data-debug-price="{{item.price_format | replace('.', '') | replace(',', '.') | float}}"
-            data-debug-price="{{item.price_format}}"
+            data-debug-price-format="{{item.price_format}}"
             data-debug-discontinued="{{item.qp_discontinued}}"
             data-debug-dangerous="{{item.qp_dangerous_goods}}"
             data-next={{key}} data-code={{item.code}} {{'disabled' if item.qp_discontinued or item.qp_dangerous_goods or (item.price_format | replace('.', '') | replace(',', '.') | float == 0) else '' }}>
