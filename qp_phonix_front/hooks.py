@@ -114,6 +114,9 @@ doc_events = {
             "qp_phonix_front.qp_phonix_front.uses_cases.sales_order.sales_order_events.set_confirmation_datetime",
         ],
     },
+    "Contact": {
+        "after_insert": "qp_phonix_front.qp_phonix_front.uses_cases.contact.contact.set_qp_is_recipient",
+    },
 }
 
 # Scheduled Tasks
