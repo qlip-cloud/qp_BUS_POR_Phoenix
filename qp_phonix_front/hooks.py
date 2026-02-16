@@ -31,7 +31,7 @@ web_include_js = "/assets/qp_phonix_front/js/qp_phonix_front.js"
 # page_js = {"page" : "public/js/file.js"}
 
 # include js in doctype views
-# doctype_js = {"doctype" : "public/js/doctype.js"}
+doctype_js = {"Contact" : "public/js/contact.js"}
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
@@ -113,6 +113,9 @@ doc_events = {
             "qp_phonix_front.qp_phonix_front.uses_cases.sales_order.sales_order_events.send_sales_order_confirmation_email",
             "qp_phonix_front.qp_phonix_front.uses_cases.sales_order.sales_order_events.set_confirmation_datetime",
         ],
+    },
+    "Contact": {
+        "after_insert": "qp_phonix_front.qp_phonix_front.uses_cases.contact.contact.set_qp_is_recipient",
     },
 }
 
