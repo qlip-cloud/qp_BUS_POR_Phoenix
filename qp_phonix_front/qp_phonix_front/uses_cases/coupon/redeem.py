@@ -36,7 +36,7 @@ def handler(code, order_id):
 
         assert_coupon_has_customer_valid(coupon, customer)
 
-        #assert_coupon_isnot_customer_repeat(coupon, customer)
+        #assert_coupon_isnot_customer_repeat(coupon, customer, order_id)
         
         coupon_log = create_coupon(coupon, customer, user,now, order_id)
 
@@ -46,9 +46,9 @@ def handler(code, order_id):
         
         order.save()
         
+        update_name_item(item_row_copy, order.items)
+
         frappe.db.commit()
-        
-        update_name_item(item_row_copy, order.items)      
 
         return {
             "status": 200,
@@ -150,8 +150,6 @@ def update_name_item(item_row_copy, items):
                 UPDATE `tabSales Order Item` set name = '{name_old}' where name = '{name_new}'
             """.format(name_new = item.name, name_old = search_item[0].name)
             frappe.db.sql(sql)
-            
-    frappe.db.commit()
         
 def redeem_coupon_items(coupon, order, coupon_log, item_row_copy):
 
@@ -353,9 +351,9 @@ def assert_has_coupon_item(coupon_log):
         raise CouponItemNotValid()
         
 
-def assert_coupon_isnot_customer_repeat(coupon, customer):
+def assert_coupon_isnot_customer_repeat(coupon, customer, order_id):
 
-    if frappe.db.exists({"doctype": "qp_pf_CouponLog", "customer": customer.name, "coupon": coupon.name}):
+    if frappe.db.exists({"doctype": "qp_pf_CouponLog", "customer": customer.name, "coupon": coupon.name, "order_id": order_id}):
         
         raise CouponCustomerRepeat
 
