@@ -36,7 +36,7 @@ def handler(code, order_id):
 
         assert_coupon_has_customer_valid(coupon, customer)
 
-        #assert_coupon_isnot_customer_repeat(coupon, customer, order_id)
+        assert_coupon_isnot_customer_repeat(coupon, customer, order_id)
         
         coupon_log = create_coupon(coupon, customer, user,now, order_id)
 
