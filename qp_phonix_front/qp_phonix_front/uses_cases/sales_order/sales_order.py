@@ -533,34 +533,34 @@ def sales_order_update(order_json):
 
 def update_coupon_rendem(sales_order):
     
-    coupon_log = get_coupon_log(sales_order.name)
+    coupon_id = get_coupon_id(sales_order.name)
     
-    if  coupon_log:
+    if  coupon_id:
         
-        coupon = frappe.get_doc("qp_pf_Coupon", coupon_log.coupon)
+        coupon = frappe.get_doc("qp_pf_Coupon", coupon_id)
         
         if not coupon.levels_group and not coupon.items:
             
             redeem_coupon_subtotal(coupon, sales_order)
     
     
-def get_coupon_log(order_id):
+def get_coupon_id(order_id):
     
-    if frappe.db.exists("qp_pf_CouponLog", {"order_id", order_id}):
+    coupon_log = frappe.get_list("qp_pf_CouponLog", {"order_id": order_id}, ["*"])
+    
+    if coupon_log:
         
-        coupon_log_name = frappe.get_list("qp_pf_CouponLog", filters = {"order_id", order_id}, pluck = "name")
-        
-        return frappe.get_doc("qp_pf_Coupon", coupon_log_name[0])
+        return coupon_log[0]["coupon"]
     
 def __confirm_sales_order(order_json, sales_order):
 
     if order_json.get("action") == "confirm":
 
-        #__send_check_out_so(sales_order)
+        __send_check_out_so(sales_order)
 
-        #__set_auto_discount(sales_order)
+        __set_auto_discount(sales_order)
 
-        #__send_sales_order(sales_order)
+        __send_sales_order(sales_order)
 
         set_qp_subtotal(sales_order)
 
