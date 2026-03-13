@@ -546,7 +546,7 @@ def update_coupon_rendem(sales_order):
     
 def get_coupon_log(order_id):
     
-    if frappe.db.exists("qp_pf_CouponLog", filters = {"order_id", order_id}):
+    if frappe.db.exists("qp_pf_CouponLog", {"order_id", order_id}):
         
         coupon_log_name = frappe.get_list("qp_pf_CouponLog", filters = {"order_id", order_id}, pluck = "name")
         
@@ -556,11 +556,11 @@ def __confirm_sales_order(order_json, sales_order):
 
     if order_json.get("action") == "confirm":
 
-        __send_check_out_so(sales_order)
+        #__send_check_out_so(sales_order)
 
-        __set_auto_discount(sales_order)
+        #__set_auto_discount(sales_order)
 
-        __send_sales_order(sales_order)
+        #__send_sales_order(sales_order)
 
         set_qp_subtotal(sales_order)
 
