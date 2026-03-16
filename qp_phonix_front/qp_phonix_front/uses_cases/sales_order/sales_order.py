@@ -26,7 +26,7 @@ from qp_phonix_front.qp_phonix_front.uses_cases.coupon.redeem import (
     get_coupon,
     create_coupon,
     set_coupont_items_log,
-    set_coupon_order,
+    set_coupon_order,redeem_coupon_subtotal
 )
 
 
@@ -418,6 +418,8 @@ def sales_order_update(order_json):
         order_item_json = __get_order_item_json(order_json)
 
         sales_order = __get_sales_order(order_id)
+        
+        
 
         customer = get_and_validate_customer(sales_order)
 
@@ -451,6 +453,9 @@ def sales_order_update(order_json):
 
 
         if not is_confirm:
+            
+            update_coupon_rendem(sales_order)
+            
             sales_order.save()
 
         frappe.db.commit()
@@ -526,7 +531,27 @@ def sales_order_update(order_json):
 
     return rec_result
 
-
+def update_coupon_rendem(sales_order):
+    
+    coupon_id = get_coupon_id(sales_order.name)
+    
+    if  coupon_id:
+        
+        coupon = frappe.get_doc("qp_pf_Coupon", coupon_id)
+        
+        if not coupon.levels_group and not coupon.items:
+            
+            redeem_coupon_subtotal(coupon, sales_order)
+    
+    
+def get_coupon_id(order_id):
+    
+    coupon_log = frappe.get_list("qp_pf_CouponLog", {"order_id": order_id}, ["*"])
+    
+    if coupon_log:
+        
+        return coupon_log[0]["coupon"]
+    
 def __confirm_sales_order(order_json, sales_order):
 
     if order_json.get("action") == "confirm":
