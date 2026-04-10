@@ -1,12 +1,61 @@
 
 import frappe
 from qp_phonix_front.resources.response import handle as response
+from qp_phonix_front.qp_phonix_front.uses_cases.item_list.get_rows_list import handler as get_rows_list
 from qp_phonix_front.qp_phonix_front.uses_cases.item_list.item_list import paginator_item_list
+
 from qp_phonix_front.qp_phonix_front.uses_cases.sales_order.sales_order import get_sales_order
 from qp_phonix_front.www.order.item_formulary import add_qty_item_list
 from qp_phonix_front.qp_phonix_front.services.manager_permission import handler as get_permission
 from collections import Counter
 import json
+
+
+@frappe.whitelist()
+def get_rows(select_class, check_list_price, check_sku, check_inventary, check_discount, text_filter, order_id, item_code_list):
+    
+    origin = "render item formulary paginator refactor"
+
+    error_msg = "Error render item formulary paginator refactor"
+    
+    text_filter = json.loads(text_filter) if text_filter else []
+    item_code_list = json.loads(item_code_list) if item_code_list else []
+    select_class = json.loads(select_class) if select_class else []  
+    check_inventary = bool(int(check_inventary)) if check_inventary else False
+    check_list_price = bool(int(check_list_price)) if check_list_price else False
+    check_sku = bool(int(check_sku)) if check_sku else False
+    check_discount = bool(int(check_discount)) if check_discount else False
+    
+    def callback():
+        
+        rows = []
+        
+
+        
+        
+        paginator_item = get_rows_list(select_class, check_list_price, check_sku, check_inventary, check_discount, text_filter, order_id, item_code_list)
+        
+        item_list = __get_item_list(None, paginator_item)
+
+        if order_id:
+
+            order_response = get_sales_order(order_id)
+
+            items_select = order_response.get("items")
+
+            add_qty_item_list(item_list, items_select)
+
+        permission = get_permission()
+
+        rows = frappe.render_template("templates/item_formulary/row.html", {"item_list" : item_list, "disabled_off": True, "permission": permission})
+
+        return {
+            "status": 200,
+            "data" : rows
+        }
+
+    return response(callback, origin, error_msg)
+
 
 @frappe.whitelist()
 def paginator(order_id = None, item_group = None, item_Categoria = None, item_SubCategoria = None, item_code_list = None, letter_filter = None, 
