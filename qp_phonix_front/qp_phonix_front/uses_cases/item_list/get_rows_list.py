@@ -90,7 +90,7 @@ def get_item_from(select_class, check_discount, check_inventary, check_sku, chec
                 INNER JOIN `tabItem Price` AS item_price ON item.name = item_price.item_code
                 INNER JOIN `tabPrice List` AS price_list ON item_price.price_list = price_list.name
                 INNER JOIN `tabCurrency` AS currency ON currency.name = price_list.currency
-                INNER JOIN `tabqp_GP_ItemQuantity` as item_quantity on (item.name = item_quantity.iditem)
+                LEFT JOIN `tabqp_GP_ItemQuantity` as item_quantity on (item.name = item_quantity.iditem)
                 {discount_inner}
             where
                 item.disabled = 0 
