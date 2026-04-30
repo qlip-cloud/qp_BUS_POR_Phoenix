@@ -453,6 +453,9 @@ def sales_order_update(order_json):
 
         set_order_flete(sales_order)
 
+        if order_json.get("action") == "confirm":
+            __update_payment_terms(sales_order)
+
         is_confirm = __confirm_sales_order(order_json, sales_order)
 
 
