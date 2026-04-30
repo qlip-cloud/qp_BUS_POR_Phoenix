@@ -683,12 +683,10 @@ def __update_payment_terms(sales_order):
     # Se actualiza la fecha de pago con base a transaction_dateen la tabla hija payment_schedule, en el campo due_date
     for payment in sales_order.payment_schedule:
         payment.due_date = sales_order.transaction_date
-    sales_order.save()
     
 def __update_sales_order_date(sales_order):
     # Se actualiza transaction_date con la fecha actual para que el proceso de confirmación de la orden en GP no falle por fecha pasada
     sales_order.transaction_date = date.today()
-    sales_order.save()
 
 def __update_order_items(sales_order, item):
 
