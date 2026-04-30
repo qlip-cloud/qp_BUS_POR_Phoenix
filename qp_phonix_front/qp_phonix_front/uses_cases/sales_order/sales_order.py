@@ -435,6 +435,8 @@ def sales_order_update(order_json):
 
         if order_json.get("action") == "confirm":
 
+            __update_sales_order_date(sales_order)
+
             __set_sales_team(order_json, sales_order, customer)
 
             __set_ship_to(order_json, sales_order)
@@ -671,6 +673,11 @@ def __set_auto_discount(sales_order):
 
         sales_order.save()
 
+
+def __update_sales_order_date(sales_order):
+    # Se actualiza transaction_date con la fecha actual para que el proceso de confirmación de la orden en GP no falle por fecha pasada
+    sales_order.transaction_date = date.today()
+    sales_order.save()
 
 def __update_order_items(sales_order, item):
 
