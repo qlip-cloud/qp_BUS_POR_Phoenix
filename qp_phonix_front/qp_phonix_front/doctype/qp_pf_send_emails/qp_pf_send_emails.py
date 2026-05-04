@@ -3,7 +3,7 @@
 import frappe
 from frappe.model.document import Document
 from qp_phonix_front.qp_phonix_front.uses_cases.sales_order.sales_order_events import send_sales_order_confirmation_email
-from frappe.utils import get_date, add_days
+from frappe.utils import getdate, add_days
 
 
 class qp_PF_Send_Emails(Document):
@@ -11,9 +11,9 @@ class qp_PF_Send_Emails(Document):
 
 
 def _get_confirmation_datetime_filters(start_date, end_date=None):
-    start_datetime = get_date(start_date)
+    start_datetime = getdate(start_date)
     end_reference = end_date or start_date
-    end_datetime = add_days(get_date(end_reference), 1)
+    end_datetime = add_days(getdate(end_reference), 1)
 
     return [
         ["transaction_date", ">=", start_datetime],
