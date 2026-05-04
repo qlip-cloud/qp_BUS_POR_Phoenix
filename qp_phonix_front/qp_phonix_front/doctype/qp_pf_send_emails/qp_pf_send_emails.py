@@ -2,7 +2,7 @@
 # For license information, please see license.txt
 import frappe
 from frappe.model.document import Document
-from qp_phoenix_front.qp_phonix_front.uses_cases.sales_order.sales_order_events import send_sales_order_confirmation_email
+from qp_phonix_front.qp_phonix_front.uses_cases.sales_order.sales_order_events import send_sales_order_confirmation_email
 from frappe.utils import get_datetime, add_days
 
 
