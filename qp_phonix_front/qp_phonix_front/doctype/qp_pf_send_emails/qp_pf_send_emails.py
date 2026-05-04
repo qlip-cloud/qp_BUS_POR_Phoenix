@@ -3,7 +3,7 @@
 import frappe
 from frappe.model.document import Document
 from qp_phonix_front.qp_phonix_front.uses_cases.sales_order.sales_order_events import send_sales_order_confirmation_email
-from frappe.utils import get_datetime, add_days
+from frappe.utils import get_date, add_days
 
 
 class qp_PF_Send_Emails(Document):
@@ -11,13 +11,13 @@ class qp_PF_Send_Emails(Document):
 
 
 def _get_confirmation_datetime_filters(start_date, end_date=None):
-    start_datetime = get_datetime(start_date)
+    start_datetime = get_date(start_date)
     end_reference = end_date or start_date
-    end_datetime = add_days(get_datetime(end_reference), 1)
+    end_datetime = add_days(get_date(end_reference), 1)
 
     return [
-        ["confirmation_datetime", ">=", start_datetime],
-        ["confirmation_datetime", "<", end_datetime],
+        ["transaction_date", ">=", start_datetime],
+        ["transaction_date", "<", end_datetime],
     ]
 
 
@@ -39,7 +39,7 @@ def send_mass_emails(docname):
         filters=filters,
         fields=["name"]
     )
-
+    frappe.log_error(f"Filters: {filters}", "qp_pf_send_emails")
     for so in sales_orders:
         so_doc = frappe.get_doc("Sales Order", so.name)
         send_sales_order_confirmation_email(so_doc, force=True)

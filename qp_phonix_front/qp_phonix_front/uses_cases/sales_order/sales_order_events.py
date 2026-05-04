@@ -320,5 +320,3 @@ def set_confirmation_datetime(doc, method=None):
     if doc.status == "To Deliver and Bill":
         if not doc.confirmation_datetime:
             doc.confirmation_datetime = frappe.utils.now()
-    else:
-        doc.confirmation_datetime = None
