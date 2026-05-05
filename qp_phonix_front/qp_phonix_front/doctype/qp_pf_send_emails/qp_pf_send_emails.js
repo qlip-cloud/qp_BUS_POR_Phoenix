@@ -14,5 +14,14 @@ frappe.ui.form.on('qp_PF_Send_Emails', {
                 }
             });
         });
+    },
+    setup(frm){
+        frm.set_query('sales_order', 'sales_orders', function() {
+            return {
+                filters: {
+                    docstatus: 1
+                }
+            };
+        });
     }
 });

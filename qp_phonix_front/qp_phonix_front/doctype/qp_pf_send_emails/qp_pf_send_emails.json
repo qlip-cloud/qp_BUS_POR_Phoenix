@@ -6,25 +6,30 @@
  "engine": "InnoDB",
  "field_order": [
   "start_date",
-  "end_date"
+  "end_date",
+  "sales_orders"
  ],
  "fields": [
   {
    "fieldname": "start_date",
    "fieldtype": "Date",
-   "in_list_view": 1,
-   "label": "Fecha de Inicio",
-   "reqd": 1
+   "label": "Fecha de Inicio"
   },
   {
    "fieldname": "end_date",
    "fieldtype": "Date",
    "label": "Fecha Final"
+  },
+  {
+   "fieldname": "sales_orders",
+   "fieldtype": "Table",
+   "label": "Ordenes",
+   "options": "Sales Order Selector Item"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-05-04 10:49:37.885903",
+ "modified": "2026-05-05 11:46:37.005461",
  "modified_by": "Administrator",
  "module": "Qp Phonix Front",
  "name": "qp_PF_Send_Emails",

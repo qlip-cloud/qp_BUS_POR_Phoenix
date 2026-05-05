@@ -32,14 +32,16 @@ def send_mass_emails(docname):
         ["docstatus", "=", 1],
         ["status", "=", "To Deliver and Bill"],
     ]
-    filters.extend(_get_confirmation_datetime_filters(doc.start_date, doc.end_date))
-
+    #filters.extend(_get_confirmation_datetime_filters(doc.start_date, doc.end_date))
+    sales_orders_selected = [so.sales_order for so in doc.sales_orders]
+    if sales_orders_selected:
+        filters.append(["name", "in", sales_orders_selected])
     sales_orders = frappe.get_all(
         "Sales Order",
         filters=filters,
         fields=["name"]
     )
-    frappe.log_error(f"Filters: {filters}", "qp_pf_send_emails")
+    frappe.log_error(f"Sales Orders: {sales_orders}", "qp_pf_send_emails")
     for so in sales_orders:
         so_doc = frappe.get_doc("Sales Order", so.name)
         send_sales_order_confirmation_email(so_doc, force=True)
