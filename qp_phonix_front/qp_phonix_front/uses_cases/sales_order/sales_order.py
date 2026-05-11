@@ -435,8 +435,6 @@ def sales_order_update(order_json):
 
         if order_json.get("action") == "confirm":
 
-            __update_sales_order_date(sales_order)
-
             __update_payment_terms(sales_order)
 
             __set_sales_team(order_json, sales_order, customer)
@@ -570,6 +568,8 @@ def __confirm_sales_order(order_json, sales_order):
         __send_sales_order(sales_order)
 
         set_qp_subtotal(sales_order)
+
+        __update_sales_order_date(sales_order)
 
         sales_order.submit()
 
