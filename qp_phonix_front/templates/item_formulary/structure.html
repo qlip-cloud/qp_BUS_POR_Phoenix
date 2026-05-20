@@ -4,8 +4,8 @@
 <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js"
     integrity="sha256-hlKLmzaRlE8SCJC1Kw8zoUbU8BxA+8kR3gseuKfMjxA=" crossorigin="anonymous"></script>
 <script src="/assets/qp_phonix_front/js/bootstrap-select.min.js"></script>
-<script src="/assets/qp_phonix_front/js/item_formulary.js"></script>
-<script src="/assets/qp_phonix_front/js/item_formulary_filter.js"></script>
+<!--script src="/assets/qp_phonix_front/js/item_formulary.js"></script>
+<script src="/assets/qp_phonix_front/js/item_formulary_filter.js"></script-->
 <script src="/assets/qp_phonix_front/js/img_detail.js"></script>
 
 
@@ -258,16 +258,16 @@
 
 
 </div>
-<div class="row">
+<div class="row filters">
     <div class="col-md-3">
         <div class="form-group">
-            <select class="selectpicker filter_style" data-selected-text-format="count" id="select-SubCategoria"
+            <select class="selectpicker filter_style filter-items" data-selected-text-format="count" id="select_class"
                 multiple data-live-search="true">
 
                 {%for class in class_list %}
 
                 <option data-active-count="" {#SubCategoria.Categoria_ids|count#}
-                    value="{{class.title | replace(' ','--') }}" class="select-option {{class.class}} ">
+                    value="{{class.code}}" class="select-option {{class.class}} ">
                     {{class.title if class.title else class.code}}</option>
 
                 {%endfor%}
@@ -279,27 +279,27 @@
     </div>
     <div class="col-md-4">
         <div class="text-left row-inventary">
-            <input class="form-check-input" type="checkbox" id="with_list_price" data-id="with_list_price">
-            <label class="form-check-label" for="with_inventary" style="font-size: 14px;">
+            <input class="form-check-input filter-items" type="checkbox" id="check_list_price" data-id="check_list_price">
+            <label class="form-check-label" for="check_list_price" style="font-size: 14px;">
                 Mostrar referencias lista de precio
             </label>
         </div>
         <div class="text-left">
-            <input class="form-check-input" type="checkbox" id="sku_true" data-id="sku_true">
+            <input class="form-check-input filter-items" type="checkbox" id="check_sku" data-id="check_sku">
 
-            <label class="form-check-label" for="with_inventary" style="font-size: 14px;">
+            <label class="form-check-label" for="check_sku" style="font-size: 14px;">
                 Mostrar referencias SKU
             </label>
         </div>
         <div class="text-left row-inventary">
-            <input class="form-check-input" type="checkbox" id="with_inventary">
-            <label class="form-check-label" for="with_inventary" style="font-size: 14px;">
+            <input class="form-check-input filter-items" type="checkbox" id="check_inventary">
+            <label class="form-check-label" for="check_inventary" style="font-size: 14px;">
                 Mostrar referencias con stock
             </label>
         </div>
         <div class="text-left row-inventary">
-            <input class="form-check-input" type="checkbox" id="only_discount">
-            <label class="form-check-label" for="only_discount" style="font-size: 14px;">
+            <input class="form-check-input filter-items" type="checkbox" id="check_discount">
+            <label class="form-check-label" for="check_discount" style="font-size: 14px;">
                 Mostrar productos en oferta
             </label>
         </div>
@@ -347,7 +347,7 @@
 <input type="hidden" id="idlevel" value="{{idlevel}}">
 <div class="row ">
     <div class="col-sm-12 col-md-5 text-left row-abc">
-        <input type="text" id="filter_text" class="form-control" name="" id="" placeholder="Buscar por Código de ítems">
+        <input type="text" id="text_filter" class="form-control filter-items" name="" id="" placeholder="Buscar por Código de ítems">
     </div>
     <div class="col-sm-12 col-md-1 text-left row-abc">
         <button class="button-master button-default search" id="search_text">
@@ -385,12 +385,25 @@
     Fallo conexion a internet
 </div>
 
-<div id="table_content" style="overflow:hidden">
+<div id="table_content" style="overflow:hidden;padding-bottom: 100px;">
     <input type="hidden" data-time="{{autosave_control}}" value="0" id="save_control">
     <div id="" style="overflow:auto">
 
         {% include "qp_phonix_front/templates/item_formulary/table.html" %}
 
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div id="loader" class="alert alert-info" style="display: none;">
+                Buscando productos...
+            </div>
+            <div id="no_results" class="alert alert-warning" style="display: none;" role="alert">
+                No se encontraron productos que coincidan con el criterio de búsqueda.
+            </div>
+            <div id="info_filter" class="alert alert-info" role="alert">
+                Utilice los filtros para listar productos.
+            </div>
+        </div>
     </div>
 </div>
 

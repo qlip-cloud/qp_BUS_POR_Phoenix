@@ -132,7 +132,7 @@ def get_cc_emails():
 
 
 
-def send_sales_order_confirmation_email(doc, method=None):
+def send_sales_order_confirmation_email(doc, method=None, force=False):
     """
     Función que se ejecuta por un doc_event para enviar un correo de confirmación de orden de venta.
     """
@@ -140,9 +140,10 @@ def send_sales_order_confirmation_email(doc, method=None):
     if doc.status != "To Deliver and Bill":
         return
 
-    old_doc = doc.get_doc_before_save()
-    if not old_doc or old_doc.status == "To Deliver and Bill":
-        return
+    if not force:
+        old_doc = doc.get_doc_before_save()
+        if not old_doc or old_doc.status == "To Deliver and Bill":
+            return
 
     email_settings = get_email_account_settings()
     if not email_settings:
@@ -319,5 +320,3 @@ def set_confirmation_datetime(doc, method=None):
     if doc.status == "To Deliver and Bill":
         if not doc.confirmation_datetime:
             doc.confirmation_datetime = frappe.utils.now()
-    else:
-        doc.confirmation_datetime = None
