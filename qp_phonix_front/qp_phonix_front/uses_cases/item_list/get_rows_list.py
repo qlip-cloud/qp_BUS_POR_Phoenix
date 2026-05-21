@@ -81,7 +81,17 @@ def get_gp_inventary_response(price_list, text_filter):
     
     if text_filter:
         
-        return get_gp_inventary_item(text_filter)
+        items = []
+        
+        for text in text_filter:
+            
+            items_response = get_gp_inventary_item(text)
+            
+            if isinstance(items_response, list) and items_response:
+                
+                items.append(items_response[0])
+                
+        return items
     
     return get_gp_inventary_all(price_list)
     
