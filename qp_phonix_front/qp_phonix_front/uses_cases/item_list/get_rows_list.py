@@ -1,11 +1,15 @@
 import frappe
 from gp_phonix_integration.gp_phonix_integration.service.utils import get_price_list
+from gp_phonix_integration.gp_phonix_integration.use_case.get_item_inventary import get_gp_inventary_item
+from gp_phonix_integration.gp_phonix_integration.use_case.get_item_inventary import get_gp_inventary_all
 
 def handler(select_class, check_list_price, check_sku, check_inventary, check_discount, text_filter, order_id, item_code_list):
     
     id_level = get_id_level()
 
     price_list = get_price_list()
+    
+    update_item_quantity(price_list, text_filter)
     
     return get_rows(id_level, price_list, select_class, check_list_price, check_sku, check_inventary, check_discount, text_filter, order_id, item_code_list)
 
@@ -53,9 +57,81 @@ def get_from_data(id_level, select_class, check_discount, check_inventary, check
         ) as coupon on (prod.name = coupon.item)
     """
 
+def update_item_quantity(price_list, text_filter = None):
+    
+    list_text_filter = list(set(text_filter)) if text_filter else []
+    
+    response = get_gp_inventary_response(price_list, list_text_filter)
+    
+    if not isinstance(response, list) or not response:
+        
+        frappe.log_error(message=response, title="Error en actualizacion de inventario en get_rows_list")
+        
+        return
+    
+    values = get_inventary_values(response)
+    
+    sql = get_inventory_sql(values)
+        
+    frappe.db.sql(sql)
+    
+    frappe.db.commit()
+
+def get_gp_inventary_response(price_list, text_filter):
+    
+    if text_filter:
+        
+        return get_gp_inventary_item(text_filter)
+    
+    return get_gp_inventary_all(price_list)
+    
+def get_inventary_values(items):
+    
+    rows = []
+    
+    now = frappe.utils.now()
+    
+    for item in items:
+        
+        row = str((
+            item.get("IdItem"),
+            item.get("IdItem"),
+            item.get("Quantity"),
+            item.get("ItemType"),
+            item.get("QuantityDis"),
+            now,
+            now
+        ))
+        rows.append(row)
+    
+    values_query = ", ".join(rows)
+    
+    return values_query
+
+def get_inventory_sql(values):
+    
+    return f"""
+        INSERT INTO `tabqp_GP_ItemQuantity` (
+            name,
+            iditem,
+            quantity,
+            itemtype,
+            quantitydis,
+            creation,
+            modified
+        ) VALUES 
+        {values}
+        ON DUPLICATE KEY UPDATE 
+            quantity = VALUES(quantity),
+            itemtype = VALUES(itemtype),
+            quantitydis = VALUES(quantitydis),
+            modified = VALUES(modified)
+    """
+    
+
+
 def get_item_from(select_class, check_discount, check_inventary, check_sku, check_list_price, price_list, item_code_list, text_filter):
     
-        
     discount_inner = get_discount_inner(check_discount)
     
     text_filter_from= get_text_filter_from(text_filter)
@@ -71,8 +147,6 @@ def get_item_from(select_class, check_discount, check_inventary, check_sku, chec
     inventary_where = get_inventary_where(check_inventary)
     
     item_code_where = get_item_code_list_where(item_code_list)
-    
-    
     
     return f"""(
             SELECT
