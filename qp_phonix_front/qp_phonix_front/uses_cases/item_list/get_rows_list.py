@@ -1,8 +1,7 @@
 import frappe
-import json
-from gp_phonix_integration.gp_phonix_integration.constant.api_setup import QUANTITY_ITEM
-from gp_phonix_integration.gp_phonix_integration.service.connection import execute_send
 from gp_phonix_integration.gp_phonix_integration.service.utils import get_price_list
+from gp_phonix_integration.gp_phonix_integration.use_case.get_item_inventary import get_gp_inventary_item
+from gp_phonix_integration.gp_phonix_integration.use_case.get_item_inventary import get_gp_inventary_all
 
 def handler(select_class, check_list_price, check_sku, check_inventary, check_discount, text_filter, order_id, item_code_list):
     
@@ -10,7 +9,7 @@ def handler(select_class, check_list_price, check_sku, check_inventary, check_di
 
     price_list = get_price_list()
     
-    update_item_quantity(price_list)
+    update_item_quantity(price_list, text_filter)
     
     return get_rows(id_level, price_list, select_class, check_list_price, check_sku, check_inventary, check_discount, text_filter, order_id, item_code_list)
 
@@ -30,6 +29,7 @@ def get_rows(id_level, price_list, select_class, check_list_price, check_sku, ch
             {from_data}
             
     """
+    print(sql)
     return frappe.db.sql(sql, as_dict=1)
 
 def get_from_data(id_level, select_class, check_discount, check_inventary, check_sku, check_list_price, price_list, item_code_list, text_filter):
@@ -57,9 +57,15 @@ def get_from_data(id_level, select_class, check_discount, check_inventary, check
         ) as coupon on (prod.name = coupon.item)
     """
 
-def update_item_quantity(price_list):
+def update_item_quantity(price_list, text_filter = None):
     
-    response = get_gp_inventary(price_list)
+    list_text_filter = list(set(text_filter)) if text_filter else []
+    
+    response = get_gp_inventary_response(price_list, list_text_filter)
+    
+    if response is None:
+    
+        return
     
     values = get_inventary_values(response)
     
@@ -69,13 +75,21 @@ def update_item_quantity(price_list):
     
     frappe.db.commit()
 
-def get_inventary_values(response):
+def get_gp_inventary_response(price_list, text_filter):
+    
+    if text_filter:
+        
+        return get_gp_inventary_item(text_filter)
+    
+    return get_gp_inventary_all(price_list)
+    
+def get_inventary_values(items):
     
     rows = []
     
     now = frappe.utils.now()
     
-    for item in response['Items']:
+    for item in items:
         
         row = str((
             item.get("IdItem"),
@@ -111,22 +125,8 @@ def get_inventory_sql(values):
             quantitydis = VALUES(quantitydis),
             modified = VALUES(modified)
     """
-def get_gp_inventary(price_list):
     
-    company = frappe.defaults.get_user_default("company")
 
-    json_data = json.dumps({
-        "PriceLevel": price_list,
-        "Warehouses": [
-            {
-                "Id": "PHOENIX"
-            }
-        ]
-    })
-
-    response =  execute_send(company_name = company, endpoint_code = QUANTITY_ITEM, json_data = json_data)
-        
-    return response
 
 def get_item_from(select_class, check_discount, check_inventary, check_sku, check_list_price, price_list, item_code_list, text_filter):
     
