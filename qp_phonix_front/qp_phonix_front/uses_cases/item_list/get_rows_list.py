@@ -1,4 +1,7 @@
 import frappe
+import json
+from gp_phonix_integration.gp_phonix_integration.constant.api_setup import QUANTITY_ITEM
+from gp_phonix_integration.gp_phonix_integration.service.connection import execute_send
 from gp_phonix_integration.gp_phonix_integration.service.utils import get_price_list
 
 def handler(select_class, check_list_price, check_sku, check_inventary, check_discount, text_filter, order_id, item_code_list):
@@ -6,6 +9,8 @@ def handler(select_class, check_list_price, check_sku, check_inventary, check_di
     id_level = get_id_level()
 
     price_list = get_price_list()
+    
+    update_item_quantity(price_list)
     
     return get_rows(id_level, price_list, select_class, check_list_price, check_sku, check_inventary, check_discount, text_filter, order_id, item_code_list)
 
@@ -25,7 +30,6 @@ def get_rows(id_level, price_list, select_class, check_list_price, check_sku, ch
             {from_data}
             
     """
-    print(sql)
     return frappe.db.sql(sql, as_dict=1)
 
 def get_from_data(id_level, select_class, check_discount, check_inventary, check_sku, check_list_price, price_list, item_code_list, text_filter):
@@ -53,9 +57,79 @@ def get_from_data(id_level, select_class, check_discount, check_inventary, check
         ) as coupon on (prod.name = coupon.item)
     """
 
+def update_item_quantity(price_list):
+    
+    response = get_gp_inventary(price_list)
+    
+    values = get_inventary_values(response)
+    
+    sql = get_inventory_sql(values)
+    
+    frappe.db.sql(sql)
+    
+    frappe.db.commit()
+
+def get_inventary_values(response):
+    
+    rows = []
+    
+    now = frappe.utils.now()
+    
+    for item in response['Items']:
+        
+        row = str((
+            item.get("IdItem"),
+            item.get("IdItem"),
+            item.get("Quantity"),
+            item.get("ItemType"),
+            item.get("QuantityDis"),
+            now,
+            now
+        ))
+        rows.append(row)
+    
+    values_query = ", ".join(rows)
+    
+    return values_query
+
+def get_inventory_sql(values):
+    
+    return f"""
+        INSERT INTO `tabqp_GP_ItemQuantity` (
+            name,
+            iditem,
+            quantity,
+            itemtype,
+            quantitydis,
+            creation,
+            modified
+        ) VALUES 
+        {values}
+        ON DUPLICATE KEY UPDATE 
+            quantity = VALUES(quantity),
+            itemtype = VALUES(itemtype),
+            quantitydis = VALUES(quantitydis),
+            modified = VALUES(modified)
+    """
+def get_gp_inventary(price_list):
+    
+    company = frappe.defaults.get_user_default("company")
+
+    json_data = json.dumps({
+        "PriceLevel": price_list,
+        "Warehouses": [
+            {
+                "Id": "PHOENIX"
+            }
+        ]
+    })
+
+    response =  execute_send(company_name = company, endpoint_code = QUANTITY_ITEM, json_data = json_data)
+        
+    return response
+
 def get_item_from(select_class, check_discount, check_inventary, check_sku, check_list_price, price_list, item_code_list, text_filter):
     
-        
     discount_inner = get_discount_inner(check_discount)
     
     text_filter_from= get_text_filter_from(text_filter)
@@ -71,8 +145,6 @@ def get_item_from(select_class, check_discount, check_inventary, check_sku, chec
     inventary_where = get_inventary_where(check_inventary)
     
     item_code_where = get_item_code_list_where(item_code_list)
-    
-    
     
     return f"""(
             SELECT
