@@ -63,7 +63,7 @@ def update_item_quantity(price_list, text_filter = None):
     
     response = get_gp_inventary_response(price_list, list_text_filter)
     
-    if not isinstance(response, list) or len(response) > 0:
+    if not isinstance(response, list) or not response:
         
         frappe.log_error(message=response, title="Error en actualizacion de inventario en get_rows_list")
         
