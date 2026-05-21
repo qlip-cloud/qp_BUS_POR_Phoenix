@@ -62,16 +62,17 @@ def update_item_quantity(price_list, text_filter = None):
     list_text_filter = list(set(text_filter)) if text_filter else []
     
     response = get_gp_inventary_response(price_list, list_text_filter)
-    frappe.log_error(message=response, title="response")
     
-    if response is None:
-    
+    if not isinstance(response, list) or len(response) > 0:
+        
+        frappe.log_error(message=response, title="Error en actualizacion de inventario en get_rows_list")
+        
         return
     
     values = get_inventary_values(response)
     
     sql = get_inventory_sql(values)
-    frappe.log_error(message=sql, title="update_item_quantity")
+        
     frappe.db.sql(sql)
     
     frappe.db.commit()
