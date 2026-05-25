@@ -9,9 +9,11 @@ def handler(select_class, check_list_price, check_sku, check_inventary, check_di
 
     price_list = get_price_list()
     
-    update_item_quantity(price_list, text_filter)
+    update_item_quantity_all(price_list, check_inventary, text_filter )
     
-    return get_rows(id_level, price_list, select_class, check_list_price, check_sku, check_inventary, check_discount, text_filter, order_id, item_code_list)
+    rows = get_rows(id_level, price_list, select_class, check_list_price, check_sku, check_inventary, check_discount, text_filter, order_id, item_code_list)
+    
+    return get_rows_update_quantity(rows, check_inventary)
 
 def get_rows(id_level, price_list, select_class, check_list_price, check_sku, check_inventary, check_discount, text_filter, order_id, item_code_list):
     
@@ -29,7 +31,7 @@ def get_rows(id_level, price_list, select_class, check_list_price, check_sku, ch
             {from_data}
             
     """
-    print(sql)
+    
     return frappe.db.sql(sql, as_dict=1)
 
 def get_from_data(id_level, select_class, check_discount, check_inventary, check_sku, check_list_price, price_list, item_code_list, text_filter):
@@ -57,25 +59,45 @@ def get_from_data(id_level, select_class, check_discount, check_inventary, check
         ) as coupon on (prod.name = coupon.item)
     """
 
-def update_item_quantity(price_list, text_filter = None):
+def get_rows_update_quantity(rows, check_inventary):
     
-    list_text_filter = list(set(text_filter)) if text_filter else []
-    
-    response = get_gp_inventary_response(price_list, list_text_filter)
-    
-    if not isinstance(response, list) or not response:
+    if check_inventary:
         
-        frappe.log_error(message=response, title="Error en actualizacion de inventario en get_rows_list")
+        return rows
+    
+    for row in rows:
         
-        return
-    
-    values = get_inventary_values(response)
-    
-    sql = get_inventory_sql(values)
+        inventary_response = get_gp_inventary_item(row.get("name"))
         
-    frappe.db.sql(sql)
+        if isinstance(inventary_response, list) and inventary_response:
+            
+            row["quantity"] = float(inventary_response[0].get("Quantity", 0))
+            
+            row["quantity_dis"] = float(inventary_response[0].get("QuantityDis", 0))
     
-    frappe.db.commit()
+    return rows
+
+def update_item_quantity_all(price_list, check_inventary, text_filter = None):
+    
+    if check_inventary:
+        
+        list_text_filter = list(set(text_filter)) if text_filter else []
+        
+        response = get_gp_inventary_response(price_list, list_text_filter)
+        
+        if not isinstance(response, list) or not response:
+            
+            frappe.log_error(message=response, title="Error en actualizacion de inventario en get_rows_list")
+            
+            return
+        
+        values = get_inventary_values(response)
+        
+        sql = get_inventory_sql(values)
+            
+        frappe.db.sql(sql)
+        
+        frappe.db.commit()
 
 def get_gp_inventary_response(price_list, text_filter):
     
