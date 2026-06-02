@@ -35,7 +35,7 @@ def get_rows(select_class, check_list_price, check_sku, check_inventary, check_d
         
         paginator_item = get_rows_list(select_class, check_list_price, check_sku, check_inventary, check_discount, text_filter, order_id, item_code_list)
         
-        item_list = __get_item_list(None, paginator_item)
+        item_list = __get_item_list(text_filter, paginator_item)
 
         if order_id:
 
