@@ -207,7 +207,7 @@ def get_item_from(select_class, check_discount, check_inventary, check_sku, chec
                 {inventary_where}
                 {item_code_where}
             order by item.item_name
-            LIMIT 0, 10
+            {"" if text_filter else "LIMIT 0, 10"}
         )
         as prod"""
         

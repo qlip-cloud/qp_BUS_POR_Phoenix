@@ -35,7 +35,7 @@ def get_rows(select_class, check_list_price, check_sku, check_inventary, check_d
         
         paginator_item = get_rows_list(select_class, check_list_price, check_sku, check_inventary, check_discount, text_filter, order_id, item_code_list)
         
-        item_list = __get_item_list(None, paginator_item)
+        item_list = get_ordered_items(text_filter, paginator_item)
 
         if order_id:
 
@@ -95,7 +95,7 @@ def paginator(order_id = None, item_group = None, item_Categoria = None, item_Su
             
             
             
-            item_list = __get_item_list(order_filter_text, paginator_item)
+            item_list = get_ordered_items(order_filter_text, paginator_item)
 
             list(map(lambda x: x.update({"initial": x.item_name[0].upper()}), item_list))
 
@@ -121,7 +121,7 @@ def paginator(order_id = None, item_group = None, item_Categoria = None, item_Su
 
     return response(callback, origin, error_msg)
 
-def __get_item_list(order_filter_text, paginator_item):
+def get_ordered_items(order_filter_text, paginator_item):
     
     if order_filter_text:
         

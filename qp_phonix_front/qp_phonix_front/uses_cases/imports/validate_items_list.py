@@ -16,7 +16,7 @@ def validate_items_for_customer(items_list, context):
     qp_box_sku = int(context["qp_box_sku"])
     qp_box_no_sku = int(context["qp_box_no_sku"])
     qp_buy_no_sku = int(context["qp_buy_no_sku"])
-
+    
     for item in valid_items:
         code = str(item.name)
         cantidad_original = input_qty_map.get(code, 0)
@@ -47,4 +47,22 @@ def validate_items_for_customer(items_list, context):
         item.cantidad = int(cantidad)
 
     valid_items = get_item_inventary(valid_items)
-    return valid_items
+    ordered_items = get_ordered_items(item_code_list, valid_items)
+    return ordered_items
+
+def get_ordered_items(order_filter_text, paginator_item):
+    
+    if order_filter_text:
+        
+        #count_dict = {item: order_filter_text.count(item) for item in order_filter_text}
+
+        result = []
+        
+        for item_code in order_filter_text:
+            
+            result += list(filter(lambda item: item["name"] == item_code, paginator_item))
+        
+                
+        return result
+    
+    return paginator_item
