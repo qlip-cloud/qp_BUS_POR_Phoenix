@@ -635,7 +635,7 @@ def get_tbl_product_list(item_group, from_base, where_base, item_code_list = Non
             prod.qp_price_group as qp_price_group,
             prod.qp_discontinued as qp_discontinued,
             prod.qp_dangerous_goods as qp_dangerous_goods,
-            prod.description as description,
+            IFNULL(prod.description, prod.item_name) as description,
             %s
             %s
             IFNULL( gp_level.discountpercentage ,0) as discountpercentage,
