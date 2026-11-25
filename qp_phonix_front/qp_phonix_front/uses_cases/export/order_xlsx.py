@@ -12,10 +12,13 @@ def export_xlsx(order_id):
     update_delivery_data(order)
 
     order_dic = order.as_dict()
+
+    order_customer = order_dic.get("qp_phoenix_order_customer")
     
     items_update = get_item_inventary(order_dic.get("items"))
 
     items =list(map(lambda item: [
+        order_customer,
         item.item_name,
         item.item_code,
         item.qty,
@@ -31,6 +34,7 @@ def export_xlsx(order_id):
 
     xlsx_data = [
         [           
+            "N° de orden de compra",
             "Referencia",
             "Código de item",
             "Cantidad",
